@@ -1,33 +1,27 @@
 // src/lib/firebase-admin.ts
-import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app';
+import { initializeApp, getApps, getApp, cert, ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// IMPORTANT: You must generate your own service account key file in the
-// Firebase console and place it in your project.
-// Go to Project settings > Service accounts > Generate new private key
-// Then, you need to set the GOOGLE_APPLICATION_CREDENTIALS environment variable
-// to the path of this file. For this demo, we'll try to read it from an env var.
-
-let serviceAccount;
+let serviceAccount: ServiceAccount | undefined;
 try {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
   } else {
-    // Fallback for local development if you use a file
-    // serviceAccount = require('../../serviceAccountKey.json');
-    console.warn("FIREBASE_SERVICE_ACCOUNT_KEY env var not set. Firebase Admin SDK might not initialize.");
+    // Fallback for local development if you use a file.
+    // Make sure to create this file and add your service account key to it.
+    // Do not commit this file to your repository.
+    // serviceAccount = require('../../../serviceAccountKey.json');
+    console.warn("FIREBASE_SERVICE_ACCOUNT_KEY env var not set. Firebase Admin SDK might not initialize correctly.");
   }
 } catch (e) {
   console.error('Could not parse Firebase service account key. Please ensure it is a valid JSON string in the FIREBASE_SERVICE_ACCOUNT_KEY environment variable.', e);
+  serviceAccount = undefined;
 }
 
+if (!serviceAccount || !serviceAccount.projectId) {
+  console.error("Firebase Admin SDK failed to initialize: Service account credentials are not valid or missing.");
+  // To prevent the app from crashing in a confusing way later, we can stop here.
+  // In a real app you might handle this more gracefully.
+}
 
-const app = !getApps().length 
-  ? initializeApp({
-      credential: cert(serviceAccount || {})
-    }) 
-  : getApp();
-
-const db = getFirestore(app);
-
-export { app, db };
+const app = !getApps().length && serviceAccount
