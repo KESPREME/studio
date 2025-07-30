@@ -2,7 +2,7 @@
 // src/components/hazard-report-card.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Languages, Loader2 } from 'lucide-react';
 
@@ -54,14 +54,13 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
   
-  // Directly use the imageUrl from the report, which should be a complete public URL.
   const imageUrl = report.imageUrl;
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
-          {isImageLoading && <Skeleton className="h-full w-full absolute" />}
+          {isImageLoading && imageUrl && <Skeleton className="h-full w-full absolute" />}
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -76,11 +75,9 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
               }}
             />
           ) : (
-            !isImageLoading && (
-               <div className="w-full h-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
-                  Image not available
-                </div>
-            )
+            <div className="w-full h-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+              Image not available
+            </div>
           )}
         </div>
         <div className="flex-1 space-y-3">
