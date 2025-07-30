@@ -2,7 +2,7 @@
 // src/components/hazard-report-card.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Languages, Loader2 } from 'lucide-react';
 
