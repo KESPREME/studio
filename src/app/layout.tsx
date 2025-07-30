@@ -27,11 +27,11 @@ export default function RootLayout({
         />
         <link
           rel="stylesheet"
-          href="https://unpkg.com/react-leaflet-cluster@2.1.0/lib/assets/MarkerCluster.css"
+          href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
         />
         <link
           rel="stylesheet"
-          href="https://unpkg.com/react-leaflet-cluster@2.1.0/lib/assets/MarkerCluster.Default.css"
+          href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
         />
       </head>
       <body className={cn("font-body antialiased", "min-h-screen bg-background font-sans")}>

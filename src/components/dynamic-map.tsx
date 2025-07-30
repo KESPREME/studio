@@ -3,7 +3,7 @@
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
+import MarkerClusterGroup from './marker-cluster-group';
 import type { Report } from '@/lib/types';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
@@ -39,7 +39,7 @@ const DynamicMap = ({ reports }: HazardMapProps) => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <MarkerClusterGroup chunkedLoading>
+      <MarkerClusterGroup>
         {reports.map((report) => (
           <Marker
             key={report._id}
