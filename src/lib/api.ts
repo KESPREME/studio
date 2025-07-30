@@ -22,8 +22,10 @@ export async function getReports(): Promise<Report[]> {
     
     return reports;
   } catch (e: any) {
-    console.error('Firestore getReports Error:', e);
+    console.error('Firestore getReports Error:', e.message);
     // In case of an error, return an empty array to prevent the page from crashing.
+    // This often happens if Firestore API is not enabled or security rules are too restrictive.
+    console.log("Please check that your Firestore API is enabled and your security rules allow reads from the 'reports' collection.");
     return [];
   }
 }

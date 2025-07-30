@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read access to all reports
+    match /reports/{reportId} {
+      allow read: if true;
+      // Allow writes only if the user is authenticated (in a real app)
+      // For now, we will allow writes to enable testing the form.
+      // In a production app, you would change this to: allow write: if request.auth != null;
+      allow write: if true;
+    }
+    match /{document=**} {
+      // Deny all other reads and writes by default
+      allow read, write: if false;
+    }
+  }
+}
