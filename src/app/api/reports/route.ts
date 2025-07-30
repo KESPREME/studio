@@ -1,7 +1,8 @@
+
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase-admin'; // Use Admin SDK
 import { collection, addDoc, getDocs, query, where, FieldValue, orderBy, Timestamp } from 'firebase-admin/firestore';
+import { db } from '@/lib/firebase-admin'; // Use Admin SDK
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types'; // Import from shared types
@@ -17,6 +18,9 @@ const reportSchema = z.object({
 });
 
 async function getReportsServer(): Promise<Report[]> {
+  if (!db) {
+    throw new Error("Firestore is not initialized.");
+  }
   const reportsCollection = collection(db, 'reports');
   const q = query(reportsCollection, orderBy('createdAt', 'desc'));
   const querySnapshot = await getDocs(q);
@@ -44,7 +48,7 @@ export async function GET() {
   {
     console.error('API GET Error:', e);
     // Provide a more specific error message for Firestore issues
-    if (e.message.includes('Could not find endpoint')) {
+    if (e.message.includes('Could not find endpoint') || e.message.includes('Firestore is not initialized')) {
         return NextResponse.json({ message: 'Firestore service is not available. Please check your configuration and network access.' }, { status: 503 });
     }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
@@ -67,6 +71,9 @@ const getBoundingBox = (latitude: number, longitude: number, distanceKm: number)
 
 
 export async function POST(request: Request) {
+  if (!db) {
+    return NextResponse.json({ message: 'Firestore is not initialized.' }, { status: 500 });
+  }
   try {
     const body = await request.json();
     const validation = reportSchema.safeParse(body);

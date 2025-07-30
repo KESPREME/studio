@@ -2,22 +2,35 @@
 import { initializeApp, getApps, getApp, cert, ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-let serviceAccount: ServiceAccount | undefined;
-try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-     serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-  } else {
-    console.warn("FIREBASE_SERVICE_ACCOUNT_KEY env var not set. Firebase Admin SDK might not initialize correctly.");
+let app;
+
+if (!getApps().length) {
+  let serviceAccount: ServiceAccount | undefined;
+  try {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    } else {
+      console.warn("FIREBASE_SERVICE_ACCOUNT_KEY env var not set. Firebase Admin SDK might not initialize correctly.");
+    }
+  } catch (e) {
+    console.error('Could not parse Firebase service account key.', e);
   }
-} catch (e) {
-  console.error('Could not parse Firebase service account key. Please ensure it is a valid JSON string in the FIREBASE_SERVICE_ACCOUNT_KEY environment variable.', e);
-  serviceAccount = undefined;
+
+  if (serviceAccount) {
+    app = initializeApp({
+      credential: cert(serviceAccount),
+    });
+  } else {
+    console.error("Firebase Admin SDK failed to initialize: Service Account credentials are not available.");
+  }
+} else {
+  app = getApp();
 }
 
-const app = !getApps().length && serviceAccount
-  ? initializeApp({ credential: cert(serviceAccount) })
-  : getApp();
+const db = app ? getFirestore(app) : null;
 
-const db = getFirestore(app);
+if (!db) {
+    console.error("Firestore database could not be initialized.");
+}
 
 export { db };

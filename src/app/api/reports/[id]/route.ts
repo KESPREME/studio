@@ -1,7 +1,7 @@
+
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc } from 'firebase-admin/firestore';
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { doc, getDoc, updateDoc, FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { z } from 'zod';
 import { db } from '@/lib/firebase-admin'; // Use the admin instance for server-side operations
 import type { Report } from '@/lib/types';
@@ -14,6 +14,9 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  if (!db) {
+    return NextResponse.json({ message: 'Firestore is not initialized.' }, { status: 500 });
+  }
   try {
     const docRef = doc(db, 'reports', params.id);
     const docSnap = await getDoc(docRef);
@@ -54,6 +57,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  if (!db) {
+    return NextResponse.json({ message: 'Firestore is not initialized.' }, { status: 500 });
+  }
   try {
     const body = await request.json();
     const validation = statusUpdateSchema.safeParse(body);
