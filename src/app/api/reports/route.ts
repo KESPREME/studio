@@ -24,9 +24,9 @@ export async function GET() {
     }));
 
     return NextResponse.json(reports);
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  } catch (e: any) {
+    console.error('MongoDB GET Error:', e);
+    return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
 
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
     const validation = reportSchema.safeParse(body);
 
     if (!validation.success) {
+      console.error('Validation Errors:', validation.error.issues);
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
     
@@ -55,11 +56,15 @@ export async function POST(request: Request) {
     });
     
     // Send SMS notification
-    await sendNewReportSms(newReport);
+    try {
+      await sendNewReportSms(newReport);
+    } catch (smsError: any) {
+      console.error("SMS sending failed, but report was created. Error:", smsError.message);
+    }
 
     return NextResponse.json({ message: 'Report created', reportId: result.insertedId }, { status: 201 });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  } catch (e: any) {
+    console.error('MongoDB POST Error:', e);
+    return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
