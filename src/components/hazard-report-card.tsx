@@ -50,14 +50,16 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
         return 'bg-green-500';
     }
   };
+  
+  const fullImageUrl = report.imageUrl ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${report.imageUrl}` : '';
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        {report.imageUrl && (
+        {fullImageUrl && (
           <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-square">
             <Image
-              src={report.imageUrl}
+              src={fullImageUrl}
               alt={report.description}
               fill
               className="rounded-md object-cover"

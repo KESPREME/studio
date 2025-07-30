@@ -75,7 +75,7 @@ export function ReportForm() {
 
     if (imageFile) {
       try {
-        const filePath = `public/${Date.now()}_${imageFile.name}`;
+        const filePath = `images/${Date.now()}_${imageFile.name}`;
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, imageFile);
@@ -84,14 +84,8 @@ export function ReportForm() {
           throw uploadError;
         }
 
-        const { data } = supabase.storage
-          .from('images')
-          .getPublicUrl(filePath);
-        
-        if (!data.publicUrl) {
-            throw new Error("Could not get public URL for the image.");
-        }
-        imageUrl = data.publicUrl;
+        imageUrl = filePath;
+
 
       } catch (error: any) {
         console.error("Image upload error:", error);
