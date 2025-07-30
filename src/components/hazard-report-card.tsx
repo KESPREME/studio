@@ -25,7 +25,13 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const { toast } = useToast();
 
-  const imageUrl = report.imageUrl;
+  let imageUrl = report.imageUrl;
+
+  // This is the fallback logic to fix existing broken URLs.
+  if (imageUrl && imageUrl.includes('/public/')) {
+    imageUrl = imageUrl.replace('/public/', '/');
+  }
+
 
   const handleTranslate = async () => {
     setIsTranslating(true);
