@@ -1,18 +1,28 @@
+// src/components/dynamic-map.tsx
 "use client";
 
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import MarkerClusterGroup from './marker-cluster-group';
+import { useEffect, useRef } from 'react';
 import type { Report } from '@/lib/types';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
+import MarkerClusterGroup from './marker-cluster-group';
+
+// This is a workaround for a known issue with react-leaflet and Next.js HMR
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
 
 const customIcon = (urgency: Report['urgency']) => {
   const color = {
-    'High': '#e67e22', // Accent color
+    'High': 'hsl(var(--accent))',
     'Moderate': '#f1c40f',
-    'Low': '#3498db' // Primary color
+    'Low': 'hsl(var(--primary))'
   }[urgency];
 
   return new L.DivIcon({
@@ -29,47 +39,56 @@ type HazardMapProps = {
 };
 
 const DynamicMap = ({ reports }: HazardMapProps) => {
-  const position: [number, number] = reports.length > 0
-    ? [reports[0].latitude, reports[0].longitude]
-    : [34.0522, -118.2437]; // Default to LA
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
-  return (
-    <MapContainer center={position} zoom={10} scrollWheelZoom={true} style={{ height: '500px', width: '100%' }}>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <MarkerClusterGroup>
-        {reports.map((report) => (
-          <Marker
-            key={report._id}
-            position={[report.latitude, report.longitude]}
-            icon={customIcon(report.urgency)}
-          >
-            <Popup>
-              <div className="space-y-2">
-                {report.imageUrl && (
-                  <Image
-                    src={report.imageUrl}
-                    alt={report.description}
-                    width={200}
-                    height={150}
-                    className="rounded-md object-cover"
-                    data-ai-hint="hazard landscape"
-                  />
-                )}
-                <h3 className="font-bold">{report.description.substring(0, 50)}...</h3>
-                <div className="flex gap-2">
-                  <Badge variant={report.urgency === 'High' ? 'destructive' : report.urgency === 'Moderate' ? 'secondary' : 'default'}>{report.urgency}</Badge>
-                  <Badge variant="outline">{report.status}</Badge>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MarkerClusterGroup>
-    </MapContainer>
-  );
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current) {
+      const position: [number, number] = reports.length > 0
+        ? [reports[0].latitude, reports[0].longitude]
+        : [34.0522, -118.2437]; // Default to LA
+
+      const map = L.map(mapContainerRef.current).setView(position, 10);
+      mapRef.current = map;
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const markerClusterGroup = L.markerClusterGroup();
+
+      reports.forEach((report) => {
+        const marker = L.marker([report.latitude, report.longitude], {
+          icon: customIcon(report.urgency)
+        });
+
+        const popupContent = `
+          <div class="space-y-2">
+            ${report.imageUrl ? `<img src="${report.imageUrl}" alt="${report.description.substring(0, 30)}" width="200" height="150" class="rounded-md object-cover" data-ai-hint="hazard landscape" />` : ''}
+            <h3 class="font-bold">${report.description.substring(0, 50)}...</h3>
+            <div class="flex gap-2">
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${report.urgency === 'High' ? 'border-transparent bg-destructive text-destructive-foreground' : report.urgency === 'Moderate' ? 'border-transparent bg-secondary text-secondary-foreground' : 'border-transparent bg-primary text-primary-foreground'}">${report.urgency}</span>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">${report.status}</span>
+            </div>
+          </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        markerClusterGroup.addLayer(marker);
+      });
+
+      map.addLayer(markerClusterGroup);
+    }
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [reports]);
+
+  return <div ref={mapContainerRef} style={{ height: '500px', width: '100%' }} />;
 };
 
 export default DynamicMap;
