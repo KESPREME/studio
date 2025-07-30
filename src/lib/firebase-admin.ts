@@ -18,10 +18,10 @@ try {
   serviceAccount = undefined;
 }
 
-if (!serviceAccount || !serviceAccount.projectId) {
-  console.error("Firebase Admin SDK failed to initialize: Service account credentials are not valid or missing.");
-  // To prevent the app from crashing in a confusing way later, we can stop here.
-  // In a real app you might handle this more gracefully.
-}
-
 const app = !getApps().length && serviceAccount
+  ? initializeApp({ credential: cert(serviceAccount) })
+  : getApp();
+
+const db = getFirestore(app);
+
+export { db };
