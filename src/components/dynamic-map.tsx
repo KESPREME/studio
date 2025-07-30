@@ -1,14 +1,14 @@
 // src/components/dynamic-map.tsx
 "use client";
 
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
-import { TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import { useEffect, useRef } from 'react';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
 import type { Report } from '@/lib/types';
-import { Badge } from './ui/badge';
-import Image from 'next/image';
 
 // This is a workaround for a known issue with react-leaflet and Next.js HMR
 L.Icon.Default.mergeOptions({
