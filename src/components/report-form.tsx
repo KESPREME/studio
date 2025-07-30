@@ -76,7 +76,7 @@ export function ReportForm() {
 
     if (imageFile) {
       try {
-        const filePath = `public/${Date.now()}_${imageFile.name}`;
+        const filePath = `${Date.now()}_${imageFile.name}`;
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, imageFile);
