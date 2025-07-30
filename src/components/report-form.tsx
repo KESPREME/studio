@@ -1,0 +1,213 @@
+"use client"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { LocateFixed, Loader2, Upload } from "lucide-react"
+import { useState } from "react"
+import Image from "next/image"
+
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { useToast } from "@/hooks/use-toast"
+
+const reportSchema = z.object({
+  description: z.string().min(10, {
+    message: "Description must be at least 10 characters.",
+  }).max(500, {
+    message: "Description must not be longer than 500 characters."
+  }),
+  urgency: z.enum(["Low", "Moderate", "High"]),
+  latitude: z.number(),
+  longitude: z.number(),
+  image: z.any().optional(),
+})
+
+export function ReportForm() {
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLocating, setIsLocating] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const form = useForm<z.infer<typeof reportSchema>>({
+    resolver: zodResolver(reportSchema),
+    defaultValues: {
+      description: "",
+      urgency: "Moderate",
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof reportSchema>) {
+    setIsSubmitting(true)
+    console.log(values)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false)
+      toast({
+        title: "Report Submitted!",
+        description: "Thank you for helping keep your community safe.",
+      })
+      form.reset()
+      setImagePreview(null)
+    }, 1500)
+  }
+
+  const handleLocation = () => {
+    setIsLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        form.setValue("latitude", position.coords.latitude)
+        form.setValue("longitude", position.coords.longitude)
+        toast({
+            title: "Location Acquired",
+            description: "Your current location has been set for the report.",
+        })
+        setIsLocating(false)
+      },
+      (error) => {
+        console.error("Geolocation error:", error)
+        toast({
+            title: "Geolocation Error",
+            description: "Could not get your location. Please ensure location services are enabled.",
+            variant: "destructive",
+        })
+        setIsLocating(false)
+      }
+    )
+  }
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      form.setValue("image", file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+
+  return (
+    <Card className="shadow-lg">
+      <CardContent className="p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Tell us about the hazard in detail..."
+                      className="resize-y min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Provide as much detail as possible to help us understand the situation.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <FormField
+                control={form.control}
+                name="urgency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Urgency</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select the urgency level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Low">Low</SelectItem>
+                        <SelectItem value="Moderate">Moderate</SelectItem>
+                        <SelectItem value="High">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormItem>
+                <FormLabel>Location</FormLabel>
+                <Button type="button" variant="outline" className="w-full" onClick={handleLocation} disabled={isLocating}>
+                  {isLocating ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <LocateFixed className="mr-2 h-4 w-4" />
+                  )}
+                  {form.watch("latitude") ? "Location Set" : "Use My Location"}
+                </Button>
+                <FormMessage>{form.formState.errors.latitude?.message || form.formState.errors.longitude?.message}</FormMessage>
+              </FormItem>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="image"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Image (Optional)</FormLabel>
+                  <FormControl>
+                    <Input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                  </FormControl>
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                        {imagePreview ? (
+                            <div className="relative w-full h-40">
+                                <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="contain" />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                <Upload className="h-8 w-8" />
+                                <p>Click to upload an image</p>
+                                <p className="text-xs">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                        )}
+                    </div>
+                  </label>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit Report
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  )
+}
