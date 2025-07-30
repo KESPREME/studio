@@ -1,7 +1,7 @@
 
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
 import type { Report } from '@/lib/types';
@@ -63,11 +63,17 @@ export async function PATCH(
     }
 
     const docRef = doc(db, 'reports', params.id);
-    await updateDoc(docRef, {
-      status: validation.data.status,
-      updatedAt: serverTimestamp(),
-      ...(validation.data.status === 'Resolved' && { resolvedAt: serverTimestamp() }),
-    });
+    
+    const updateData: { status: string; updatedAt: Date; resolvedAt?: Date } = {
+        status: validation.data.status,
+        updatedAt: new Date(),
+    };
+
+    if (validation.data.status === 'Resolved') {
+        updateData.resolvedAt = new Date();
+    }
+
+    await updateDoc(docRef, updateData);
 
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
