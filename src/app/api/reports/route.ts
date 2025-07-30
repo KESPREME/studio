@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, 'reports'), newReportData);
+    const docRef = await addDoc(collection(db, 'reports'), newReportdData);
     
     // Send SMS notification to admin
     try {
