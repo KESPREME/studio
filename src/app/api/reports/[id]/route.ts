@@ -64,13 +64,13 @@ export async function PATCH(
 
     const docRef = doc(db, 'reports', params.id);
     
-    const updateData: { status: string; updatedAt: Date; resolvedAt?: Date } = {
+    const updateData: { status: string; updatedAt: Timestamp; resolvedAt?: Timestamp } = {
         status: validation.data.status,
-        updatedAt: new Date(),
+        updatedAt: Timestamp.now(),
     };
 
     if (validation.data.status === 'Resolved') {
-        updateData.resolvedAt = new Date();
+        updateData.resolvedAt = Timestamp.now();
     }
 
     await updateDoc(docRef, updateData);
