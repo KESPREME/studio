@@ -11,25 +11,12 @@ import { StatCard } from '@/components/stat-card';
 import type { Report, Status } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
-import { getReports } from '@/lib/api';
+import { getReports, updateReportStatus } from '@/lib/api';
 import withAuth from '@/components/with-auth';
 import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
 
-
-async function updateReportStatus(reportId: string, status: Status) {
-  const response = await fetch(`/api/reports/${reportId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to update status');
-  }
-}
 
 function AdminDashboard() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -38,10 +25,20 @@ function AdminDashboard() {
 
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
-    const fetchedReports = await getReports();
-    setReports(fetchedReports);
-    setIsLoading(false);
-  }, []);
+    try {
+      const fetchedReports = await getReports();
+      setReports(fetchedReports);
+    } catch (error) {
+       console.error("Failed to fetch reports:", error);
+       toast({
+        title: "Error",
+        description: "Could not fetch reports.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     fetchReports();
@@ -58,10 +55,10 @@ function AdminDashboard() {
     try {
       await updateReportStatus(reportId, newStatus);
       toast({
-        title: "Status Updated Successfully",
-        description: `Report #${reportId.substring(0,6)}... changed to ${newStatus}.`,
+        title: "Status Updated",
+        description: `Report status successfully changed to ${newStatus}.`,
       });
-      // Optionally re-fetch to ensure data consistency
+      // Re-fetch to ensure data consistency
       await fetchReports();
     } catch (error: any) {
       // Revert on failure

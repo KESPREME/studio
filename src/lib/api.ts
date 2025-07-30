@@ -1,7 +1,7 @@
 // src/lib/api.ts
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
-import type { Report } from '@/lib/types';
+import type { Report, Status } from '@/lib/types';
 
 export async function getReports(): Promise<Report[]> {
   try {
@@ -28,4 +28,19 @@ export async function getReports(): Promise<Report[]> {
     console.log("Please check that your Firestore API is enabled and your security rules allow reads from the 'reports' collection.");
     return [];
   }
+}
+
+
+export async function updateReportStatus(reportId: string, status: Status) {
+  const response = await fetch(`/api/reports/${reportId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to update status');
+  }
+  return await response.json();
 }
