@@ -2,7 +2,9 @@
 import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGO_URI;
-const options = {};
+const options = {
+  tlsDisableOCSPEndpointCheck: true,
+};
 
 if (!uri) {
   throw new Error('Please add your Mongo URI to .env');
