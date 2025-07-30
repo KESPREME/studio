@@ -1,10 +1,10 @@
+
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
-import { getReports } from '@/lib/api';
 import type { Report } from '@/lib/types';
 
 
@@ -13,13 +13,27 @@ const reportSchema = z.object({
   urgency: z.enum(["Low", "Moderate", "High"]),
   latitude: z.number(),
   longitude: z.number(),
-  imageUrl: z.string().url().optional(),
+  imageUrl: z.string().optional(),
   reportedBy: z.string().email(),
 });
 
 export async function GET() {
   try {
-    const reports = await getReports();
+    const reportsCollection = collection(db, 'reports');
+    const q = query(reportsCollection, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    const reports = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+        updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
+        resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
+      } as Report;
+    });
+
     return NextResponse.json(reports);
   } catch (e: any)
   {
@@ -101,9 +115,10 @@ export async function POST(request: Request) {
              }
           }
         });
-
-        if (nearbyReporters.length > 0) {
-          await sendMassAlertSms(validation.data, nearbyReporters);
+        
+        const uniquePhoneNumbers = [...new Set(nearbyReporters)];
+        if (uniquePhoneNumbers.length > 0) {
+          await sendMassAlertSms(validation.data, uniquePhoneNumbers);
         } else {
           console.log("No nearby reporters found to send mass alert.");
         }
@@ -117,6 +132,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Report created', reportId: docRef.id }, { status: 201 });
   } catch (e: any) {
     console.error('Firestore POST Error:', e);
+    // If the error is due to payload size, provide a specific message
+    if (e.message?.includes('too large')) {
+       return NextResponse.json({ message: 'Request body too large. Please upload a smaller image file.' }, { status: 413 });
+    }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }

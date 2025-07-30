@@ -31,7 +31,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
-import { supabase } from "@/lib/supabase"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -44,6 +43,14 @@ const reportSchema = z.object({
   longitude: z.number({ required_error: 'Location is required.'}),
   image: z.any().optional(),
 })
+
+// Helper to convert file to base64
+const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+});
 
 export function ReportForm() {
   const { toast } = useToast()
@@ -72,37 +79,16 @@ export function ReportForm() {
       return;
     }
 
-    let publicUrl: string | undefined = undefined;
+    let imageAsBase64: string | undefined = undefined;
 
     if (imageFile) {
       try {
-        const file = imageFile;
-        const fileName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
-        const filePath = fileName;
-
-        const { error: uploadError } = await supabase.storage
-          .from('images')
-          .upload(filePath, file);
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        const { data } = supabase.storage
-          .from('images')
-          .getPublicUrl(filePath);
-
-        if (!data) {
-             throw new Error("Could not get public URL for the image.");
-        }
-        
-        publicUrl = data.publicUrl;
-
+        imageAsBase64 = await toBase64(imageFile);
       } catch (error: any) {
-        console.error("Image upload error:", error);
+        console.error("Image conversion error:", error);
         toast({
-          title: "Image Upload Failed",
-          description: `Could not upload your image: ${error.message}`,
+          title: "Image Processing Failed",
+          description: `Could not process your image: ${error.message}`,
           variant: "destructive",
         })
         setIsSubmitting(false);
@@ -116,7 +102,7 @@ export function ReportForm() {
       urgency: values.urgency,
       latitude: values.latitude,
       longitude: values.longitude,
-      imageUrl: publicUrl, 
+      imageUrl: imageAsBase64, 
       reportedBy: user.email,
     };
     
