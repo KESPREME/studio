@@ -1,7 +1,7 @@
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase-admin'; // Use Admin SDK
-import { collection, addDoc, getDocs, query, where, FieldValue, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, FieldValue, orderBy, Timestamp } from 'firebase-admin/firestore';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types'; // Import from shared types

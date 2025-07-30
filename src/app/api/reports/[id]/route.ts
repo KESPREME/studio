@@ -1,6 +1,7 @@
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, FieldValue } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { z } from 'zod';
 import { db } from '@/lib/firebase-admin'; // Use the admin instance for server-side operations
 import type { Report } from '@/lib/types';
@@ -22,20 +23,24 @@ export async function GET(
     }
     
     const reportData = docSnap.data();
+    if (!reportData) {
+        return NextResponse.json({ message: 'Report data is empty' }, { status: 404 });
+    }
+    
     const report: Partial<Report> = {
       id: docSnap.id,
       ...reportData,
     };
 
     // Convert timestamps to string for serialization
-    if (reportData?.createdAt) {
-      report.createdAt = new Date(reportData.createdAt.toMillis()).toISOString();
+    if (reportData.createdAt) {
+      report.createdAt = (reportData.createdAt as Timestamp).toDate().toISOString();
     }
-    if (reportData?.updatedAt) {
-      report.updatedAt = new Date(reportData.updatedAt.toMillis()).toISOString();
+    if (reportData.updatedAt) {
+      report.updatedAt = (reportData.updatedAt as Timestamp).toDate().toISOString();
     }
-     if (reportData?.resolvedAt) {
-      report.resolvedAt = new Date(reportData.resolvedAt.toMillis()).toISOString();
+     if (reportData.resolvedAt) {
+      report.resolvedAt = (reportData.resolvedAt as Timestamp).toDate().toISOString();
     }
 
     return NextResponse.json(report);
