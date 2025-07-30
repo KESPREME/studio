@@ -1,17 +1,27 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read access to all reports
+
+    // Reports Collection
     match /reports/{reportId} {
+      
+      // ANY authenticated user can read all reports.
+      // This is necessary for the main map view and community dashboard.
+      // For now, we will allow open read access during development.
       allow read: if true;
-      // Allow writes only if the user is authenticated (in a real app)
-      // For now, we will allow writes to enable testing the form.
-      // In a production app, you would change this to: allow write: if request.auth != null;
-      allow write: if true;
-    }
-    match /{document=**} {
-      // Deny all other reads and writes by default
-      allow read, write: if false;
+
+      // ANY authenticated user can create a report.
+      // For now, we will allow open write access during development.
+      allow create: if true;
+
+      // ANY authenticated user can update a report.
+      // In a real app, you'd check if the user is an admin.
+      // For now, we will allow open update access during development.
+      allow update: if true;
+      
+      // No one can delete reports for now to prevent accidental data loss.
+      allow delete: if false;
     }
   }
 }
