@@ -55,13 +55,12 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         {report.imageUrl && (
-          <div className="w-full sm:w-48 sm:h-auto flex-shrink-0">
+          <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-square">
             <Image
               src={report.imageUrl}
               alt={report.description}
-              width={150}
-              height={150}
-              className="rounded-md object-cover w-full h-auto"
+              fill
+              className="rounded-md object-cover"
               data-ai-hint="hazard street"
             />
           </div>
