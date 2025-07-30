@@ -9,10 +9,11 @@ if (!accountSid || !authToken || !twilioPhone || !adminPhone) {
   console.warn("Twilio environment variables are not fully configured. SMS notifications will be disabled.");
 }
 
-const client = twilio(accountSid, authToken);
+const client = (accountSid && authToken) ? twilio(accountSid, authToken) : null;
 
 export async function sendNewReportSms(report: { description: string; urgency: string; }) {
-  if (!accountSid || !authToken || !twilioPhone || !adminPhone) {
+  if (!client || !twilioPhone || !adminPhone) {
+    console.log('Twilio client not initialized or phone numbers missing. Skipping SMS.');
     return;
   }
   
@@ -25,5 +26,7 @@ export async function sendNewReportSms(report: { description: string; urgency: s
     console.log('SMS sent:', message.sid);
   } catch (error) {
     console.error('Failed to send SMS:', error);
+    // We throw the error so the caller can decide how to handle it.
+    throw error;
   }
 }
