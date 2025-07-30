@@ -24,8 +24,8 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const { toast } = useToast();
 
-  // Construct the public URL directly. This is the simplest and most reliable method
-  // assuming the bucket is public.
+  // Construct the public URL directly from the stored path.
+  // This is the correct and most reliable method for public buckets.
   const imageUrl = report.imageUrl
     ? `https://zeycfgpgoptewbcyucxd.supabase.co/storage/v1/object/public/images/${report.imageUrl}`
     : null;
@@ -62,7 +62,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        {imageUrl && (
+        {imageUrl ? (
           <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
             {isImageLoading && <Skeleton className="h-full w-full absolute" />}
             <Image
@@ -78,8 +78,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
               }}
             />
           </div>
-        )}
-        {!imageUrl && report.imageUrl && (
+        ) : (
              <div className="w-full sm:w-48 h-32 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
                 Image not available
               </div>
