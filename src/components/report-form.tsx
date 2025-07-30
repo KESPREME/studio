@@ -31,7 +31,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
-import { supabase } from "@/lib/supabase"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -44,6 +43,15 @@ const reportSchema = z.object({
   longitude: z.number({ required_error: 'Location is required.'}),
   image: z.any().optional(),
 })
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
 
 export function ReportForm() {
   const { toast } = useToast()
@@ -72,30 +80,16 @@ export function ReportForm() {
       return;
     }
 
-    let publicImageUrl: string | undefined = undefined;
+    let imageAsBase64: string | undefined = undefined;
 
     if (imageFile) {
       try {
-        const filePath = `${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
-        const { error: uploadError } = await supabase.storage
-          .from('images')
-          .upload(filePath, imageFile);
-
-        if (uploadError) {
-          throw uploadError;
-        }
-        
-        const { data: urlData } = supabase.storage.from('images').getPublicUrl(filePath);
-        if (!urlData.publicUrl) {
-          throw new Error("Could not get public URL for the uploaded image.");
-        }
-        publicImageUrl = urlData.publicUrl;
-
+        imageAsBase64 = await fileToBase64(imageFile);
       } catch (error: any) {
-        console.error("Image upload error:", error);
+        console.error("Image conversion error:", error);
         toast({
-          title: "Image Upload Failed",
-          description: `Could not upload your image: ${error.message}`,
+          title: "Image Processing Failed",
+          description: `Could not process your image: ${error.message}`,
           variant: "destructive",
         })
         setIsSubmitting(false);
@@ -109,7 +103,7 @@ export function ReportForm() {
       urgency: values.urgency,
       latitude: values.latitude,
       longitude: values.longitude,
-      imageUrl: publicImageUrl, 
+      imageUrl: imageAsBase64, 
       reportedBy: user.email,
     };
     
