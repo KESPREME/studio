@@ -1,9 +1,9 @@
 
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
-import { db } from '@/lib/firebase-admin'; // Use the admin instance for server-side operations
+import { db } from '@/lib/firebase';
 import type { Report } from '@/lib/types';
 
 const statusUpdateSchema = z.object({
@@ -14,9 +14,6 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  if (!db) {
-    return NextResponse.json({ message: 'Firestore is not initialized.' }, { status: 500 });
-  }
   try {
     const docRef = doc(db, 'reports', params.id);
     const docSnap = await getDoc(docRef);
@@ -57,9 +54,6 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  if (!db) {
-    return NextResponse.json({ message: 'Firestore is not initialized.' }, { status: 500 });
-  }
   try {
     const body = await request.json();
     const validation = statusUpdateSchema.safeParse(body);
@@ -71,8 +65,8 @@ export async function PATCH(
     const docRef = doc(db, 'reports', params.id);
     await updateDoc(docRef, {
       status: validation.data.status,
-      updatedAt: FieldValue.serverTimestamp(),
-      ...(validation.data.status === 'Resolved' && { resolvedAt: FieldValue.serverTimestamp() }),
+      updatedAt: serverTimestamp(),
+      ...(validation.data.status === 'Resolved' && { resolvedAt: serverTimestamp() }),
     });
 
     return NextResponse.json({ message: 'Report status updated' });

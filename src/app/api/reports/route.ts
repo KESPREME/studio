@@ -1,11 +1,11 @@
 
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
-import { collection, addDoc, getDocs, query, where, FieldValue, orderBy, Timestamp } from 'firebase-admin/firestore';
-import { db } from '@/lib/firebase-admin'; // Use Admin SDK
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
-import type { Report } from '@/lib/types'; // Import from shared types
+import type { Report } from '@/lib/types';
 
 
 const reportSchema = z.object({
@@ -17,40 +17,27 @@ const reportSchema = z.object({
   reportedBy: z.string().email(),
 });
 
-async function getReportsServer(): Promise<Report[]> {
-  if (!db) {
-    throw new Error("Firestore is not initialized.");
-  }
-  const reportsCollection = collection(db, 'reports');
-  const q = query(reportsCollection, orderBy('createdAt', 'desc'));
-  const querySnapshot = await getDocs(q);
-
-  const reports = querySnapshot.docs.map(doc => {
-    const data = doc.data();
-    // Important: Convert Timestamps to ISO strings for JSON serialization
-    return {
-      id: doc.id,
-      ...data,
-      createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
-      updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
-      resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
-    } as Report;
-  });
-  
-  return reports;
-}
-
 export async function GET() {
   try {
-    const reports = await getReportsServer();
+    const reportsCollection = collection(db, 'reports');
+    const q = query(reportsCollection, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    const reports = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+        updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
+        resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
+      } as Report;
+    });
+
     return NextResponse.json(reports);
   } catch (e: any)
   {
     console.error('API GET Error:', e);
-    // Provide a more specific error message for Firestore issues
-    if (e.message.includes('Could not find endpoint') || e.message.includes('Firestore is not initialized')) {
-        return NextResponse.json({ message: 'Firestore service is not available. Please check your configuration and network access.' }, { status: 503 });
-    }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
@@ -71,9 +58,6 @@ const getBoundingBox = (latitude: number, longitude: number, distanceKm: number)
 
 
 export async function POST(request: Request) {
-  if (!db) {
-    return NextResponse.json({ message: 'Firestore is not initialized.' }, { status: 500 });
-  }
   try {
     const body = await request.json();
     const validation = reportSchema.safeParse(body);
@@ -86,12 +70,11 @@ export async function POST(request: Request) {
     const newReportData = {
       ...validation.data,
       status: 'New',
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     };
 
-    const reportsCollection = collection(db, 'reports');
-    const docRef = await addDoc(reportsCollection, newReportData);
+    const docRef = await addDoc(collection(db, 'reports'), newReportData);
     
     // Send SMS notification to admin
     try {
@@ -108,9 +91,11 @@ export async function POST(request: Request) {
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
         const q = query(
-          reportsCollection,
+          collection(db, 'reports'),
           where('latitude', '>=', box.minLat),
-          where('latitude', '<=', box.maxLat)
+          where('latitude', '<=', box.maxLat),
+          // Note: Firestore doesn't support range filters on multiple fields.
+          // We'll have to filter longitude in the application code.
         );
         
         const querySnapshot = await getDocs(q);
@@ -130,7 +115,7 @@ export async function POST(request: Request) {
              }
           }
         });
-
+        
         const uniquePhoneNumbers = [...new Set(nearbyReporters)];
         if (uniquePhoneNumbers.length > 0) {
           await sendMassAlertSms(validation.data, uniquePhoneNumbers);
