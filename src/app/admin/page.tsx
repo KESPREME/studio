@@ -3,33 +3,78 @@
 
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { StatCard } from '@/components/stat-card';
-import type { Report } from '@/lib/types';
+import type { Report, Status } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
 import { getReports } from '@/lib/api';
 import withAuth from '@/components/with-auth';
 import { ReportsDataTable } from './_components/reports-data-table';
-import { columns } from './_components/columns';
+import { getColumns } from './_components/columns';
+import { useToast } from '@/hooks/use-toast';
 
+
+async function updateReportStatus(reportId: string, status: Status) {
+  const response = await fetch(`/api/reports/${reportId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to update status');
+  }
+}
 
 function AdminDashboard() {
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchReports = useCallback(async () => {
+    setIsLoading(true);
+    const fetchedReports = await getReports();
+    setReports(fetchedReports);
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
-    const fetchReports = async () => {
-      setIsLoading(true);
-      const fetchedReports = await getReports();
-      setReports(fetchedReports);
-      setIsLoading(false);
-    };
     fetchReports();
-  }, []);
+  }, [fetchReports]);
+  
+  const handleStatusChange = useCallback(async (reportId: string, newStatus: Status) => {
+    const originalReports = [...reports];
+    
+    // Optimistic UI update
+    setReports(currentReports =>
+      currentReports.map(r => (r.id === reportId ? { ...r, status: newStatus } : r))
+    );
+
+    try {
+      await updateReportStatus(reportId, newStatus);
+      toast({
+        title: "Status Updated Successfully",
+        description: `Report #${reportId.substring(0,6)}... changed to ${newStatus}.`,
+      });
+      // Optionally re-fetch to ensure data consistency
+      await fetchReports();
+    } catch (error: any) {
+      // Revert on failure
+      setReports(originalReports);
+      toast({
+        title: "Update Failed",
+        variant: "destructive",
+        description: error.message || "Could not update report status. Please try again.",
+      });
+    }
+  }, [reports, toast, fetchReports]);
+
+  const columns = getColumns({ onStatusChange: handleStatusChange });
 
   const stats = {
     total: reports.length,

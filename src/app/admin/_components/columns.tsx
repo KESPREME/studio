@@ -21,23 +21,13 @@ import {
 import { Badge } from "@/components/ui/badge"
 import type { Report, Status } from "@/lib/types"
 import { TimeAgo } from "@/components/time-ago"
-import { useState } from "react"
-import { useToast } from "@/hooks/use-toast"
 
-async function updateReportStatus(reportId: string, status: Status) {
-  const response = await fetch(`/api/reports/${reportId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to update status');
-  }
+// The props for the columns now include the onStatusChange callback
+export type ColumnsProps = {
+  onStatusChange: (reportId: string, newStatus: Status) => Promise<void>;
 }
 
-
-export const columns: ColumnDef<Report>[] = [
+export const getColumns = ({ onStatusChange }: ColumnsProps): ColumnDef<Report>[] => [
   {
     accessorKey: "description",
     header: "Description",
@@ -89,20 +79,6 @@ export const columns: ColumnDef<Report>[] = [
     id: "actions",
     cell: ({ row }) => {
       const report = row.original
-      const [currentStatus, setCurrentStatus] = useState<Status>(report.status);
-      const { toast } = useToast();
-
-      const handleStatusChange = async (newStatus: Status) => {
-        try {
-          await updateReportStatus(report.id, newStatus);
-          setCurrentStatus(newStatus);
-          // This is a bit of a hack to force a table refresh. In a real app, you'd use a state management library.
-          window.location.reload();
-          toast({ title: "Status Updated", description: `Report status changed to ${newStatus}.` });
-        } catch (error) {
-          toast({ title: "Update Failed", variant: "destructive", description: "Could not update report status." });
-        }
-      };
 
       return (
         <DropdownMenu>
@@ -123,7 +99,10 @@ export const columns: ColumnDef<Report>[] = [
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>Update Status</DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                 <DropdownMenuRadioGroup value={currentStatus} onValueChange={(value) => handleStatusChange(value as Status)}>
+                 <DropdownMenuRadioGroup 
+                    value={report.status} 
+                    onValueChange={(value) => onStatusChange(report.id, value as Status)}
+                  >
                     <DropdownMenuRadioItem value="New">New</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="In Progress">In Progress</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="Resolved">Resolved</DropdownMenuRadioItem>
