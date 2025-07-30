@@ -5,19 +5,21 @@
 import { useState, useEffect } from 'react';
 
 export function AppFooter() {
-  const [year, setYear] = useState<number | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setYear(new Date().getFullYear());
+    setIsMounted(true);
   }, []);
+
+  const currentYear = new Date().getFullYear();
+
+  if (!isMounted) {
+    return <div className="h-10" />;
+  }
 
   return (
     <footer className="py-4 text-center text-sm text-muted-foreground h-10">
-      {year ? (
-        <p>&copy; {year} AlertFront. All rights reserved.</p>
-      ) : (
-        <div className="h-full w-full" />
-      )}
+      <p>&copy; {currentYear} AlertFront. All rights reserved.</p>
     </footer>
   );
 }

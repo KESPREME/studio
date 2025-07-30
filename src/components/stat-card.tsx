@@ -10,9 +10,9 @@ type StatCardProps = {
 export function StatCard({ title, value, variant = 'default' }: StatCardProps) {
   const variantClasses = {
     default: "bg-card",
-    new: "bg-blue-100 dark:bg-blue-900/50 border-primary",
-    inProgress: "bg-orange-100 dark:bg-orange-900/50 border-accent",
-    resolved: "bg-green-100 dark:bg-green-900/50 border-green-500",
+    new: "bg-primary/10 border-primary",
+    inProgress: "bg-accent/20 border-accent",
+    resolved: "bg-green-500/10 border-green-500",
   }
 
   return (
