@@ -1,3 +1,4 @@
+
 // src/components/hazard-report-card.tsx
 "use client";
 
@@ -24,11 +25,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const { toast } = useToast();
 
-  // Construct the public URL directly from the stored path.
-  // This is the correct and most reliable method for public buckets.
-  const imageUrl = report.imageUrl
-    ? `https://zeycfgpgoptewbcyucxd.supabase.co/storage/v1/object/public/images/${report.imageUrl}`
-    : null;
+  const imageUrl = report.imageUrl;
 
   const handleTranslate = async () => {
     setIsTranslating(true);

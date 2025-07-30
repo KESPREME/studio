@@ -72,11 +72,11 @@ export function ReportForm() {
       return;
     }
 
-    let imagePath: string | undefined = undefined;
+    let imageUrl: string | undefined = undefined;
 
     if (imageFile) {
       try {
-        const filePath = `reports/${Date.now()}_${imageFile.name}`;
+        const filePath = `public/${Date.now()}_${imageFile.name}`;
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, imageFile);
@@ -85,7 +85,13 @@ export function ReportForm() {
           throw uploadError;
         }
         
-        imagePath = filePath;
+        const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+
+        if (!data) {
+             throw new Error("Could not get public URL for the image.");
+        }
+        
+        imageUrl = data.publicUrl;
 
 
       } catch (error: any) {
@@ -106,7 +112,7 @@ export function ReportForm() {
       urgency: values.urgency,
       latitude: values.latitude,
       longitude: values.longitude,
-      imageUrl: imagePath, // Save the path, not the full URL
+      imageUrl: imageUrl, 
       reportedBy: user.email,
     };
     
