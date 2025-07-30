@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
+import { supabase } from "@/lib/supabase"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -43,14 +44,6 @@ const reportSchema = z.object({
   longitude: z.number({ required_error: 'Location is required.'}),
   image: z.any().optional(),
 })
-
-// Helper to convert file to base64
-const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-});
 
 export function ReportForm() {
   const { toast } = useToast()
@@ -79,21 +72,28 @@ export function ReportForm() {
       return;
     }
 
-    let imageAsBase64: string | undefined = undefined;
+    let imagePath: string | undefined = undefined;
 
     if (imageFile) {
-      try {
-        imageAsBase64 = await toBase64(imageFile);
-      } catch (error: any) {
-        console.error("Image conversion error:", error);
+      const file = imageFile;
+      const fileName = `${Date.now()}_${file.name}`;
+      const filePath = `${fileName}`; // No leading slash or 'public'
+
+      const { data, error } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (error) {
+        console.error('Supabase upload error:', error);
         toast({
-          title: "Image Processing Failed",
-          description: `Could not process your image: ${error.message}`,
+          title: "Image Upload Failed",
+          description: `Could not upload your image to storage: ${error.message}`,
           variant: "destructive",
-        })
+        });
         setIsSubmitting(false);
         return;
       }
+      imagePath = data.path;
     }
 
 
@@ -102,7 +102,7 @@ export function ReportForm() {
       urgency: values.urgency,
       latitude: values.latitude,
       longitude: values.longitude,
-      imageUrl: imageAsBase64, 
+      imageUrl: imagePath, // Save just the path
       reportedBy: user.email,
     };
     
@@ -116,7 +116,8 @@ export function ReportForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit report');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit report');
       }
 
       toast({
@@ -136,11 +137,11 @@ export function ReportForm() {
       setImagePreview(null);
       setImageFile(null);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submission error:", error);
       toast({
         title: "Submission Failed",
-        description: "Could not submit your report. Please try again later.",
+        description: error.message || "Could not submit your report. Please try again later.",
         variant: "destructive",
       })
     } finally {

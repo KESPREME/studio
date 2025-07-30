@@ -2,7 +2,7 @@
 // src/components/hazard-report-card.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Languages, Loader2 } from 'lucide-react';
 
@@ -14,6 +14,7 @@ import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
 import { Skeleton } from './ui/skeleton';
+import { supabase } from '@/lib/supabase';
 
 type HazardReportCardProps = {
   report: Report;
@@ -23,7 +24,21 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const [publicImageUrl, setPublicImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (report.imageUrl) {
+      const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl);
+      if (data) {
+        setPublicImageUrl(data.publicUrl);
+      } else {
+        console.error("Could not get public URL for", report.imageUrl);
+        setPublicImageUrl(null);
+      }
+    }
+  }, [report.imageUrl]);
+
 
   const handleTranslate = async () => {
     setIsTranslating(true);
@@ -53,24 +68,22 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
         return 'bg-green-500';
     }
   };
-  
-  const { imageUrl } = report;
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
-          {isImageLoading && imageUrl && <Skeleton className="h-full w-full absolute" />}
-          {imageUrl ? (
+          {(isImageLoading && publicImageUrl) && <Skeleton className="h-full w-full absolute" />}
+          {publicImageUrl ? (
             <Image
-              src={imageUrl}
+              src={publicImageUrl}
               alt={report.description}
               fill
               className="rounded-md object-cover"
               data-ai-hint="hazard street"
               onLoad={() => setIsImageLoading(false)}
               onError={() => {
-                console.error("Image failed to load:", imageUrl);
+                console.error("Image failed to load:", publicImageUrl);
                 setIsImageLoading(false);
               }}
             />
