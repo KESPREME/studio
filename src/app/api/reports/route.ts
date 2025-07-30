@@ -1,11 +1,11 @@
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import { z } from 'zod';
-
-import { adminDb } from '@/lib/firebase-admin'; // Use Admin SDK for server-side
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
+import { z } from 'zod';
 import type { Report } from '@/lib/types';
+
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -18,9 +18,9 @@ const reportSchema = z.object({
 
 export async function GET() {
   try {
-    const reportsCollection = adminDb.collection('reports');
-    const q = reportsCollection.orderBy('createdAt', 'desc');
-    const querySnapshot = await q.get();
+    const reportsCollection = collection(db, 'reports');
+    const q = query(reportsCollection, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
 
     const reports = querySnapshot.docs.map(doc => {
       const data = doc.data();
@@ -55,6 +55,7 @@ const getBoundingBox = (latitude: number, longitude: number, distanceKm: number)
   };
 };
 
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -68,11 +69,11 @@ export async function POST(request: Request) {
     const newReportData = {
       ...validation.data,
       status: 'New',
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     };
 
-    const docRef = await adminDb.collection('reports').add(newReportData);
+    const docRef = await addDoc(collection(db, 'reports'), newReportData);
     
     // Send SMS notification to admin
     try {
@@ -88,11 +89,15 @@ export async function POST(request: Request) {
         const radiusKm = 10; // 10km radius
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
-        const q = adminDb.collection('reports')
-          .where('latitude', '>=', box.minLat)
-          .where('latitude', '<=', box.maxLat);
+        const q = query(
+          collection(db, 'reports'),
+          where('latitude', '>=', box.minLat),
+          where('latitude', '<=', box.maxLat),
+          // Note: Firestore doesn't support range filters on multiple fields.
+          // We'll have to filter longitude in the application code.
+        );
         
-        const querySnapshot = await q.get();
+        const querySnapshot = await getDocs(q);
         const nearbyReporters: string[] = [];
         
         const adminPhoneNumber = process.env.ADMIN_PHONE_NUMBER;
@@ -101,6 +106,9 @@ export async function POST(request: Request) {
           const report = doc.data() as Report;
           // Secondary longitude filter
           if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
+             // For this demo, we don't have user phone numbers.
+             // We'll use the ADMIN_PHONE_NUMBER as a stand-in for every "nearby" user.
+             // In a real app, you'd look up the user's phone number from their email or user ID.
              if (adminPhoneNumber) {
                 nearbyReporters.push(adminPhoneNumber);
              }
@@ -118,6 +126,7 @@ export async function POST(request: Request) {
         console.error("Mass alert SMS process failed. Error:", massAlertError.message);
       }
     }
+
 
     return NextResponse.json({ message: 'Report created', reportId: docRef.id }, { status: 201 });
   } catch (e: any) {

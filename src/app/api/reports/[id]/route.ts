@@ -1,8 +1,8 @@
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
-import { adminDb } from '@/lib/firebase-admin'; // Use Admin SDK
 import type { Report } from '@/lib/types';
 
 const statusUpdateSchema = z.object({
@@ -14,10 +14,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const docRef = adminDb.collection('reports').doc(params.id);
-    const docSnap = await docRef.get();
+    const docRef = doc(db, 'reports', params.id);
+    const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists) {
+    if (!docSnap.exists()) {
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
     
@@ -61,18 +61,18 @@ export async function PATCH(
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
 
-    const docRef = adminDb.collection('reports').doc(params.id);
+    const docRef = doc(db, 'reports', params.id);
     
-    const updateData: { status: string; updatedAt: FieldValue; resolvedAt?: FieldValue } = {
+    const updateData: { status: string; updatedAt: any; resolvedAt?: any } = {
         status: validation.data.status,
-        updatedAt: FieldValue.serverTimestamp(),
+        updatedAt: serverTimestamp(),
     };
 
     if (validation.data.status === 'Resolved') {
-        updateData.resolvedAt = FieldValue.serverTimestamp();
+        updateData.resolvedAt = serverTimestamp();
     }
 
-    await docRef.update(updateData);
+    await updateDoc(docRef, updateData);
 
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
