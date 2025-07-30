@@ -8,6 +8,7 @@ import { HazardReportCard } from '@/components/hazard-report-card';
 import { REPORTS } from '@/lib/mock-data';
 import type { Report } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
+import { AppFooter } from '@/components/app-footer';
 
 export default function Dashboard() {
   const reports: Report[] = REPORTS;
@@ -61,9 +62,7 @@ export default function Dashboard() {
 
         </div>
       </main>
-      <footer className="py-4 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} AlertFront. All rights reserved.</p>
-      </footer>
+      <AppFooter />
     </div>
   );
 }
