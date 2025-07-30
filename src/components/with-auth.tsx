@@ -23,11 +23,11 @@ export default function withAuth<P extends object>(
         if (!user) {
           router.replace('/login');
         } else if (options.roles && !options.roles.includes(user.role)) {
-          // If user role is not allowed, redirect to a relevant page
-          router.replace(user.role === 'admin' ? '/admin' : '/report/new');
+          // If user role is not allowed, redirect to their own dashboard
+          router.replace(user.role === 'admin' ? '/admin' : '/dashboard');
         }
       }
-    }, [user, isLoading, router]);
+    }, [user, isLoading, router, options.roles]);
 
     if (isLoading || !user || (options.roles && !options.roles.includes(user.role))) {
       return (

@@ -40,7 +40,7 @@ export default function LoginPage() {
     if (role === 'admin') {
       router.push('/admin');
     } else {
-      router.push('/report/new');
+      router.push('/dashboard');
     }
   };
 

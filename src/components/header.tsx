@@ -24,11 +24,16 @@ export function Header() {
     router.push('/login');
   };
 
+  const getDashboardLink = () => {
+    if (!user) return '/';
+    return user.role === 'admin' ? '/admin' : '/dashboard';
+  }
+
   return (
     <header className="bg-card border-b shadow-sm sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href={user ? (user.role === 'admin' ? '/admin' : '/report/new') : '/'} className="flex items-center gap-2">
+          <Link href={getDashboardLink()} className="flex items-center gap-2">
             <ShieldAlert className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold font-headline text-foreground">AlertFront</span>
           </Link>
@@ -47,12 +52,10 @@ export function Header() {
                     <div className="text-xs text-muted-foreground">{user.email}</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {user.role === 'admin' && (
-                     <DropdownMenuItem onClick={() => router.push('/admin')}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      <span>Admin Dashboard</span>
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem onClick={() => router.push(getDashboardLink())}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => router.push('/settings')}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
