@@ -1,7 +1,6 @@
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { FieldValue } from 'firebase-admin/firestore';
+import { doc, getDoc, updateDoc, FieldValue } from 'firebase/firestore';
 import { z } from 'zod';
 import { db } from '@/lib/firebase-admin'; // Use the admin instance for server-side operations
 import type { Report } from '@/lib/types';
