@@ -1,10 +1,6 @@
 // src/lib/firebase-admin.ts
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { config } from 'dotenv';
-
-// Load environment variables from .env file
-config();
 
 const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
@@ -17,9 +13,8 @@ try {
   serviceAccount = JSON.parse(serviceAccountString);
 } catch (e) {
   console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY. Make sure it is a valid JSON string.", e);
-  throw new Error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY. Make sure it is a valid JSON string.');
+  throw new Error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY.');
 }
-
 
 if (!admin.apps.length) {
   try {
@@ -28,7 +23,6 @@ if (!admin.apps.length) {
     });
   } catch (error: any) {
     console.error('Firebase admin initialization error', error.stack);
-    // Throwing the error to make it visible during development
     throw new Error('Firebase admin initialization failed: ' + error.message);
   }
 }
