@@ -1,8 +1,7 @@
-
 // src/components/hazard-report-card.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Languages, Loader2 } from 'lucide-react';
 
@@ -14,6 +13,7 @@ import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
 import { Skeleton } from './ui/skeleton';
+import { supabase } from '@/lib/supabase';
 
 type HazardReportCardProps = {
   report: Report;
@@ -22,7 +22,41 @@ type HazardReportCardProps = {
 export function HazardReportCard({ report }: HazardReportCardProps) {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    const loadImage = async () => {
+      if (report.imageUrl) {
+        setIsImageLoading(true);
+        const { data, error } = await supabase.storage
+          .from('images')
+          .download(report.imageUrl); // report.imageUrl is now the path
+
+        if (error) {
+          console.error('Error downloading image:', error);
+          setImageUrl(null);
+        } else if (data) {
+          objectUrl = URL.createObjectURL(data);
+          setImageUrl(objectUrl);
+        }
+        setIsImageLoading(false);
+      } else {
+        setIsImageLoading(false);
+      }
+    };
+
+    loadImage();
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [report.imageUrl]);
+
 
   const handleTranslate = async () => {
     setIsTranslating(true);
@@ -58,13 +92,21 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         {report.imageUrl && (
           <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
+            {isImageLoading ? (
+              <Skeleton className="h-full w-full" />
+            ) : imageUrl ? (
               <Image
-                src={report.imageUrl}
+                src={imageUrl}
                 alt={report.description}
                 fill
                 className="rounded-md object-cover"
                 data-ai-hint="hazard street"
               />
+            ) : (
+               <div className="w-full h-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+                  Image not available
+                </div>
+            )}
           </div>
         )}
         <div className="flex-1 space-y-3">
