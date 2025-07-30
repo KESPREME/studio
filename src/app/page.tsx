@@ -5,13 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { StatCard } from '@/components/stat-card';
 import { HazardReportCard } from '@/components/hazard-report-card';
-import { REPORTS } from '@/lib/mock-data';
 import type { Report } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
 
-export default function Dashboard() {
-  const reports: Report[] = REPORTS;
+async function getReports(): Promise<Report[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reports`, { cache: 'no-store' });
+  if (!res.ok) {
+    console.error('Failed to fetch reports');
+    return [];
+  }
+  const data = await res.json();
+  // Ensure we return an array even if the API response is not as expected.
+  return Array.isArray(data) ? data : [];
+}
+
+
+export default async function Dashboard() {
+  const reports: Report[] = await getReports();
 
   const stats = {
     total: reports.length,

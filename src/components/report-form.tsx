@@ -36,8 +36,8 @@ const reportSchema = z.object({
     message: "Description must not be longer than 500 characters."
   }),
   urgency: z.enum(["Low", "Moderate", "High"]),
-  latitude: z.number(),
-  longitude: z.number(),
+  latitude: z.number({ required_error: 'Location is required.'}),
+  longitude: z.number({ required_error: 'Location is required.'}),
   image: z.any().optional(),
 })
 
@@ -55,20 +55,48 @@ export function ReportForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof reportSchema>) {
+  async function onSubmit(values: z.infer<typeof reportSchema>) {
     setIsSubmitting(true)
-    console.log(values)
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
+    // In a real app, you would handle image upload to a service like S3 or Cloudinary
+    // and get a URL back. For now, we'll just log it.
+    const reportData = {
+      ...values,
+      imageUrl: imagePreview || undefined, // This is just for demonstration
+    };
+
+    try {
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit report');
+      }
+
       toast({
         title: "Report Submitted!",
         description: "Thank you for helping keep your community safe.",
       })
-      form.reset()
-      setImagePreview(null)
-    }, 1500)
+      form.reset({
+        description: "",
+        urgency: "Moderate",
+      });
+      setImagePreview(null);
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: "Submission Failed",
+        description: "Could not submit your report. Please try again later.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleLocation = () => {
@@ -160,15 +188,17 @@ export function ReportForm() {
 
               <FormItem>
                 <FormLabel>Location</FormLabel>
-                <Button type="button" variant="outline" className="w-full" onClick={handleLocation} disabled={isLocating}>
-                  {isLocating ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <LocateFixed className="mr-2 h-4 w-4" />
-                  )}
-                  {form.watch("latitude") ? "Location Set" : "Use My Location"}
-                </Button>
-                <FormMessage>{form.formState.errors.latitude?.message || form.formState.errors.longitude?.message}</FormMessage>
+                <div className="flex flex-col gap-2">
+                    <Button type="button" variant="outline" className="w-full" onClick={handleLocation} disabled={isLocating}>
+                    {isLocating ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <LocateFixed className="mr-2 h-4 w-4" />
+                    )}
+                    {form.watch("latitude") && form.watch("longitude") ? "Location Set" : "Use My Location"}
+                    </Button>
+                    <FormMessage>{form.formState.errors.latitude?.message || form.formState.errors.longitude?.message}</FormMessage>
+                </div>
               </FormItem>
             </div>
 

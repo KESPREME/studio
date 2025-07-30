@@ -1,8 +1,10 @@
+import { ObjectId } from "mongodb";
+
 export type Urgency = 'Low' | 'Moderate' | 'High';
 export type Status = 'New' | 'In Progress' | 'Resolved';
 
 export interface Report {
-  _id: string;
+  _id: string | ObjectId;
   description: string;
   latitude: number;
   longitude: number;
