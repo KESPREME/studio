@@ -6,21 +6,14 @@ service cloud.firestore {
     // Reports Collection
     match /reports/{reportId} {
       
-      // ANY authenticated user can read all reports.
-      // This is necessary for the main map view and community dashboard.
-      // For now, we will allow open read access during development.
+      // Allow anyone to read all reports for the map and community dashboard.
       allow read: if true;
 
-      // ANY authenticated user can create a report.
-      // For now, we will allow open write access during development.
-      allow create: if true;
-
-      // ANY authenticated user can update a report.
-      // In a real app, you'd check if the user is an admin.
-      // For now, we will allow open update access during development.
-      allow update: if true;
+      // Allow anyone to create, and update reports.
+      // In a real app, you would add authentication checks here.
+      allow create, update: if true;
       
-      // No one can delete reports for now to prevent accidental data loss.
+      // Prevent reports from being deleted.
       allow delete: if false;
     }
   }

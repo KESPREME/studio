@@ -2,9 +2,7 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow image uploads to the 'reports' folder for any user.
-    // In a real app with authentication, you would want to restrict this
-    // to only authenticated users: `if request.auth != null;`
+    // Allow image read and write access in the 'reports' folder.
     match /reports/{imageId} {
       allow read: if true;
       allow write: if true;
