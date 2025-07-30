@@ -2,7 +2,7 @@
 // src/components/hazard-report-card.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Languages, Loader2 } from 'lucide-react';
 
@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
-import { supabase } from '@/lib/supabase';
 import { Skeleton } from './ui/skeleton';
 
 type HazardReportCardProps = {
@@ -24,21 +23,6 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
-  const [publicImageUrl, setPublicImageUrl] = useState<string | null>(null);
-  const [isImageLoading, setIsImageLoading] = useState(true);
-
-  useEffect(() => {
-    if (report.imageUrl) {
-      setIsImageLoading(true);
-      // The imageUrl is now just the path, so we get the public URL from Supabase
-      const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl);
-      setPublicImageUrl(data.publicUrl);
-      setIsImageLoading(false);
-    } else {
-      setIsImageLoading(false);
-    }
-  }, [report.imageUrl]);
-
 
   const handleTranslate = async () => {
     setIsTranslating(true);
@@ -72,19 +56,17 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
-          {isImageLoading ? (
-            <Skeleton className="h-full w-full" />
-          ) : publicImageUrl ? (
-            <Image
-              src={publicImageUrl}
-              alt={report.description}
-              fill
-              className="rounded-md object-cover"
-              data-ai-hint="hazard street"
-            />
-          ) : null}
-        </div>
+        {report.imageUrl && (
+          <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
+              <Image
+                src={report.imageUrl}
+                alt={report.description}
+                fill
+                className="rounded-md object-cover"
+                data-ai-hint="hazard street"
+              />
+          </div>
+        )}
         <div className="flex-1 space-y-3">
           <div>
             <p className="text-foreground">{report.description}</p>
