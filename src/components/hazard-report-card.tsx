@@ -1,8 +1,8 @@
+// src/components/hazard-report-card.tsx
 "use client";
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
 import { Languages, Loader2 } from 'lucide-react';
 
 import type { Report } from '@/lib/types';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
+import { TimeAgo } from './time-ago';
 
 type HazardReportCardProps = {
   report: Report;
@@ -85,7 +86,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
             </div>
           </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{formatDistanceToNow(new Date(report.createdAt), { addSuffix: true })}</span>
+            <TimeAgo dateString={report.createdAt} />
             <Button onClick={handleTranslate} disabled={isTranslating} size="sm" variant="ghost">
               {isTranslating ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
