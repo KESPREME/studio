@@ -14,7 +14,6 @@ import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
 import { Skeleton } from './ui/skeleton';
-import { supabase } from '@/lib/supabase';
 
 type HazardReportCardProps = {
   report: Report;
@@ -24,30 +23,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
-  const [publicImageUrl, setPublicImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (report.imageUrl) {
-      const getImageUrl = async () => {
-        setIsImageLoading(true);
-        const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl!);
-        
-        if (data.publicUrl) {
-          setPublicImageUrl(data.publicUrl);
-        } else {
-          console.error("Could not get public URL for image:", report.imageUrl);
-          setPublicImageUrl(null);
-        }
-        setIsImageLoading(false);
-      };
-      getImageUrl();
-    } else {
-      setIsImageLoading(false);
-      setPublicImageUrl(null);
-    }
-  }, [report.imageUrl]);
-
 
   const handleTranslate = async () => {
     setIsTranslating(true);
@@ -78,21 +54,24 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
   
+  // Directly use the imageUrl from the report, which should be a complete public URL.
+  const imageUrl = report.imageUrl;
+
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
           {isImageLoading && <Skeleton className="h-full w-full absolute" />}
-          {publicImageUrl ? (
+          {imageUrl ? (
             <Image
-              src={publicImageUrl}
+              src={imageUrl}
               alt={report.description}
               fill
               className="rounded-md object-cover"
               data-ai-hint="hazard street"
               onLoad={() => setIsImageLoading(false)}
               onError={() => {
-                console.error("Image failed to load:", publicImageUrl);
+                console.error("Image failed to load:", imageUrl);
                 setIsImageLoading(false);
               }}
             />
