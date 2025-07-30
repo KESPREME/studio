@@ -58,12 +58,13 @@ export function ReportForm() {
   async function onSubmit(values: z.infer<typeof reportSchema>) {
     setIsSubmitting(true)
     
-    // In a real app, you would handle image upload to a service like S3 or Cloudinary
-    // and get a URL back. For now, we'll just log it.
     const reportData = {
       ...values,
-      imageUrl: imagePreview || undefined, // This is just for demonstration
+      imageUrl: imagePreview ? 'https://placehold.co/600x400.png' : undefined,
     };
+    // Don't send the raw image data to the backend
+    delete reportData.image;
+
 
     try {
       const response = await fetch('/api/reports', {
