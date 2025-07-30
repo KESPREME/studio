@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase-admin'; // Use Admin SDK
 import { collection, addDoc, getDocs, query, where, FieldValue, orderBy, Timestamp } from 'firebase/firestore';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
-import type { Report } from '@/lib/types';
+import type { Report } from '@/lib/types'; // Import from shared types
 
 
 const reportSchema = z.object({
@@ -17,29 +17,23 @@ const reportSchema = z.object({
 });
 
 async function getReportsServer(): Promise<Report[]> {
-  try {
-    const reportsCollection = collection(db, 'reports');
-    const q = query(reportsCollection, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
+  const reportsCollection = collection(db, 'reports');
+  const q = query(reportsCollection, orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
 
-    const reports = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      // Important: Convert Timestamps to ISO strings for JSON serialization
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
-        updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
-        resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
-      } as Report;
-    });
-    
-    return reports;
-  } catch (e: any) {
-    console.error('Firestore getReports Error:', e.message);
-    console.log("Please check that your Firestore API is enabled and your security rules allow reads from the 'reports' collection.");
-    return [];
-  }
+  const reports = querySnapshot.docs.map(doc => {
+    const data = doc.data();
+    // Important: Convert Timestamps to ISO strings for JSON serialization
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+      updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
+      resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
+    } as Report;
+  });
+  
+  return reports;
 }
 
 export async function GET() {
@@ -49,6 +43,10 @@ export async function GET() {
   } catch (e: any)
   {
     console.error('API GET Error:', e);
+    // Provide a more specific error message for Firestore issues
+    if (e.message.includes('Could not find endpoint')) {
+        return NextResponse.json({ message: 'Firestore service is not available. Please check your configuration and network access.' }, { status: 503 });
+    }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }

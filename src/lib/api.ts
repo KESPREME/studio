@@ -5,7 +5,8 @@ export async function getReports(): Promise<Report[]> {
   try {
     const response = await fetch('/api/reports', { cache: 'no-store' });
     if (!response.ok) {
-      console.error("Failed to fetch reports:", response.statusText);
+      const errorText = await response.text();
+      console.error("Failed to fetch reports:", response.status, errorText);
       return [];
     }
     const reports = await response.json();

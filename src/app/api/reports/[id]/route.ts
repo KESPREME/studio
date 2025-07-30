@@ -1,9 +1,9 @@
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase-admin'; // Use the admin instance
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { FieldValue } from 'firebase-admin/firestore'; // Import FieldValue for server timestamp
+import { FieldValue } from 'firebase-admin/firestore';
 import { z } from 'zod';
+import { db } from '@/lib/firebase-admin'; // Use the admin instance for server-side operations
 import type { Report } from '@/lib/types';
 
 const statusUpdateSchema = z.object({
@@ -23,10 +23,10 @@ export async function GET(
     }
     
     const reportData = docSnap.data();
-    const report = {
+    const report: Partial<Report> = {
       id: docSnap.id,
       ...reportData,
-    } as Report;
+    };
 
     // Convert timestamps to string for serialization
     if (reportData?.createdAt) {
@@ -61,7 +61,7 @@ export async function PATCH(
     const docRef = doc(db, 'reports', params.id);
     await updateDoc(docRef, {
       status: validation.data.status,
-      updatedAt: FieldValue.serverTimestamp(), // Correct server-side timestamp
+      updatedAt: FieldValue.serverTimestamp(),
       ...(validation.data.status === 'Resolved' && { resolvedAt: FieldValue.serverTimestamp() }),
     });
 
