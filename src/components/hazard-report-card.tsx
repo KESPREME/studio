@@ -22,41 +22,15 @@ type HazardReportCardProps = {
 export function HazardReportCard({ report }: HazardReportCardProps) {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    let objectUrl: string | null = null;
-    const loadImage = async () => {
-      if (report.imageUrl) {
-        setIsImageLoading(true);
-        const { data, error } = await supabase.storage
-          .from('images')
-          .download(report.imageUrl); // report.imageUrl is now the path
+  const getPublicImageUrl = (path: string) => {
+    const { data } = supabase.storage.from('images').getPublicUrl(path);
+    return data?.publicUrl || null;
+  }
 
-        if (error) {
-          console.error('Error downloading image:', error);
-          setImageUrl(null);
-        } else if (data) {
-          objectUrl = URL.createObjectURL(data);
-          setImageUrl(objectUrl);
-        }
-        setIsImageLoading(false);
-      } else {
-        setIsImageLoading(false);
-      }
-    };
-
-    loadImage();
-
-    return () => {
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-    };
-  }, [report.imageUrl]);
-
+  const imageUrl = report.imageUrl ? getPublicImageUrl(report.imageUrl) : null;
 
   const handleTranslate = async () => {
     setIsTranslating(true);
@@ -92,15 +66,16 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         {report.imageUrl && (
           <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
-            {isImageLoading ? (
-              <Skeleton className="h-full w-full" />
-            ) : imageUrl ? (
+            {isImageLoading && <Skeleton className="h-full w-full absolute" />}
+            {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={report.description}
                 fill
                 className="rounded-md object-cover"
                 data-ai-hint="hazard street"
+                onLoad={() => setIsImageLoading(false)}
+                onError={() => setIsImageLoading(false)}
               />
             ) : (
                <div className="w-full h-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
