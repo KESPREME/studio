@@ -6,6 +6,7 @@ import * as z from "zod"
 import { LocateFixed, Loader2, Upload } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/use-auth"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -43,6 +45,8 @@ const reportSchema = z.object({
 
 export function ReportForm() {
   const { toast } = useToast()
+  const router = useRouter();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -58,9 +62,16 @@ export function ReportForm() {
   async function onSubmit(values: z.infer<typeof reportSchema>) {
     setIsSubmitting(true)
     
+    if (!user) {
+      toast({ title: "Authentication Error", description: "You must be logged in to submit a report.", variant: "destructive" });
+      setIsSubmitting(false);
+      return;
+    }
+
     const reportData = {
       ...values,
       imageUrl: imagePreview ? 'https://placehold.co/600x400.png' : undefined,
+      reportedBy: user.email,
     };
     // Don't send the raw image data to the backend
     delete reportData.image;
@@ -83,11 +94,17 @@ export function ReportForm() {
         title: "Report Submitted!",
         description: "Thank you for helping keep your community safe.",
       })
-      form.reset({
-        description: "",
-        urgency: "Moderate",
-      });
-      setImagePreview(null);
+      
+      if(user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        form.reset({
+          description: "",
+          urgency: "Moderate",
+        });
+        setImagePreview(null);
+      }
+
     } catch (error) {
       console.error("Submission error:", error);
       toast({

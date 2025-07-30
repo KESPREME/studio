@@ -1,7 +1,11 @@
+// src/app/report/new/page.tsx
+"use client";
+
 import { Header } from "@/components/header";
 import { ReportForm } from "@/components/report-form";
+import withAuth from "@/components/with-auth";
 
-export default function NewReportPage() {
+function NewReportPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -17,3 +21,5 @@ export default function NewReportPage() {
     </div>
   );
 }
+
+export default withAuth(NewReportPage, { roles: ['reporter', 'admin'] });

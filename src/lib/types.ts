@@ -16,3 +16,9 @@ export interface Report {
   updatedAt: string; 
   resolvedAt?: string;
 }
+
+export type User = {
+  name: string;
+  email: string;
+  role: 'reporter' | 'admin';
+};
