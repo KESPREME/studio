@@ -22,20 +22,21 @@ export async function GET(
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
     
+    const reportData = docSnap.data();
     const report = {
       id: docSnap.id,
-      ...docSnap.data(),
+      ...reportData,
     } as Report;
 
     // Convert timestamps to string for serialization
-    if (report.createdAt) {
-      report.createdAt = new Date(report.createdAt).toISOString();
+    if (reportData?.createdAt) {
+      report.createdAt = new Date(reportData.createdAt.toMillis()).toISOString();
     }
-    if (report.updatedAt) {
-      report.updatedAt = new Date(report.updatedAt).toISOString();
+    if (reportData?.updatedAt) {
+      report.updatedAt = new Date(reportData.updatedAt.toMillis()).toISOString();
     }
-     if (report.resolvedAt) {
-      report.resolvedAt = new Date(report.resolvedAt).toISOString();
+     if (reportData?.resolvedAt) {
+      report.resolvedAt = new Date(reportData.resolvedAt.toMillis()).toISOString();
     }
 
     return NextResponse.json(report);

@@ -61,6 +61,7 @@ function AdminDashboard() {
       // Re-fetch to ensure data consistency
       await fetchReports();
     } catch (error: any) {
+      console.error("Update failed:", error);
       // Revert on failure
       setReports(originalReports);
       toast({
