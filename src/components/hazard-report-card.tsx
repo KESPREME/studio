@@ -43,9 +43,9 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const getStatusColor = (status: Report['status']) => {
     switch (status) {
       case 'New':
-        return 'bg-blue-500';
+        return 'bg-primary';
       case 'In Progress':
-        return 'bg-orange-500';
+        return 'bg-accent';
       case 'Resolved':
         return 'bg-green-500';
     }
@@ -55,13 +55,13 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         {report.imageUrl && (
-          <div className="w-full sm:w-1/3 h-40 sm:h-auto relative">
+          <div className="w-full sm:w-48 sm:h-auto flex-shrink-0">
             <Image
               src={report.imageUrl}
               alt={report.description}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-md"
+              width={150}
+              height={150}
+              className="rounded-md object-cover w-full h-auto"
               data-ai-hint="hazard street"
             />
           </div>
