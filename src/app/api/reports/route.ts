@@ -3,6 +3,7 @@ import clientPromise from '@/lib/mongodb';
 import { sendNewReportSms } from '@/lib/sms';
 import { Report } from '@/lib/types';
 import { z } from 'zod';
+import { getReports } from '@/lib/api';
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -14,18 +15,10 @@ const reportSchema = z.object({
 
 export async function GET() {
   try {
-    const client = await clientPromise;
-    const db = client.db();
-    const reportsFromDb = await db.collection('reports').find({}).sort({ createdAt: -1 }).toArray();
-    
-    const reports = reportsFromDb.map(report => ({
-      ...report,
-      _id: report._id.toString(),
-    }));
-
+    const reports = await getReports();
     return NextResponse.json(reports);
   } catch (e: any) {
-    console.error('MongoDB GET Error:', e);
+    console.error('API GET Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }

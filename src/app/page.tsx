@@ -8,17 +8,7 @@ import { HazardReportCard } from '@/components/hazard-report-card';
 import type { Report } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
-
-async function getReports(): Promise<Report[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reports`, { cache: 'no-store' });
-  if (!res.ok) {
-    console.error('Failed to fetch reports');
-    return [];
-  }
-  const data = await res.json();
-  // Ensure we return an array even if the API response is not as expected.
-  return Array.isArray(data) ? data : [];
-}
+import { getReports } from '@/lib/api';
 
 
 export default async function Dashboard() {
@@ -65,7 +55,7 @@ export default async function Dashboard() {
               <h2 className="text-xl font-bold mb-4 font-headline">Latest Reports</h2>
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                 {reports.slice(0, 10).map((report) => (
-                  <HazardReportCard key={report._id} report={report} />
+                  <HazardReportCard key={report._id as string} report={report} />
                 ))}
               </div>
             </div>
