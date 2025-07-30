@@ -2,13 +2,13 @@
 "use client";
 
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster';
 import { TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect, useRef } from 'react';
 import type { Report } from '@/lib/types';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
-import MarkerClusterGroup from './marker-cluster-group';
 
 // This is a workaround for a known issue with react-leaflet and Next.js HMR
 L.Icon.Default.mergeOptions({
