@@ -1,8 +1,8 @@
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin'; // Use Admin SDK
 import type { Report } from '@/lib/types';
 
 const statusUpdateSchema = z.object({
@@ -14,10 +14,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const docRef = doc(db, 'reports', params.id);
-    const docSnap = await getDoc(docRef);
+    const docRef = adminDb.collection('reports').doc(params.id);
+    const docSnap = await docRef.get();
 
-    if (!docSnap.exists()) {
+    if (!docSnap.exists) {
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
     
@@ -32,13 +32,13 @@ export async function GET(
     };
 
     // Convert timestamps to string for serialization
-    if (reportData.createdAt) {
-      report.createdAt = (reportData.createdAt as Timestamp).toDate().toISOString();
+    if (reportData.createdAt && reportData.createdAt instanceof Timestamp) {
+      report.createdAt = reportData.createdAt.toDate().toISOString();
     }
-    if (reportData.updatedAt) {
-      report.updatedAt = (reportData.updatedAt as Timestamp).toDate().toISOString();
+    if (reportData.updatedAt && reportData.updatedAt instanceof Timestamp) {
+      report.updatedAt = reportData.updatedAt.toDate().toISOString();
     }
-     if (reportData.resolvedAt) {
+     if (reportData.resolvedAt && reportData.resolvedAt instanceof Timestamp) {
       report.resolvedAt = (reportData.resolvedAt as Timestamp).toDate().toISOString();
     }
 
@@ -61,24 +61,22 @@ export async function PATCH(
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
 
-    const docRef = doc(db, 'reports', params.id);
+    const docRef = adminDb.collection('reports').doc(params.id);
     
-    const updateData: { status: string; updatedAt: any; resolvedAt?: any } = {
+    const updateData: { status: string; updatedAt: FieldValue; resolvedAt?: FieldValue } = {
         status: validation.data.status,
-        updatedAt: serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
     };
 
     if (validation.data.status === 'Resolved') {
-        updateData.resolvedAt = serverTimestamp();
+        updateData.resolvedAt = FieldValue.serverTimestamp();
     }
 
-    await updateDoc(docRef, updateData);
+    await docRef.update(updateData);
 
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
     console.error('API PATCH Error:', e);
-    // Log the full error for better debugging
-    console.error(e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
