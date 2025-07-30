@@ -1,4 +1,3 @@
-
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
@@ -74,7 +73,7 @@ export async function POST(request: Request) {
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, 'reports'), newReportdData);
+    const docRef = await addDoc(collection(db, 'reports'), newReportData);
     
     // Send SMS notification to admin
     try {
