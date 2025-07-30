@@ -7,6 +7,7 @@ import { LocateFixed, Loader2, Upload } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -30,6 +31,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
+import { storage } from "@/lib/firebase"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -50,6 +52,8 @@ export function ReportForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
 
   const form = useForm<z.infer<typeof reportSchema>>({
     resolver: zodResolver(reportSchema),
@@ -68,9 +72,29 @@ export function ReportForm() {
       return;
     }
 
+    let imageUrl: string | undefined = undefined;
+
+    if (imageFile) {
+      try {
+        const imageRef = ref(storage, `reports/${Date.now()}_${imageFile.name}`);
+        await uploadBytes(imageRef, imageFile);
+        imageUrl = await getDownloadURL(imageRef);
+      } catch (error) {
+        console.error("Image upload error:", error);
+        toast({
+          title: "Image Upload Failed",
+          description: "Could not upload your image. Please try again.",
+          variant: "destructive",
+        })
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
+
     const reportData = {
       ...values,
-      imageUrl: imagePreview ? 'https://placehold.co/600x400.png' : undefined,
+      imageUrl,
       reportedBy: user.email,
     };
     // Don't send the raw image data to the backend
@@ -103,6 +127,7 @@ export function ReportForm() {
           urgency: "Moderate",
         });
         setImagePreview(null);
+        setImageFile(null);
       }
 
     } catch (error) {
@@ -144,6 +169,7 @@ export function ReportForm() {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      setImageFile(file);
       form.setValue("image", file)
       const reader = new FileReader()
       reader.onloadend = () => {
