@@ -1,7 +1,7 @@
 // src/components/hazard-report-card.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Languages, Loader2 } from 'lucide-react';
 
@@ -13,7 +13,6 @@ import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
 import { Skeleton } from './ui/skeleton';
-import { supabase } from '@/lib/supabase';
 
 type HazardReportCardProps = {
   report: Report;
@@ -25,12 +24,11 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const { toast } = useToast();
 
-  const getPublicImageUrl = (path: string) => {
-    const { data } = supabase.storage.from('images').getPublicUrl(path);
-    return data?.publicUrl || null;
-  }
-
-  const imageUrl = report.imageUrl ? getPublicImageUrl(report.imageUrl) : null;
+  // Construct the public URL directly. This is the simplest and most reliable method
+  // assuming the bucket is public.
+  const imageUrl = report.imageUrl 
+    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${report.imageUrl}` 
+    : null;
 
   const handleTranslate = async () => {
     setIsTranslating(true);
@@ -64,25 +62,27 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        {report.imageUrl && (
+        {imageUrl && (
           <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
             {isImageLoading && <Skeleton className="h-full w-full absolute" />}
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={report.description}
-                fill
-                className="rounded-md object-cover"
-                data-ai-hint="hazard street"
-                onLoad={() => setIsImageLoading(false)}
-                onError={() => setIsImageLoading(false)}
-              />
-            ) : (
-               <div className="w-full h-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
-                  Image not available
-                </div>
-            )}
+            <Image
+              src={imageUrl}
+              alt={report.description}
+              fill
+              className="rounded-md object-cover"
+              data-ai-hint="hazard street"
+              onLoad={() => setIsImageLoading(false)}
+              onError={() => {
+                console.error("Image failed to load:", imageUrl);
+                setIsImageLoading(false);
+              }}
+            />
           </div>
+        )}
+        {!imageUrl && report.imageUrl && (
+             <div className="w-full sm:w-48 h-32 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+                Image not available
+              </div>
         )}
         <div className="flex-1 space-y-3">
           <div>
