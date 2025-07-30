@@ -1,7 +1,8 @@
+// src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { sendNewReportSms } from '@/lib/sms';
-import { Report } from '@/lib/types';
 import { z } from 'zod';
 import { getReports } from '@/lib/api';
 
@@ -17,7 +18,8 @@ export async function GET() {
   try {
     const reports = await getReports();
     return NextResponse.json(reports);
-  } catch (e: any) {
+  } catch (e: any)
+  {
     console.error('API GET Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
@@ -33,31 +35,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
     
-    const client = await clientPromise;
-    const db = client.db();
-    
-    const newReport: Omit<Report, '_id' | 'createdAt' | 'updatedAt'> = {
+    const newReportData = {
       ...validation.data,
       status: 'New',
-      reportedBy: 'anonymous', // Replace with actual user ID when auth is implemented
+      reportedBy: 'anonymous',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     };
 
-    const result = await db.collection('reports').insertOne({
-      ...newReport,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+    const docRef = await addDoc(collection(db, 'reports'), newReportData);
     
     // Send SMS notification
     try {
-      await sendNewReportSms(newReport);
+      await sendNewReportSms(validation.data);
     } catch (smsError: any) {
       console.error("SMS sending failed, but report was created. Error:", smsError.message);
     }
 
-    return NextResponse.json({ message: 'Report created', reportId: result.insertedId }, { status: 201 });
+    return NextResponse.json({ message: 'Report created', reportId: docRef.id }, { status: 201 });
   } catch (e: any) {
-    console.error('MongoDB POST Error:', e);
+    console.error('Firestore POST Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }

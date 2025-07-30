@@ -55,7 +55,7 @@ export default async function Dashboard() {
               <h2 className="text-xl font-bold mb-4 font-headline">Latest Reports</h2>
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                 {reports.slice(0, 10).map((report) => (
-                  <HazardReportCard key={report._id as string} report={report} />
+                  <HazardReportCard key={report.id as string} report={report} />
                 ))}
               </div>
             </div>
