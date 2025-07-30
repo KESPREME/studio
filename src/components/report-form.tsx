@@ -78,7 +78,7 @@ export function ReportForm() {
       try {
         const file = imageFile;
         const fileName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
-        const filePath = fileName; // Corrected: Do not add any prefix here
+        const filePath = fileName;
 
         const { error: uploadError } = await supabase.storage
           .from('images')
