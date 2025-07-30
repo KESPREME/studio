@@ -56,7 +56,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="user@example.com" defaultValue="citizen@example.com" required />
+              <Input id="email" type="email" placeholder="user@example.com" defaultValue={role === 'admin' ? 'responder@ndrf.gov.in' : 'citizen@example.com'} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
