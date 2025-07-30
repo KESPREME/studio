@@ -72,12 +72,12 @@ export function ReportForm() {
       return;
     }
 
-    let imageUrl: string | undefined = undefined;
+    let imagePath: string | undefined = undefined;
 
     if (imageFile) {
       try {
         const filePath = `reports/${Date.now()}_${imageFile.name}`;
-        const { error: uploadError } = await supabase.storage
+        const { data, error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, imageFile);
 
@@ -85,16 +85,7 @@ export function ReportForm() {
           throw uploadError;
         }
 
-        const { data: publicUrlData } = supabase.storage
-          .from('images')
-          .getPublicUrl(filePath);
-
-        if (!publicUrlData) {
-            throw new Error("Could not get public URL for the image.");
-        }
-
-        imageUrl = publicUrlData.publicUrl;
-
+        imagePath = data.path;
 
       } catch (error: any) {
         console.error("Image upload error:", error);
@@ -110,14 +101,14 @@ export function ReportForm() {
 
 
     const reportData = {
-      ...values,
-      imageUrl,
+      description: values.description,
+      urgency: values.urgency,
+      latitude: values.latitude,
+      longitude: values.longitude,
+      imageUrl: imagePath, // Save the path, not the full URL
       reportedBy: user.email,
     };
-    // Don't send the raw image data to the backend
-    delete reportData.image;
-
-
+    
     try {
       const response = await fetch('/api/reports', {
         method: 'POST',
@@ -139,13 +130,14 @@ export function ReportForm() {
       if(user.role === 'admin') {
         router.push('/admin');
       } else {
-        form.reset({
-          description: "",
-          urgency: "Moderate",
-        });
-        setImagePreview(null);
-        setImageFile(null);
+        router.push('/dashboard');
       }
+      form.reset({
+        description: "",
+        urgency: "Moderate",
+      });
+      setImagePreview(null);
+      setImageFile(null);
 
     } catch (error) {
       console.error("Submission error:", error);
@@ -276,7 +268,7 @@ export function ReportForm() {
                     <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
                         {imagePreview ? (
                             <div className="relative w-full h-40">
-                                <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="contain" />
+                                <Image src={imagePreview} alt="Image preview" fill objectFit="contain" />
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
