@@ -7,7 +7,6 @@ import { LocateFixed, Loader2, Upload } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +30,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
-import { storage } from "@/lib/firebase"
+import { supabase } from "@/lib/supabase"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -76,14 +75,29 @@ export function ReportForm() {
 
     if (imageFile) {
       try {
-        const imageRef = ref(storage, `reports/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(imageRef);
-      } catch (error) {
+        const filePath = `public/${Date.now()}_${imageFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('reports')
+          .upload(filePath, imageFile);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data } = supabase.storage
+          .from('reports')
+          .getPublicUrl(filePath);
+        
+        if (!data.publicUrl) {
+            throw new Error("Could not get public URL for the image.");
+        }
+        imageUrl = data.publicUrl;
+
+      } catch (error: any) {
         console.error("Image upload error:", error);
         toast({
           title: "Image Upload Failed",
-          description: "Could not upload your image. Please try again.",
+          description: `Could not upload your image: ${error.message}`,
           variant: "destructive",
         })
         setIsSubmitting(false);
