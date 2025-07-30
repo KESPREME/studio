@@ -16,7 +16,13 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const reports = await db.collection('reports').find({}).sort({ createdAt: -1 }).toArray();
+    const reportsFromDb = await db.collection('reports').find({}).sort({ createdAt: -1 }).toArray();
+    
+    const reports = reportsFromDb.map(report => ({
+      ...report,
+      _id: report._id.toString(),
+    }));
+
     return NextResponse.json(reports);
   } catch (e) {
     console.error(e);
