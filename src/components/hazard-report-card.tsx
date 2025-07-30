@@ -26,8 +26,8 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
 
   // Construct the public URL directly. This is the simplest and most reliable method
   // assuming the bucket is public.
-  const imageUrl = report.imageUrl 
-    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${report.imageUrl}` 
+  const imageUrl = report.imageUrl
+    ? `https://zeycfgpgoptewbcyucxd.supabase.co/storage/v1/object/public/images/${report.imageUrl}`
     : null;
 
   const handleTranslate = async () => {
