@@ -2,18 +2,12 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Match any file in the 'reports' folder
-    match /reports/{reportImage} {
-
-      // Allow reads from anyone. 
-      // This is necessary so the public can see report images.
+    // Allow image uploads to the 'reports' folder for any user.
+    // In a real app with authentication, you would want to restrict this
+    // to only authenticated users: `if request.auth != null;`
+    match /reports/{imageId} {
       allow read: if true;
-
-      // Allow writes only if the user is "authenticated" (for this app, any user)
-      // and the image is less than 5MB.
-      // In a real app, you would check `request.auth.uid != null`.
-      allow write: if request.resource.size < 5 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
+      allow write: if true;
     }
   }
 }
