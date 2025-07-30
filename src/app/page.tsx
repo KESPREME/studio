@@ -43,7 +43,7 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40 relative overflow-hidden bg-primary/5">
-          <div className="container px-4 md:px-6 z-10">
+          <div className="container px-4 md:px-6 z-10 mx-auto">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-24">
               <div className="flex flex-col justify-center space-y-4">
                 <ScrollReveal delay={0.1}>
@@ -111,7 +111,7 @@ export default function HomePage() {
 
         {/* How It Works Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
             <ScrollReveal>
               <div className="flex flex-col items-center justify-center space-y-4 text-center">
                 <div className="space-y-2">
@@ -138,7 +138,7 @@ export default function HomePage() {
 
         {/* Why AlertFront Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-primary/5">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
             <ScrollReveal>
               <div className="flex flex-col items-center justify-center space-y-4 text-center">
                 <div className="space-y-2">
@@ -177,7 +177,7 @@ export default function HomePage() {
 
         {/* Who We Help Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
              <ScrollReveal>
               <div className="flex flex-col items-center justify-center space-y-4 text-center">
                 <div className="space-y-2">
@@ -215,7 +215,7 @@ export default function HomePage() {
 
         {/* Final CTA */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-primary/5 text-center">
-           <div className="container px-4 md:px-6">
+           <div className="container px-4 md:px-6 mx-auto">
               <ScrollReveal>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">Ready to Make Your Community Safer?</h2>
                 <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
