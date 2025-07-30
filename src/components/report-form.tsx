@@ -77,7 +77,7 @@ export function ReportForm() {
       try {
         const filePath = `public/${Date.now()}_${imageFile.name}`;
         const { error: uploadError } = await supabase.storage
-          .from('reports')
+          .from('images')
           .upload(filePath, imageFile);
 
         if (uploadError) {
@@ -85,7 +85,7 @@ export function ReportForm() {
         }
 
         const { data } = supabase.storage
-          .from('reports')
+          .from('images')
           .getPublicUrl(filePath);
         
         if (!data.publicUrl) {
