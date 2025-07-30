@@ -54,7 +54,12 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
   
-  const imageUrl = report.imageUrl;
+  // Fix for existing bad URLs
+  let imageUrl = report.imageUrl;
+  if (imageUrl && imageUrl.includes('/public/')) {
+    imageUrl = imageUrl.replace('/public/', '/');
+  }
+
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
