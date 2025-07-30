@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useForm } from "react-hook-form"
@@ -75,7 +76,7 @@ export function ReportForm() {
 
     if (imageFile) {
       try {
-        const filePath = `images/${Date.now()}_${imageFile.name}`;
+        const filePath = `reports/${Date.now()}_${imageFile.name}`;
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, imageFile);
@@ -84,7 +85,15 @@ export function ReportForm() {
           throw uploadError;
         }
 
-        imageUrl = filePath;
+        const { data: publicUrlData } = supabase.storage
+          .from('images')
+          .getPublicUrl(filePath);
+
+        if (!publicUrlData) {
+            throw new Error("Could not get public URL for the image.");
+        }
+
+        imageUrl = publicUrlData.publicUrl;
 
 
       } catch (error: any) {

@@ -1,3 +1,4 @@
+
 // src/components/hazard-report-card.tsx
 "use client";
 
@@ -51,15 +52,13 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
   
-  const fullImageUrl = report.imageUrl ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${report.imageUrl}` : '';
-
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        {fullImageUrl && (
-          <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-square">
+        {report.imageUrl && (
+          <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
             <Image
-              src={fullImageUrl}
+              src={report.imageUrl}
               alt={report.description}
               fill
               className="rounded-md object-cover"
