@@ -13,7 +13,7 @@ const statusUpdateSchema = z.object({
 });
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { id:string } }
 ) {
   try {
@@ -26,7 +26,11 @@ export async function GET(
     
     const reportData = docSnap.data();
     
-    const imageUrl = reportData.imageUrl ? supabase.storage.from('images').getPublicUrl(reportData.imageUrl).data.publicUrl : undefined;
+    let imageUrl: string | undefined = undefined;
+    if (reportData.imageUrl) {
+        const { data } = supabase.storage.from('images').getPublicUrl(reportData.imageUrl);
+        imageUrl = data.publicUrl;
+    }
 
     const report: Report = {
       id: docSnap.id,
@@ -94,8 +98,7 @@ export async function DELETE(
     }
 
     const reportData = docSnap.data();
-    // This is now guaranteed to be the image path, not a full URL
-    const imagePath = reportData?.imageUrl; 
+    const imagePath = reportData?.imageUrl; // This is the path, e.g., 'user_123.png'
 
     // Primary Operation: Delete the Firestore document. This is the most critical step.
     await deleteDoc(docRef);

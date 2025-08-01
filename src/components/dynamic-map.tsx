@@ -42,52 +42,52 @@ type HazardMapProps = {
 const DynamicMap = ({ reports }: HazardMapProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.MarkerClusterGroup | null>(null);
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
       const position: [number, number] = reports.length > 0
         ? [reports[0].latitude, reports[0].longitude]
-        : [34.0522, -118.2437]; // Default to LA
+        : [20.5937, 78.9629]; // Default to India center
 
-      const map = L.map(mapContainerRef.current).setView(position, 10);
+      const map = L.map(mapContainerRef.current).setView(position, 5);
       mapRef.current = map;
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      const markerClusterGroup = L.markerClusterGroup();
+      markersRef.current = L.markerClusterGroup();
+      map.addLayer(markersRef.current);
+    }
+  }, []); // Run only once on mount
 
-      reports.forEach((report) => {
-        const marker = L.marker([report.latitude, report.longitude], {
-          icon: customIcon(report.urgency)
-        });
+  useEffect(() => {
+    const markerClusterGroup = markersRef.current;
+    if (!markerClusterGroup) return;
 
-        const popupContent = `
-          <div class="space-y-2">
-            ${report.imageUrl ? `<img src="${report.imageUrl}" alt="${report.description.substring(0, 30)}" width="200" height="150" class="rounded-md object-cover" data-ai-hint="hazard landscape" />` : ''}
-            <h3 class="font-bold">${report.description.substring(0, 50)}...</h3>
-            <div class="flex gap-2">
-              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${report.urgency === 'High' ? 'border-transparent bg-destructive text-destructive-foreground' : report.urgency === 'Moderate' ? 'border-transparent bg-secondary text-secondary-foreground' : 'border-transparent bg-primary text-primary-foreground'}">${report.urgency}</span>
-              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">${report.status}</span>
-            </div>
-          </div>
-        `;
-        
-        marker.bindPopup(popupContent);
-        markerClusterGroup.addLayer(marker);
+    markerClusterGroup.clearLayers();
+
+    reports.forEach((report) => {
+      const marker = L.marker([report.latitude, report.longitude], {
+        icon: customIcon(report.urgency)
       });
 
-      map.addLayer(markerClusterGroup);
-    }
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, [reports]);
+      const popupContent = `
+        <div class="space-y-2 p-1 max-w-[200px]">
+          ${report.imageUrl ? `<img src="${report.imageUrl}" alt="${report.description.substring(0, 30)}" width="200" height="150" class="rounded-md object-cover" data-ai-hint="hazard landscape" />` : ''}
+          <h3 class="font-bold text-sm leading-tight">${report.description.substring(0, 80)}...</h3>
+          <div class="flex gap-2 flex-wrap">
+            <span class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${report.urgency === 'High' ? 'border-transparent bg-destructive text-destructive-foreground' : report.urgency === 'Moderate' ? 'border-transparent bg-secondary text-secondary-foreground' : 'border-transparent bg-primary text-primary-foreground'}">${report.urgency}</span>
+            <span class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">${report.status}</span>
+          </div>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+      markerClusterGroup.addLayer(marker);
+    });
+  }, [reports]); // Re-run whenever reports change
 
   return <div ref={mapContainerRef} style={{ height: '500px', width: '100%' }} />;
 };

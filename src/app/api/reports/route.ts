@@ -18,7 +18,7 @@ const reportSchema = z.object({
   reportedBy: z.string().email(),
 });
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const reportsCollection = collection(db, 'reports');
     const q = query(reportsCollection, orderBy('createdAt', 'desc'));
@@ -31,7 +31,11 @@ export async function GET(request: Request) {
       const updatedAt = data.updatedAt as Timestamp | undefined;
       const resolvedAt = data.resolvedAt as Timestamp | undefined;
       
-      const imageUrl = data.imageUrl ? supabase.storage.from('images').getPublicUrl(data.imageUrl).data.publicUrl : undefined;
+      let imageUrl: string | undefined = undefined;
+      if (data.imageUrl) {
+        const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(data.imageUrl);
+        imageUrl = publicUrlData.publicUrl;
+      }
 
       return {
         id: doc.id,
