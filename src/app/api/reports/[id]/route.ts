@@ -34,8 +34,8 @@ export async function GET(
       status: reportData.status,
       imageUrl: reportData.imageUrl,
       reportedBy: reportData.reportedBy,
-      createdAt: (reportData.createdAt as Timestamp).toDate().toISOString(),
-      updatedAt: (reportData.updatedAt as Timestamp).toDate().toISOString(),
+      createdAt: (reportData.createdAt as Timestamp)?.toDate().toISOString(),
+      updatedAt: (reportData.updatedAt as Timestamp)?.toDate().toISOString(),
       resolvedAt: reportData.resolvedAt ? (reportData.resolvedAt as Timestamp).toDate().toISOString() : undefined,
     };
 

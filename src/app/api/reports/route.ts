@@ -29,8 +29,8 @@ export async function GET() {
       return {
         id: doc.id,
         ...data,
-        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
-        updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
+        createdAt: (data.createdAt as Timestamp)?.toDate().toISOString(),
+        updatedAt: (data.updatedAt as Timestamp)?.toDate().toISOString(),
         resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
       } as Report;
     });
