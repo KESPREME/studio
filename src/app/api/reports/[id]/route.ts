@@ -12,7 +12,7 @@ const statusUpdateSchema = z.object({
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id:string } }
 ) {
   try {
     const docRef = doc(db, 'reports', params.id);
@@ -98,15 +98,22 @@ export async function DELETE(
 
     // Delete image from Supabase Storage if it exists
     if (report.imageUrl) {
+      let imagePath: string | null = null;
       try {
-        // Extract the path from the full URL.
-        // e.g., https://<...>.supabase.co/storage/v1/object/public/images/image.png -> image.png
-        const url = new URL(report.imageUrl);
-        const pathSegments = url.pathname.split('/');
-        const imagePath = pathSegments[pathSegments.length - 1];
-
+        // The imageUrl can either be a full URL or just the path.
+        // This robustly handles both cases.
+        if (report.imageUrl.startsWith('http')) {
+          const url = new URL(report.imageUrl);
+          const pathSegments = url.pathname.split('/');
+          // The path we need is the last segment, e.g., "1234_image.png"
+          imagePath = pathSegments[pathSegments.length - 1] ?? null;
+        } else {
+          // It's already just the path
+          imagePath = report.imageUrl;
+        }
+        
         if (imagePath) {
-          const { error: deleteError } = await supabase.storage
+           const { error: deleteError } = await supabase.storage
             .from('images')
             .remove([imagePath]);
           
@@ -116,7 +123,7 @@ export async function DELETE(
           }
         }
       } catch (e) {
-        console.error("Could not parse image URL to delete from storage:", report.imageUrl, e);
+        console.error("Could not parse or use image path to delete from storage:", report.imageUrl, e);
       }
     }
 
