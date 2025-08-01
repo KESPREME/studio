@@ -106,7 +106,7 @@ export async function DELETE(
         
         if (deleteError) {
           // Log the error but don't cause the request to fail.
-          // This handles cases where the file doesn't exist in storage.
+          // This handles cases where the file doesn't exist in storage or other permission issues.
           console.warn(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. The Firestore document was deleted successfully.`);
         }
       } catch (storageError: any) {

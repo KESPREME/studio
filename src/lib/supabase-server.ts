@@ -7,8 +7,14 @@ if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error('Supabase server-side URL and service key are required.')
 }
 
+// This is the admin client, for use in server-side code (API routes, server components)
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
+    //
+    // Important: these settings prevent the admin client from trying to use
+    // browser storage, which is not available in a server environment.
+    //
+    autoRefreshToken: false,
     persistSession: false,
   }
 })
