@@ -82,6 +82,26 @@ export async function PATCH(
   }
 }
 
+// Helper function to extract the storage path from a URL or return the path if it's not a URL
+const getImagePath = (imageUrl: string): string | null => {
+  if (!imageUrl) return null;
+  try {
+    // Check if it's a full URL
+    const url = new URL(imageUrl);
+    const pathSegments = url.pathname.split('/');
+    // Find the 'images' segment and take everything after it
+    const imagesIndex = pathSegments.indexOf('images');
+    if (imagesIndex > -1 && imagesIndex < pathSegments.length -1) {
+      return pathSegments.slice(imagesIndex + 1).join('/');
+    }
+    return null;
+  } catch (e) {
+    // If it's not a valid URL, assume it's already a path
+    return imageUrl;
+  }
+};
+
+
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
@@ -98,14 +118,16 @@ export async function DELETE(
 
     // Delete image from Supabase Storage if it exists
     if (report?.imageUrl) {
-      const imagePath = report.imageUrl;
-      const { error: deleteError } = await supabase.storage
-        .from('images')
-        .remove([imagePath]);
-      
-      if (deleteError) {
-        // Log the error but don't block deletion of the Firestore document
-        console.error('Supabase image deletion failed:', deleteError.message);
+      const imagePath = getImagePath(report.imageUrl);
+      if (imagePath) {
+        const { error: deleteError } = await supabase.storage
+          .from('images')
+          .remove([imagePath]);
+        
+        if (deleteError) {
+          // Log the error but don't block deletion of the Firestore document
+          console.error('Supabase image deletion failed:', deleteError.message);
+        }
       }
     }
 

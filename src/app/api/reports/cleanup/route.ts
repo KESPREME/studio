@@ -9,6 +9,26 @@ import type { Report } from '@/lib/types';
 // like checking for a specific role or using a service account.
 const CRON_SECRET = process.env.CRON_SECRET || 'your-super-secret-key';
 
+// Helper function to extract the storage path from a URL or return the path if it's not a URL
+const getImagePath = (imageUrl: string): string | null => {
+  if (!imageUrl) return null;
+  try {
+    // Check if it's a full URL
+    const url = new URL(imageUrl);
+    const pathSegments = url.pathname.split('/');
+    // Find the 'images' segment and take everything after it
+    const imagesIndex = pathSegments.indexOf('images');
+    if (imagesIndex > -1 && imagesIndex < pathSegments.length -1) {
+      return pathSegments.slice(imagesIndex + 1).join('/');
+    }
+    return null;
+  } catch (e) {
+    // If it's not a valid URL, assume it's already a path
+    return imageUrl;
+  }
+};
+
+
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${CRON_SECRET}`) {
@@ -41,19 +61,9 @@ export async function POST(request: Request) {
       const report = doc.data() as Report;
       batch.delete(doc.ref);
       if (report.imageUrl) {
-        // The imageUrl is the full public URL. We need to extract the path.
-        // Example: https://zeycfgpgoptewbcyucxd.supabase.co/storage/v1/object/public/images/1753898693610_auto-cheetah.png
-        // We need the path: "1753898693610_auto-cheetah.png"
-        try {
-            const url = new URL(report.imageUrl);
-            const pathSegments = url.pathname.split('/');
-            // The actual file path is the last segment of the URL path
-            const imagePath = pathSegments[pathSegments.length - 1];
-            if(imagePath) {
-                imagePathsToDelete.push(imagePath);
-            }
-        } catch (e) {
-            console.error("Invalid imageUrl format, cannot extract path:", report.imageUrl);
+        const imagePath = getImagePath(report.imageUrl);
+        if (imagePath) {
+          imagePathsToDelete.push(imagePath);
         }
       }
     });
