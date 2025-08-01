@@ -6,7 +6,6 @@ import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
 import { supabaseAdmin } from '@/lib/supabase-server';
-import { supabase } from '@/lib/supabase';
 
 const statusUpdateSchema = z.object({
   status: z.enum(["New", "In Progress", "Resolved"]),
@@ -28,7 +27,7 @@ export async function GET(
     
     let imageUrl: string | undefined = undefined;
     if (reportData.imageUrl) {
-        const { data } = supabase.storage.from('images').getPublicUrl(reportData.imageUrl);
+        const { data } = supabaseAdmin.storage.from('images').getPublicUrl(reportData.imageUrl);
         imageUrl = data.publicUrl;
     }
 

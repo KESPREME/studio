@@ -18,8 +18,8 @@ service cloud.firestore {
       // In a real app, you'd check if request.auth.uid is an admin.
       allow update: if true;
       
-      // No one can delete reports for now.
-      allow delete: if false;
+      // In a real app, you'd check if request.auth.uid is an admin.
+      allow delete: if true;
     }
   }
 }
