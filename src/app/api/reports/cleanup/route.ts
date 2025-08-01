@@ -9,23 +9,6 @@ import type { Report } from '@/lib/types';
 // like checking for a specific role or using a service account.
 const CRON_SECRET = process.env.CRON_SECRET || 'your-super-secret-key';
 
-const getImagePath = (imageUrl: string): string | null => {
-    if (!imageUrl) return null;
-    try {
-        // This handles both full URLs and raw paths
-        const url = new URL(imageUrl);
-        const pathSegments = url.pathname.split('/images/');
-        if (pathSegments.length > 1) {
-            return decodeURIComponent(pathSegments[1]);
-        }
-        return null;
-    } catch (e) {
-        // If it's not a valid URL, it's likely already a path
-        return imageUrl.split('/images/').pop() || imageUrl;
-    }
-};
-
-
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${CRON_SECRET}`) {
@@ -57,11 +40,9 @@ export async function POST(request: Request) {
     querySnapshot.forEach(doc => {
       const report = doc.data() as Report;
       batch.delete(doc.ref);
+      // report.imageUrl will be the path
       if (report.imageUrl) {
-        const imagePath = getImagePath(report.imageUrl);
-        if (imagePath) {
-          imagePathsToDelete.push(imagePath);
-        }
+        imagePathsToDelete.push(report.imageUrl);
       }
     });
 

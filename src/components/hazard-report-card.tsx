@@ -14,6 +14,7 @@ import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
 import { Skeleton } from './ui/skeleton';
+import { supabase } from '@/lib/supabase';
 
 type HazardReportCardProps = {
   report: Report;
@@ -54,21 +55,23 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
 
+  const imageUrl = report.imageUrl ? supabase.storage.from('images').getPublicUrl(report.imageUrl).data.publicUrl : null;
+
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         <div className="w-full sm:w-48 sm:h-auto flex-shrink-0 relative aspect-video">
-          {(isImageLoading && report.imageUrl) && <Skeleton className="h-full w-full absolute" />}
-          {report.imageUrl ? (
+          {(isImageLoading && imageUrl) && <Skeleton className="h-full w-full absolute" />}
+          {imageUrl ? (
             <Image
-              src={report.imageUrl}
+              src={imageUrl}
               alt={report.description}
               fill
               className="rounded-md object-cover"
               data-ai-hint="hazard street"
               onLoad={() => setIsImageLoading(false)}
               onError={() => {
-                console.error("Image failed to load:", report.imageUrl);
+                console.error("Image failed to load:", imageUrl);
                 setIsImageLoading(false);
               }}
             />

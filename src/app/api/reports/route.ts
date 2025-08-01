@@ -12,7 +12,8 @@ const reportSchema = z.object({
   urgency: z.enum(["Low", "Moderate", "High"]),
   latitude: z.number(),
   longitude: z.number(),
-  imageUrl: z.string().url().optional(),
+  // Ensure we store the image path, not the full URL. This is more robust.
+  imageUrl: z.string().optional(),
   reportedBy: z.string().email(),
 });
 
@@ -131,6 +132,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Report created', reportId: docRef.id }, { status: 201 });
   } catch (e: any) {
     console.error('Firestore POST Error:', e);
+    // If the error is due to payload size, provide a specific message
+    if (e.message?.includes('too large')) {
+       return NextResponse.json({ message: 'Request body too large. Please upload a smaller image file.' }, { status: 413 });
+    }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
