@@ -83,6 +83,8 @@ function AdminDashboard() {
         title: "Report Deleted",
         description: "The resolved report has been successfully deleted.",
       });
+      // Optional: re-fetch to ensure sync, though optimistic removal is often sufficient
+      // await fetchReports(); 
     } catch (error: any) {
       console.error("Delete failed:", error);
       setReports(originalReports); // Revert on failure
