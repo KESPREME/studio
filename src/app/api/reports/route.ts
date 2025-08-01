@@ -1,4 +1,3 @@
-
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
@@ -6,7 +5,6 @@ import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Ti
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
-
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -18,7 +16,14 @@ const reportSchema = z.object({
   reportedBy: z.string().email(),
 });
 
-export async function GET() {
+export async function GET(request: Request) {
+   // This revalidation strategy ensures that for a short period (60s),
+   // users will get a fast, cached response. After that, the next request
+   // will trigger a re-fetch from the database. This drastically reduces
+   // database reads for high-traffic scenarios.
+  const { next: { revalidate } } = request as any;
+  if (revalidate) revalidate(60);
+
   try {
     const reportsCollection = collection(db, 'reports');
     const q = query(reportsCollection, orderBy('createdAt', 'desc'));

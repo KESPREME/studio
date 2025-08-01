@@ -3,7 +3,7 @@
 
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
@@ -24,7 +24,10 @@ function AdminDashboard() {
   const { toast } = useToast();
 
   const fetchReports = useCallback(async () => {
-    setIsLoading(true);
+    // Keep loading true when re-fetching in background
+    if (reports.length === 0) {
+      setIsLoading(true);
+    }
     try {
       const fetchedReports = await getReports();
       setReports(fetchedReports);
@@ -38,7 +41,7 @@ function AdminDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, reports.length]);
 
   useEffect(() => {
     fetchReports();
@@ -83,8 +86,7 @@ function AdminDashboard() {
         title: "Report Deleted",
         description: "The resolved report has been successfully deleted.",
       });
-      // Optional: re-fetch to ensure sync, though optimistic removal is often sufficient
-      // await fetchReports(); 
+      // No need to re-fetch, optimistic removal is sufficient
     } catch (error: any) {
       console.error("Delete failed:", error);
       setReports(originalReports); // Revert on failure
@@ -96,17 +98,17 @@ function AdminDashboard() {
     }
   }, [reports, toast]);
 
-  const columns = getColumns({ 
+  const columns = useMemo(() => getColumns({ 
     onStatusChange: handleStatusChange,
     onDelete: handleDelete 
-  });
+  }), [handleStatusChange, handleDelete]);
 
-  const stats = {
+  const stats = useMemo(() => ({
     total: reports.length,
     new: reports.filter((r) => r.status === 'New').length,
     inProgress: reports.filter((r) => r.status === 'In Progress').length,
     resolved: reports.filter((r) => r.status === 'Resolved').length,
-  };
+  }), [reports]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -124,17 +126,17 @@ function AdminDashboard() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-            <StatCard title="Total Reports" value={stats.total} />
-            <StatCard title="New" value={stats.new} variant="new" />
-            <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" />
-            <StatCard title="Resolved" value={stats.resolved} variant="resolved" />
+            <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
+            <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
+            <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
+            <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
           </div>
 
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-1">
               <h2 className="text-xl font-bold mb-4 font-headline">Hazard Map</h2>
               <div className="rounded-lg overflow-hidden shadow-md">
-                <MapWrapper reports={reports} />
+                <MapWrapper reports={reports} isLoading={isLoading} />
               </div>
             </div>
 

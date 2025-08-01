@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Languages, Loader2 } from 'lucide-react';
+import { Languages, Loader2, ImageOff } from 'lucide-react';
 
 import type { Report } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +20,29 @@ type HazardReportCardProps = {
   report: Report;
 };
 
+const HazardReportCardSkeleton = () => {
+    return (
+        <Card className="overflow-hidden shadow-lg">
+            <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
+                <Skeleton className="w-full sm:w-48 sm:h-auto flex-shrink-0 aspect-video rounded-md" />
+                <div className="flex-1 space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <Skeleton className="h-6 w-24 rounded-full" />
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                       <Skeleton className="h-4 w-1/3" />
+                       <Skeleton className="h-8 w-24" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
+
 export function HazardReportCard({ report }: HazardReportCardProps) {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
@@ -27,6 +50,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
   const { toast } = useToast();
 
   const handleTranslate = async () => {
+    if (isTranslating) return;
     setIsTranslating(true);
     setTranslatedText('');
     try {
@@ -77,8 +101,9 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
               }}
             />
           ) : (
-            <div className="w-full h-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
-              Image not available
+            <div className="w-full h-full bg-muted rounded-md flex flex-col items-center justify-center text-xs text-muted-foreground gap-2">
+              <ImageOff className="w-6 h-6"/>
+              <span>No Image</span>
             </div>
           )}
         </div>
@@ -117,3 +142,5 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     </Card>
   );
 }
+
+HazardReportCard.Skeleton = HazardReportCardSkeleton;

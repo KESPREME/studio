@@ -1,9 +1,9 @@
 // src/app/dashboard/page.tsx
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { PlusCircle, Map, List } from 'lucide-react';
+import { PlusCircle, Map, List, Wind } from 'lucide-react';
 
 import withAuth from '@/components/with-auth';
 import { useAuth } from '@/hooks/use-auth';
@@ -20,37 +20,45 @@ import { Skeleton } from '@/components/ui/skeleton';
 function ReporterDashboard() {
   const { user } = useAuth();
   const [allReports, setAllReports] = useState<Report[]>([]);
-  const [myReports, setMyReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      setIsLoading(true);
+  const fetchReports = useCallback(async () => {
+    setIsLoading(true);
+    try {
       const fetchedReports = await getReports();
       setAllReports(fetchedReports);
-      if (user) {
-        setMyReports(fetchedReports.filter(r => r.reportedBy === user.email));
-      }
+    } catch (error) {
+      console.error("Failed to fetch reports:", error);
+      // Optionally add a toast message here for the user
+    } finally {
       setIsLoading(false);
-    };
+    }
+  }, []);
 
+  useEffect(() => {
     fetchReports();
-  }, [user]);
+  }, [fetchReports]);
+  
+  const myReports = useMemo(() => {
+    if (!user) return [];
+    return allReports.filter(r => r.reportedBy === user.email);
+  }, [allReports, user]);
 
-  const ReportList = ({ reports, emptyMessage }: { reports: Report[], emptyMessage: string }) => {
+  const ReportList = ({ reports, emptyMessage, isLoading }: { reports: Report[], emptyMessage: string, isLoading: boolean }) => {
     if (isLoading) {
       return (
          <div className="space-y-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
+          <HazardReportCard.Skeleton />
+          <HazardReportCard.Skeleton />
+          <HazardReportCard.Skeleton />
         </div>
       )
     }
 
     if (reports.length === 0) {
       return (
-        <div className="text-center py-12 text-muted-foreground">
+        <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-4 border-2 border-dashed rounded-lg">
+          <Wind className="w-12 h-12 text-muted-foreground/50" />
           <p>{emptyMessage}</p>
         </div>
       );
@@ -90,18 +98,18 @@ function ReporterDashboard() {
             </TabsList>
             <TabsContent value="map" className="mt-6">
                  <div className="rounded-lg overflow-hidden shadow-md">
-                   <MapWrapper reports={allReports} />
+                   <MapWrapper reports={allReports} isLoading={isLoading} />
                 </div>
             </TabsContent>
             <TabsContent value="list" className="mt-6">
                  <div className="grid gap-8 lg:grid-cols-2">
                     <div>
                         <h2 className="text-xl font-bold mb-4 font-headline">My Submitted Reports ({myReports.length})</h2>
-                        <ReportList reports={myReports} emptyMessage="You haven't submitted any reports yet." />
+                        <ReportList reports={myReports} emptyMessage="You haven't submitted any reports yet." isLoading={isLoading} />
                     </div>
                      <div>
                         <h2 className="text-xl font-bold mb-4 font-headline">Latest Community Reports</h2>
-                        <ReportList reports={allReports} emptyMessage="No community reports yet. Be the first!" />
+                        <ReportList reports={allReports.slice(0, 10)} emptyMessage="No community reports yet. Be the first!" isLoading={isLoading} />
                     </div>
                 </div>
             </TabsContent>
