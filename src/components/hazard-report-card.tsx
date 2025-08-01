@@ -55,6 +55,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
 
+  // Construct the public URL from the stored path
   const imageUrl = report.imageUrl ? supabase.storage.from('images').getPublicUrl(report.imageUrl).data.publicUrl : null;
 
   return (

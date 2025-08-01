@@ -91,6 +91,7 @@ export async function DELETE(
     }
 
     const reportData = docSnap.data();
+    // This is now guaranteed to be the image path, not a full URL
     const imagePath = reportData?.imageUrl; 
 
     // Primary Operation: Delete the Firestore document. This is the most critical step.

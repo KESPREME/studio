@@ -13,7 +13,7 @@ const reportSchema = z.object({
   urgency: z.enum(["Low", "Moderate", "High"]),
   latitude: z.number(),
   longitude: z.number(),
-  // Ensure we store the image path, not the full URL. This is more robust.
+  // Store the image path from Supabase, not the full URL. This is more robust.
   imageUrl: z.string().optional(),
   reportedBy: z.string().email(),
 });
