@@ -78,9 +78,8 @@ export async function PATCH(
   }
 }
 
-// Using a more robust signature for the DELETE handler.
 export async function DELETE(
-  _request: Request, // Use _request to indicate it's not used
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -91,24 +90,24 @@ export async function DELETE(
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
 
-    const report = docSnap.data();
-    // The imageUrl is stored as the path, e.g., 'image_name.png'
-    const imagePath = report?.imageUrl; 
+    const reportData = docSnap.data();
+    const imagePath = reportData?.imageUrl; // This is expected to be the path
 
-    // Delete the Firestore document first, as it's the primary record.
+    // Primary Operation: Delete the Firestore document.
     await deleteDoc(docRef);
 
-    // After successfully deleting the Firestore doc, attempt to delete the image.
-    // This operation is secondary; its failure should not block the overall success.
-    if (imagePath) {
+    // Secondary Operation: Attempt to delete the image from storage.
+    // This should not block the success of the overall request.
+    if (imagePath && typeof imagePath === 'string') {
       try {
         const { error: deleteError } = await supabaseAdmin.storage
           .from('images')
-          .remove([imagePath]); // Pass the path as an array of strings
+          .remove([imagePath]); 
         
         if (deleteError) {
           // Log the error but don't cause the request to fail.
-          console.error(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. The Firestore document was deleted successfully.`);
+          // This handles cases where the file doesn't exist in storage.
+          console.warn(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. The Firestore document was deleted successfully.`);
         }
       } catch (storageError: any) {
          console.error(`An exception occurred during Supabase image deletion for path: ${imagePath}. Error: ${storageError.message}.`);
