@@ -80,6 +80,7 @@ export async function PATCH(
 const getImagePath = (imageUrl: string): string | null => {
     if (!imageUrl) return null;
     try {
+        // This handles both full URLs and raw paths
         const url = new URL(imageUrl);
         const pathSegments = url.pathname.split('/images/');
         if (pathSegments.length > 1) {
@@ -87,8 +88,8 @@ const getImagePath = (imageUrl: string): string | null => {
         }
         return null;
     } catch (e) {
-        console.warn("Could not parse image URL, it might be a raw path:", imageUrl);
-        return imageUrl.split('/images/').pop() || null;
+        // If it's not a valid URL, it's likely already a path
+        return imageUrl.split('/images/').pop() || imageUrl;
     }
 };
 
@@ -106,23 +107,30 @@ export async function DELETE(
     }
 
     const report = docSnap.data();
+    const imageUrl = report?.imageUrl;
 
-    // Attempt to delete image from Supabase Storage if it exists.
-    if (report?.imageUrl) {
-      const imagePath = getImagePath(report.imageUrl);
+    // Delete the Firestore document first, as it's the primary record.
+    await deleteDoc(docRef);
+
+    // After successfully deleting the Firestore doc, attempt to delete the image.
+    // This operation is secondary; its failure should not block the overall success.
+    if (imageUrl) {
+      const imagePath = getImagePath(imageUrl);
       if (imagePath) {
-        const { error: deleteError } = await supabaseAdmin.storage
-          .from('images')
-          .remove([imagePath]);
-        
-        if (deleteError) {
-          console.error(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. Proceeding with Firestore deletion.`);
+        try {
+          const { error: deleteError } = await supabaseAdmin.storage
+            .from('images')
+            .remove([imagePath]);
+          
+          if (deleteError) {
+            // Log the error but don't cause the request to fail.
+            console.error(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. The Firestore document was deleted successfully.`);
+          }
+        } catch (storageError: any) {
+           console.error(`An exception occurred during Supabase image deletion for path: ${imagePath}. Error: ${storageError.message}.`);
         }
       }
     }
-
-    // Delete the Firestore document regardless of image deletion outcome
-    await deleteDoc(docRef);
 
     return NextResponse.json({ message: 'Report deleted successfully' });
   } catch (e: any) {

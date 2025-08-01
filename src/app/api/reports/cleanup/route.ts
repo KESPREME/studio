@@ -9,21 +9,19 @@ import type { Report } from '@/lib/types';
 // like checking for a specific role or using a service account.
 const CRON_SECRET = process.env.CRON_SECRET || 'your-super-secret-key';
 
-// Robust helper function to extract the storage path from a Supabase URL
 const getImagePath = (imageUrl: string): string | null => {
     if (!imageUrl) return null;
     try {
+        // This handles both full URLs and raw paths
         const url = new URL(imageUrl);
-        // The path is everything after '/images/'
         const pathSegments = url.pathname.split('/images/');
         if (pathSegments.length > 1) {
             return decodeURIComponent(pathSegments[1]);
         }
         return null;
     } catch (e) {
-        // If it's not a valid URL, it might be a raw path.
-        console.warn("Could not parse image URL during cleanup, assuming it's a path:", imageUrl);
-        return imageUrl;
+        // If it's not a valid URL, it's likely already a path
+        return imageUrl.split('/images/').pop() || imageUrl;
     }
 };
 
@@ -67,24 +65,27 @@ export async function POST(request: Request) {
       }
     });
 
-    // Attempt to delete images from Supabase Storage, but don't block on failure
+    // Commit the Firestore deletions first.
+    await batch.commit();
+
+    // After successful deletion from Firestore, attempt to delete from storage.
+    // Failure here should not cause the entire job to fail.
     if (imagePathsToDelete.length > 0) {
-      // Use the admin client for server-side operations
-      const { data, error } = await supabaseAdmin.storage.from('images').remove(imagePathsToDelete);
-      if (error) {
-        // Log the error but don't block the Firestore cleanup
-        console.error('Supabase image deletion failed for some paths, but Firestore cleanup will proceed:', error.message);
-      } else {
-         console.log('Successfully deleted images from Supabase:', data);
+      try {
+        const { data, error } = await supabaseAdmin.storage.from('images').remove(imagePathsToDelete);
+        if (error) {
+          console.error('Supabase image deletion failed for some paths, but Firestore cleanup was successful:', error.message);
+        } else {
+           console.log('Successfully deleted images from Supabase:', data);
+        }
+      } catch (storageError: any) {
+        console.error('An exception occurred during Supabase image cleanup:', storageError.message);
       }
     }
 
-    // Commit the Firestore deletions regardless of image deletion outcome
-    await batch.commit();
-
     return NextResponse.json({
-      message: `Successfully deleted ${querySnapshot.size} old resolved reports.`,
-      deletedImagePaths: imagePathsToDelete,
+      message: `Successfully deleted ${querySnapshot.size} old resolved reports from Firestore.`,
+      attemptedImageDeletions: imagePathsToDelete.length,
     });
 
   } catch (e: any) {
