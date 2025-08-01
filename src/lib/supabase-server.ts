@@ -1,6 +1,9 @@
+// src/lib/supabase-server.ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL
+// Use the public URL for consistency, as it points to the same project.
+// The security is handled by the service key.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
 if (!supabaseUrl || !supabaseServiceKey) {
