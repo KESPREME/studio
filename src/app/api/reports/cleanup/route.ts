@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
 import { supabaseAdmin } from '@/lib/supabase-server';
-import type { Report } from '@/lib/types';
 
 // In a production environment, you would secure this with a more robust mechanism
 // like checking for a specific role or using a service account.
