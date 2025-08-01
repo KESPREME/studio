@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 const statusUpdateSchema = z.object({
   status: z.enum(["New", "In Progress", "Resolved"]),
@@ -88,10 +88,12 @@ const getImagePath = (imageUrl: string): string | null => {
   try {
     // Check if it's a full URL
     const url = new URL(imageUrl);
+    // Pathname looks like /storage/v1/object/public/images/some-image.png
+    // We want to extract 'some-image.png' from the 'images' bucket.
     const pathSegments = url.pathname.split('/');
-    // Find the 'images' segment and take everything after it
     const imagesIndex = pathSegments.indexOf('images');
     if (imagesIndex > -1 && imagesIndex < pathSegments.length -1) {
+      // Return the rest of the path after the bucket name.
       return pathSegments.slice(imagesIndex + 1).join('/');
     }
     return null;
@@ -120,7 +122,8 @@ export async function DELETE(
     if (report?.imageUrl) {
       const imagePath = getImagePath(report.imageUrl);
       if (imagePath) {
-        const { error: deleteError } = await supabase.storage
+        // Use the admin client for server-side operations
+        const { error: deleteError } = await supabaseAdmin.storage
           .from('images')
           .remove([imagePath]);
         

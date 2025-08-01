@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import type { Report } from '@/lib/types';
 
 // In a production environment, you would secure this with a more robust mechanism
@@ -15,10 +15,12 @@ const getImagePath = (imageUrl: string): string | null => {
   try {
     // Check if it's a full URL
     const url = new URL(imageUrl);
+     // Pathname looks like /storage/v1/object/public/images/some-image.png
+    // We want to extract 'some-image.png' from the 'images' bucket.
     const pathSegments = url.pathname.split('/');
-    // Find the 'images' segment and take everything after it
     const imagesIndex = pathSegments.indexOf('images');
     if (imagesIndex > -1 && imagesIndex < pathSegments.length -1) {
+      // Return the rest of the path after the bucket name.
       return pathSegments.slice(imagesIndex + 1).join('/');
     }
     return null;
@@ -70,7 +72,8 @@ export async function POST(request: Request) {
 
     // Attempt to delete images from Supabase Storage, but don't block on failure
     if (imagePathsToDelete.length > 0) {
-      const { data, error } = await supabase.storage.from('images').remove(imagePathsToDelete);
+      // Use the admin client for server-side operations
+      const { data, error } = await supabaseAdmin.storage.from('images').remove(imagePathsToDelete);
       if (error) {
         // Log the error but don't block the Firestore cleanup
         console.error('Supabase image deletion failed for some paths, but Firestore cleanup will proceed:', error.message);
