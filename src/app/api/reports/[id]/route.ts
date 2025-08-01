@@ -116,7 +116,7 @@ export async function DELETE(
 
     const report = docSnap.data();
 
-    // Delete image from Supabase Storage if it exists
+    // Attempt to delete image from Supabase Storage if it exists, but don't block deletion on failure.
     if (report?.imageUrl) {
       const imagePath = getImagePath(report.imageUrl);
       if (imagePath) {
@@ -126,12 +126,12 @@ export async function DELETE(
         
         if (deleteError) {
           // Log the error but don't block deletion of the Firestore document
-          console.error('Supabase image deletion failed:', deleteError.message);
+          console.error(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. Proceeding with Firestore deletion.`);
         }
       }
     }
 
-    // Delete the Firestore document
+    // Delete the Firestore document regardless of image deletion outcome
     await deleteDoc(docRef);
 
     return NextResponse.json({ message: 'Report deleted successfully' });

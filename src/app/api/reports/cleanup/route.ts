@@ -68,19 +68,18 @@ export async function POST(request: Request) {
       }
     });
 
-    // Delete images from Supabase Storage
+    // Attempt to delete images from Supabase Storage, but don't block on failure
     if (imagePathsToDelete.length > 0) {
       const { data, error } = await supabase.storage.from('images').remove(imagePathsToDelete);
       if (error) {
-        console.error('Supabase image deletion failed, but Firestore cleanup will proceed:', error);
-        // We won't block the Firestore cleanup if image deletion fails,
-        // but we'll log the error.
+        // Log the error but don't block the Firestore cleanup
+        console.error('Supabase image deletion failed for some paths, but Firestore cleanup will proceed:', error.message);
       } else {
          console.log('Successfully deleted images from Supabase:', data);
       }
     }
 
-    // Commit the Firestore deletions
+    // Commit the Firestore deletions regardless of image deletion outcome
     await batch.commit();
 
     return NextResponse.json({
