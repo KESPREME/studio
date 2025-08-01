@@ -1,3 +1,4 @@
+
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
@@ -103,7 +104,7 @@ export async function DELETE(
       try {
         const { error: deleteError } = await supabaseAdmin.storage
           .from('images')
-          .remove([imagePath]); // Pass the path directly
+          .remove([imagePath]); // Pass the path as an array of strings
         
         if (deleteError) {
           // Log the error but don't cause the request to fail.

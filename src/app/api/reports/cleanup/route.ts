@@ -1,3 +1,4 @@
+
 // src/app/api/reports/cleanup/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
@@ -38,11 +39,11 @@ export async function POST(request: Request) {
     const imagePathsToDelete: string[] = [];
 
     querySnapshot.forEach(doc => {
-      const report = doc.data() as Report;
+      const reportData = doc.data();
       batch.delete(doc.ref);
-      // report.imageUrl will be the path
-      if (report.imageUrl) {
-        imagePathsToDelete.push(report.imageUrl);
+      // reportData.imageUrl will be the path
+      if (reportData.imageUrl) {
+        imagePathsToDelete.push(reportData.imageUrl);
       }
     });
 
