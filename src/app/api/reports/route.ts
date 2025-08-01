@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Ti
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -18,11 +19,6 @@ const reportSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  // Set revalidate to 0 to prevent caching on this dynamic endpoint.
-  // We want fresh data every time someone visits the dashboard.
-  const { nextUrl } = request;
-  nextUrl.searchParams.set('revalidate', '0');
-
   try {
     const reportsCollection = collection(db, 'reports');
     const q = query(reportsCollection, orderBy('createdAt', 'desc'));
@@ -34,10 +30,13 @@ export async function GET(request: Request) {
       const createdAt = data.createdAt as Timestamp | undefined;
       const updatedAt = data.updatedAt as Timestamp | undefined;
       const resolvedAt = data.resolvedAt as Timestamp | undefined;
+      
+      const imageUrl = data.imageUrl ? supabase.storage.from('images').getPublicUrl(data.imageUrl).data.publicUrl : undefined;
 
       return {
         id: doc.id,
         ...data,
+        imageUrl,
         createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
         updatedAt: updatedAt ? updatedAt.toDate().toISOString() : new Date().toISOString(),
         resolvedAt: resolvedAt ? resolvedAt.toDate().toISOString() : undefined,

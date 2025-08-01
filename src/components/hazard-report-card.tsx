@@ -14,7 +14,6 @@ import { translateToTamil } from '@/ai/flows/translate-to-tamil';
 import { useToast } from '@/hooks/use-toast';
 import { TimeAgo } from './time-ago';
 import { Skeleton } from './ui/skeleton';
-import { supabase } from '@/lib/supabase';
 
 type HazardReportCardProps = {
   report: Report;
@@ -79,8 +78,7 @@ export function HazardReportCard({ report }: HazardReportCardProps) {
     }
   };
 
-  // Construct the public URL from the stored path
-  const imageUrl = report.imageUrl ? supabase.storage.from('images').getPublicUrl(report.imageUrl).data.publicUrl : null;
+  const imageUrl = report.imageUrl;
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">

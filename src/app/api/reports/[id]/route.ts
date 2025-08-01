@@ -6,6 +6,7 @@ import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabase } from '@/lib/supabase';
 
 const statusUpdateSchema = z.object({
   status: z.enum(["New", "In Progress", "Resolved"]),
@@ -25,6 +26,8 @@ export async function GET(
     
     const reportData = docSnap.data();
     
+    const imageUrl = reportData.imageUrl ? supabase.storage.from('images').getPublicUrl(reportData.imageUrl).data.publicUrl : undefined;
+
     const report: Report = {
       id: docSnap.id,
       description: reportData.description,
@@ -32,7 +35,7 @@ export async function GET(
       longitude: reportData.longitude,
       urgency: reportData.urgency,
       status: reportData.status,
-      imageUrl: reportData.imageUrl,
+      imageUrl: imageUrl,
       reportedBy: reportData.reportedBy,
       createdAt: (reportData.createdAt as Timestamp)?.toDate().toISOString(),
       updatedAt: (reportData.updatedAt as Timestamp)?.toDate().toISOString(),

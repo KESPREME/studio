@@ -10,7 +10,6 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 import type { Report } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
 
 // This is a workaround for a known issue with react-leaflet and Next.js HMR
 L.Icon.Default.mergeOptions({
@@ -64,12 +63,9 @@ const DynamicMap = ({ reports }: HazardMapProps) => {
           icon: customIcon(report.urgency)
         });
 
-        // Construct the public URL from the stored path
-        const fullImageUrl = report.imageUrl ? supabase.storage.from('images').getPublicUrl(report.imageUrl).data.publicUrl : '';
-
         const popupContent = `
           <div class="space-y-2">
-            ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${report.description.substring(0, 30)}" width="200" height="150" class="rounded-md object-cover" data-ai-hint="hazard landscape" />` : ''}
+            ${report.imageUrl ? `<img src="${report.imageUrl}" alt="${report.description.substring(0, 30)}" width="200" height="150" class="rounded-md object-cover" data-ai-hint="hazard landscape" />` : ''}
             <h3 class="font-bold">${report.description.substring(0, 50)}...</h3>
             <div class="flex gap-2">
               <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${report.urgency === 'High' ? 'border-transparent bg-destructive text-destructive-foreground' : report.urgency === 'Moderate' ? 'border-transparent bg-secondary text-secondary-foreground' : 'border-transparent bg-primary text-primary-foreground'}">${report.urgency}</span>
