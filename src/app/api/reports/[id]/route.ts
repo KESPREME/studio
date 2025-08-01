@@ -82,15 +82,23 @@ export async function PATCH(
   }
 }
 
-// Helper function to extract the storage path from a Supabase URL
+// Robust helper function to extract the storage path from a Supabase URL
 const getImagePath = (imageUrl: string): string | null => {
-  if (!imageUrl) return null;
-  // If it's a full URL, extract the path after the bucket name 'images'
-  if (imageUrl.includes('/storage/v1/object/public/images/')) {
-    return imageUrl.split('/images/').pop() || null;
-  }
-  // Otherwise, assume it's already a path
-  return imageUrl;
+    if (!imageUrl) return null;
+    try {
+        const url = new URL(imageUrl);
+        // The path is everything after '/images/'
+        const pathSegments = url.pathname.split('/images/');
+        if (pathSegments.length > 1) {
+            return decodeURIComponent(pathSegments[1]);
+        }
+        return null;
+    } catch (e) {
+        // If it's not a valid URL, it might be a raw path.
+        // This is a fallback and should not happen with the new upload logic.
+        console.warn("Could not parse image URL, assuming it's a path:", imageUrl);
+        return imageUrl;
+    }
 };
 
 
@@ -108,7 +116,7 @@ export async function DELETE(
 
     const report = docSnap.data();
 
-    // Attempt to delete image from Supabase Storage if it exists, but don't block deletion on failure.
+    // Attempt to delete image from Supabase Storage if it exists.
     if (report?.imageUrl) {
       const imagePath = getImagePath(report.imageUrl);
       if (imagePath) {

@@ -9,15 +9,22 @@ import type { Report } from '@/lib/types';
 // like checking for a specific role or using a service account.
 const CRON_SECRET = process.env.CRON_SECRET || 'your-super-secret-key';
 
-// Helper function to extract the storage path from a Supabase URL
+// Robust helper function to extract the storage path from a Supabase URL
 const getImagePath = (imageUrl: string): string | null => {
-  if (!imageUrl) return null;
-  // If it's a full URL, extract the path after the bucket name 'images'
-  if (imageUrl.includes('/storage/v1/object/public/images/')) {
-    return imageUrl.split('/images/').pop() || null;
-  }
-  // Otherwise, assume it's already a path
-  return imageUrl;
+    if (!imageUrl) return null;
+    try {
+        const url = new URL(imageUrl);
+        // The path is everything after '/images/'
+        const pathSegments = url.pathname.split('/images/');
+        if (pathSegments.length > 1) {
+            return decodeURIComponent(pathSegments[1]);
+        }
+        return null;
+    } catch (e) {
+        // If it's not a valid URL, it might be a raw path.
+        console.warn("Could not parse image URL during cleanup, assuming it's a path:", imageUrl);
+        return imageUrl;
+    }
 };
 
 
