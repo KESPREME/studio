@@ -25,9 +25,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    allowedDevOrigins: ["*.cloudworkstations.dev", "*.cloud.goog"],
-  }
 };
 
 export default nextConfig;
