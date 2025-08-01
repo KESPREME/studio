@@ -98,13 +98,25 @@ export async function DELETE(
 
     // Delete image from Supabase Storage if it exists
     if (report.imageUrl) {
-      const { error: deleteError } = await supabase.storage
-        .from('images')
-        .remove([report.imageUrl]);
-      
-      if (deleteError) {
-        // Log the error but don't block deletion of the Firestore document
-        console.error('Supabase image deletion failed:', deleteError.message);
+      try {
+        // Extract the path from the full URL.
+        // e.g., https://<...>.supabase.co/storage/v1/object/public/images/image.png -> image.png
+        const url = new URL(report.imageUrl);
+        const pathSegments = url.pathname.split('/');
+        const imagePath = pathSegments[pathSegments.length - 1];
+
+        if (imagePath) {
+          const { error: deleteError } = await supabase.storage
+            .from('images')
+            .remove([imagePath]);
+          
+          if (deleteError) {
+            // Log the error but don't block deletion of the Firestore document
+            console.error('Supabase image deletion failed:', deleteError.message);
+          }
+        }
+      } catch (e) {
+        console.error("Could not parse image URL to delete from storage:", report.imageUrl, e);
       }
     }
 
