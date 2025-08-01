@@ -82,25 +82,15 @@ export async function PATCH(
   }
 }
 
-// Helper function to extract the storage path from a URL or return the path if it's not a URL
+// Helper function to extract the storage path from a Supabase URL
 const getImagePath = (imageUrl: string): string | null => {
   if (!imageUrl) return null;
-  try {
-    // Check if it's a full URL
-    const url = new URL(imageUrl);
-    // Pathname looks like /storage/v1/object/public/images/some-image.png
-    // We want to extract 'some-image.png' from the 'images' bucket.
-    const pathSegments = url.pathname.split('/');
-    const imagesIndex = pathSegments.indexOf('images');
-    if (imagesIndex > -1 && imagesIndex < pathSegments.length -1) {
-      // Return the rest of the path after the bucket name.
-      return pathSegments.slice(imagesIndex + 1).join('/');
-    }
-    return null;
-  } catch (e) {
-    // If it's not a valid URL, assume it's already a path
-    return imageUrl;
+  // If it's a full URL, extract the path after the bucket name 'images'
+  if (imageUrl.includes('/storage/v1/object/public/images/')) {
+    return imageUrl.split('/images/').pop() || null;
   }
+  // Otherwise, assume it's already a path
+  return imageUrl;
 };
 
 
