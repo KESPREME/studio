@@ -98,13 +98,14 @@ export async function DELETE(
     }
 
     const reportData = docSnap.data();
-    const imagePath = reportData?.imageUrl; // This is the path, e.g., 'user_123.png'
+    const imagePath = reportData?.imageUrl; 
 
     // Primary Operation: Delete the Firestore document. This is the most critical step.
     await deleteDoc(docRef);
 
-    // Secondary Operation: Attempt to delete the image from storage.
+    // Secondary, Optional Operation: Attempt to delete the image from storage.
     // This should not block the success of the overall request.
+    // Check if imagePath is a non-empty string before proceeding.
     if (imagePath && typeof imagePath === 'string') {
       try {
         const { error: deleteError } = await supabaseAdmin.storage
