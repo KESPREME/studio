@@ -22,12 +22,13 @@ import { Badge } from "@/components/ui/badge"
 import type { Report, Status } from "@/lib/types"
 import { TimeAgo } from "@/components/time-ago"
 
-// The props for the columns now include the onStatusChange callback
+// The props for the columns now include the onStatusChange and onDelete callbacks
 export type ColumnsProps = {
   onStatusChange: (reportId: string, newStatus: Status) => Promise<void>;
+  onDelete: (reportId: string) => Promise<void>;
 }
 
-export const getColumns = ({ onStatusChange }: ColumnsProps): ColumnDef<Report>[] => [
+export const getColumns = ({ onStatusChange, onDelete }: ColumnsProps): ColumnDef<Report>[] => [
   {
     accessorKey: "description",
     header: "Description",
@@ -109,6 +110,14 @@ export const getColumns = ({ onStatusChange }: ColumnsProps): ColumnDef<Report>[
                  </DropdownMenuRadioGroup>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+            <DropdownMenuSeparator />
+             <DropdownMenuItem
+              onClick={() => onDelete(report.id)}
+              className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+              disabled={report.status !== 'Resolved'}
+            >
+              Delete Report
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

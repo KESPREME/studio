@@ -1,9 +1,10 @@
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 
 const statusUpdateSchema = z.object({
   status: z.enum(["New", "In Progress", "Resolved"]),
@@ -77,6 +78,42 @@ export async function PATCH(
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
     console.error('API PATCH Error:', e);
+    return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const docRef = doc(db, 'reports', params.id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return NextResponse.json({ message: 'Report not found' }, { status: 404 });
+    }
+
+    const report = docSnap.data() as Report;
+
+    // Delete image from Supabase Storage if it exists
+    if (report.imageUrl) {
+      const { error: deleteError } = await supabase.storage
+        .from('images')
+        .remove([report.imageUrl]);
+      
+      if (deleteError) {
+        // Log the error but don't block deletion of the Firestore document
+        console.error('Supabase image deletion failed:', deleteError.message);
+      }
+    }
+
+    // Delete the Firestore document
+    await deleteDoc(docRef);
+
+    return NextResponse.json({ message: 'Report deleted successfully' });
+  } catch (e: any) {
+    console.error('API DELETE Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }

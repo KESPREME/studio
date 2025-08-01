@@ -11,7 +11,7 @@ import { StatCard } from '@/components/stat-card';
 import type { Report, Status } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
-import { getReports, updateReportStatus } from '@/lib/api';
+import { getReports, updateReportStatus, deleteReport } from '@/lib/api';
 import withAuth from '@/components/with-auth';
 import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
@@ -72,7 +72,32 @@ function AdminDashboard() {
     }
   }, [reports, toast, fetchReports]);
 
-  const columns = getColumns({ onStatusChange: handleStatusChange });
+  const handleDelete = useCallback(async (reportId: string) => {
+    const originalReports = [...reports];
+    // Optimistic UI update
+    setReports(currentReports => currentReports.filter(r => r.id !== reportId));
+
+    try {
+      await deleteReport(reportId);
+      toast({
+        title: "Report Deleted",
+        description: "The resolved report has been successfully deleted.",
+      });
+    } catch (error: any) {
+      console.error("Delete failed:", error);
+      setReports(originalReports); // Revert on failure
+      toast({
+        title: "Delete Failed",
+        variant: "destructive",
+        description: error.message || "Could not delete the report. Please try again.",
+      });
+    }
+  }, [reports, toast]);
+
+  const columns = getColumns({ 
+    onStatusChange: handleStatusChange,
+    onDelete: handleDelete 
+  });
 
   const stats = {
     total: reports.length,

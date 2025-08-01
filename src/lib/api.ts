@@ -31,3 +31,15 @@ export async function updateReportStatus(reportId: string, status: Status): Prom
   }
   return await response.json();
 }
+
+export async function deleteReport(reportId: string): Promise<any> {
+  const response = await fetch(`/api/reports/${reportId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to delete report');
+  }
+  return await response.json();
+}
