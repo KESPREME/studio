@@ -267,7 +267,7 @@ export function ReportForm() {
                     <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
                         {imagePreview ? (
                             <div className="relative w-full h-40">
-                                <Image src={imagePreview} alt="Image preview" fill objectFit="contain" />
+                                <Image src={imagePreview} alt="Image preview" fill style={{objectFit: 'contain'}} />
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">

@@ -6,7 +6,7 @@ import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Ti
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -33,7 +33,7 @@ export async function GET() {
       
       let imageUrl: string | undefined = undefined;
       if (data.imageUrl) {
-        const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(data.imageUrl);
+        const { data: publicUrlData } = supabaseAdmin.storage.from('images').getPublicUrl(data.imageUrl);
         imageUrl = publicUrlData.publicUrl;
       }
 
@@ -80,8 +80,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
     
+    // In a real application, you would need to get the user from the session,
+    // not just trust the email from the request body.
+    const { reportedBy, ...restOfData } = validation.data;
+    
     const newReportData = {
-      ...validation.data,
+      ...restOfData,
+      reportedBy,
       status: 'New',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
