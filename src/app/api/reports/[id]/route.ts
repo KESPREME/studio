@@ -77,8 +77,9 @@ export async function PATCH(
   }
 }
 
+// Using a more robust signature for the DELETE handler.
 export async function DELETE(
-  request: Request,
+  _request: Request, // Use _request to indicate it's not used
   { params }: { params: { id: string } }
 ) {
   try {
@@ -90,7 +91,8 @@ export async function DELETE(
     }
 
     const report = docSnap.data();
-    const imagePath = report?.imageUrl; // This will now be the path, not a full URL
+    // The imageUrl is stored as the path, e.g., 'image_name.png'
+    const imagePath = report?.imageUrl; 
 
     // Delete the Firestore document first, as it's the primary record.
     await deleteDoc(docRef);
@@ -101,7 +103,7 @@ export async function DELETE(
       try {
         const { error: deleteError } = await supabaseAdmin.storage
           .from('images')
-          .remove([imagePath]);
+          .remove([imagePath]); // Pass the path directly
         
         if (deleteError) {
           // Log the error but don't cause the request to fail.
