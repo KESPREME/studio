@@ -1,3 +1,4 @@
+
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
@@ -17,12 +18,10 @@ const reportSchema = z.object({
 });
 
 export async function GET(request: Request) {
-   // This revalidation strategy ensures that for a short period (60s),
-   // users will get a fast, cached response. After that, the next request
-   // will trigger a re-fetch from the database. This drastically reduces
-   // database reads for high-traffic scenarios.
-  const { next: { revalidate } } = request as any;
-  if (revalidate) revalidate(60);
+  // Set revalidate to 0 to prevent caching on this dynamic endpoint.
+  // We want fresh data every time someone visits the dashboard.
+  const { nextUrl } = request;
+  nextUrl.searchParams.set('revalidate', '0');
 
   try {
     const reportsCollection = collection(db, 'reports');
@@ -31,12 +30,17 @@ export async function GET(request: Request) {
 
     const reports = querySnapshot.docs.map(doc => {
       const data = doc.data();
+      // Defensive date handling
+      const createdAt = data.createdAt as Timestamp | undefined;
+      const updatedAt = data.updatedAt as Timestamp | undefined;
+      const resolvedAt = data.resolvedAt as Timestamp | undefined;
+
       return {
         id: doc.id,
         ...data,
-        createdAt: (data.createdAt as Timestamp)?.toDate().toISOString(),
-        updatedAt: (data.updatedAt as Timestamp)?.toDate().toISOString(),
-        resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
+        createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
+        updatedAt: updatedAt ? updatedAt.toDate().toISOString() : new Date().toISOString(),
+        resolvedAt: resolvedAt ? resolvedAt.toDate().toISOString() : undefined,
       } as Report;
     });
 
