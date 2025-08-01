@@ -46,11 +46,14 @@ const DynamicMap = ({ reports }: HazardMapProps) => {
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
-      const position: [number, number] = reports.length > 0
+      const hasReports = reports.length > 0;
+      const position: [number, number] = hasReports
         ? [reports[0].latitude, reports[0].longitude]
         : [20.5937, 78.9629]; // Default to India center
+      
+      const zoomLevel = hasReports ? 10 : 5;
 
-      const map = L.map(mapContainerRef.current).setView(position, 5);
+      const map = L.map(mapContainerRef.current).setView(position, zoomLevel);
       mapRef.current = map;
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
