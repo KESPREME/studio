@@ -19,7 +19,7 @@ service cloud.firestore {
       allow update: if true;
       
       // No one can delete reports for now.
-      allow delete: if false;
+      allow delete: if true;
     }
   }
 }

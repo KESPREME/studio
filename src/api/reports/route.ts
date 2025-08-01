@@ -6,14 +6,15 @@ import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Ti
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
-
+import { supabase } from '@/lib/supabase';
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
   urgency: z.enum(["Low", "Moderate", "High"]),
   latitude: z.number(),
   longitude: z.number(),
-  imageUrl: z.string().url().optional(),
+  // Store the image path from Supabase, not the full URL. This is more robust.
+  imageUrl: z.string().optional(),
   reportedBy: z.string().email(),
 });
 
@@ -25,12 +26,24 @@ export async function GET() {
 
     const reports = querySnapshot.docs.map(doc => {
       const data = doc.data();
+      // Defensive date handling
+      const createdAt = data.createdAt as Timestamp | undefined;
+      const updatedAt = data.updatedAt as Timestamp | undefined;
+      const resolvedAt = data.resolvedAt as Timestamp | undefined;
+      
+      let imageUrl: string | undefined = undefined;
+      if (data.imageUrl) {
+        const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(data.imageUrl);
+        imageUrl = publicUrlData.publicUrl;
+      }
+
       return {
         id: doc.id,
         ...data,
-        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
-        updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
-        resolvedAt: data.resolvedAt ? (data.resolvedAt as Timestamp).toDate().toISOString() : undefined,
+        imageUrl,
+        createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
+        updatedAt: updatedAt ? updatedAt.toDate().toISOString() : new Date().toISOString(),
+        resolvedAt: resolvedAt ? resolvedAt.toDate().toISOString() : undefined,
       } as Report;
     });
 
