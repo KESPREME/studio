@@ -94,36 +94,18 @@ export async function DELETE(
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
 
-    const report = docSnap.data() as Report;
+    const report = docSnap.data();
 
     // Delete image from Supabase Storage if it exists
-    if (report.imageUrl) {
-      let imagePath: string | null = null;
-      try {
-        // The imageUrl can either be a full URL or just the path.
-        // This robustly handles both cases.
-        if (report.imageUrl.startsWith('http')) {
-          const url = new URL(report.imageUrl);
-          const pathSegments = url.pathname.split('/');
-          // The path we need is the last segment, e.g., "1234_image.png"
-          imagePath = pathSegments[pathSegments.length - 1] ?? null;
-        } else {
-          // It's already just the path
-          imagePath = report.imageUrl;
-        }
-        
-        if (imagePath) {
-           const { error: deleteError } = await supabase.storage
-            .from('images')
-            .remove([imagePath]);
-          
-          if (deleteError) {
-            // Log the error but don't block deletion of the Firestore document
-            console.error('Supabase image deletion failed:', deleteError.message);
-          }
-        }
-      } catch (e) {
-        console.error("Could not parse or use image path to delete from storage:", report.imageUrl, e);
+    if (report?.imageUrl) {
+      const imagePath = report.imageUrl;
+      const { error: deleteError } = await supabase.storage
+        .from('images')
+        .remove([imagePath]);
+      
+      if (deleteError) {
+        // Log the error but don't block deletion of the Firestore document
+        console.error('Supabase image deletion failed:', deleteError.message);
       }
     }
 
