@@ -23,25 +23,20 @@ export async function GET(
     }
     
     const reportData = docSnap.data();
-    if (!reportData) {
-        return NextResponse.json({ message: 'Report data is empty' }, { status: 404 });
-    }
     
-    const report: Partial<Report> = {
+    const report: Report = {
       id: docSnap.id,
-      ...reportData,
+      description: reportData.description,
+      latitude: reportData.latitude,
+      longitude: reportData.longitude,
+      urgency: reportData.urgency,
+      status: reportData.status,
+      imageUrl: reportData.imageUrl,
+      reportedBy: reportData.reportedBy,
+      createdAt: (reportData.createdAt as Timestamp).toDate().toISOString(),
+      updatedAt: (reportData.updatedAt as Timestamp).toDate().toISOString(),
+      resolvedAt: reportData.resolvedAt ? (reportData.resolvedAt as Timestamp).toDate().toISOString() : undefined,
     };
-
-    // Convert timestamps to string for serialization
-    if (reportData.createdAt && reportData.createdAt instanceof Timestamp) {
-      report.createdAt = reportData.createdAt.toDate().toISOString();
-    }
-    if (reportData.updatedAt && reportData.updatedAt instanceof Timestamp) {
-      report.updatedAt = reportData.updatedAt.toDate().toISOString();
-    }
-     if (reportData.resolvedAt && reportData.resolvedAt instanceof Timestamp) {
-      report.resolvedAt = (reportData.resolvedAt as Timestamp).toDate().toISOString();
-    }
 
     return NextResponse.json(report);
   } catch (e: any) {
@@ -82,22 +77,18 @@ export async function PATCH(
   }
 }
 
-// Robust helper function to extract the storage path from a Supabase URL
 const getImagePath = (imageUrl: string): string | null => {
     if (!imageUrl) return null;
     try {
         const url = new URL(imageUrl);
-        // The path is everything after '/images/'
         const pathSegments = url.pathname.split('/images/');
         if (pathSegments.length > 1) {
             return decodeURIComponent(pathSegments[1]);
         }
         return null;
     } catch (e) {
-        // If it's not a valid URL, it might be a raw path.
-        // This is a fallback and should not happen with the new upload logic.
-        console.warn("Could not parse image URL, assuming it's a path:", imageUrl);
-        return imageUrl;
+        console.warn("Could not parse image URL, it might be a raw path:", imageUrl);
+        return imageUrl.split('/images/').pop() || null;
     }
 };
 
@@ -120,13 +111,11 @@ export async function DELETE(
     if (report?.imageUrl) {
       const imagePath = getImagePath(report.imageUrl);
       if (imagePath) {
-        // Use the admin client for server-side operations
         const { error: deleteError } = await supabaseAdmin.storage
           .from('images')
           .remove([imagePath]);
         
         if (deleteError) {
-          // Log the error but don't block deletion of the Firestore document
           console.error(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. Proceeding with Firestore deletion.`);
         }
       }

@@ -13,7 +13,7 @@ const reportSchema = z.object({
   urgency: z.enum(["Low", "Moderate", "High"]),
   latitude: z.number(),
   longitude: z.number(),
-  imageUrl: z.string().url().optional(), // Now this is a full URL, or undefined
+  imageUrl: z.string().url().optional(),
   reportedBy: z.string().email(),
 });
 
