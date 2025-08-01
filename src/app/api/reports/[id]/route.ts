@@ -93,7 +93,7 @@ export async function DELETE(
     const reportData = docSnap.data();
     const imagePath = reportData?.imageUrl; 
 
-    // Primary Operation: Delete the Firestore document.
+    // Primary Operation: Delete the Firestore document. This is the most critical step.
     await deleteDoc(docRef);
 
     // Secondary Operation: Attempt to delete the image from storage.
@@ -106,7 +106,7 @@ export async function DELETE(
         
         if (deleteError) {
           // Log the error but don't cause the request to fail.
-          // This handles cases where the file doesn't exist in storage or other permission issues.
+          // This handles cases where the file doesn't exist or other permission issues.
           console.warn(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. The Firestore document was deleted successfully.`);
         }
       } catch (storageError: any) {
