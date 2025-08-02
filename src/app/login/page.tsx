@@ -90,7 +90,7 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm">
         <PeekingRaccoon isPeeking={isPeeking} isHiding={isHiding} />
         <Card 
-          className="w-full shadow-2xl transition-transform duration-500"
+          className="w-full shadow-2xl transition-transform duration-500 relative z-20"
           style={{ transform: isPeeking ? 'rotateY(-10deg) rotateX(3deg)' : 'rotateY(0) rotateX(0)'}}
         >
           <CardHeader className="text-center">

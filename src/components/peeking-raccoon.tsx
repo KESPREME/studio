@@ -13,9 +13,9 @@ export function PeekingRaccoon({ isPeeking, isHiding }: PeekingRaccoonProps) {
     <div
       aria-hidden="true"
       className={cn(
-        "absolute -top-14 -right-20 w-48 h-48 transition-all duration-500 ease-in-out z-0",
+        "absolute -top-14 -right-20 w-48 h-48 transition-all duration-500 ease-in-out z-10",
         isPeeking && "-translate-x-12 translate-y-8 -rotate-12",
-        isHiding && "translate-x-16 -translate-y-10 rotate-12",
+        isHiding && "translate-x-16 -translate-y-10 rotate-12"
       )}
     >
       <svg
