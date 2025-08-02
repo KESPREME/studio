@@ -64,20 +64,6 @@ export function ReportForm() {
     },
   })
 
-  // Helper to calculate bounding box for nearby query
-  const getBoundingBox = (latitude: number, longitude: number, distanceKm: number) => {
-    const latRadian = latitude * (Math.PI / 180);
-    const degLat = distanceKm / 111.132;
-    const degLon = distanceKm / (111.320 * Math.cos(latRadian));
-
-    return {
-      minLat: latitude - degLat,
-      maxLat: latitude + degLat,
-      minLon: longitude - degLon,
-      maxLon: longitude + degLon,
-    };
-  };
-
   async function onSubmit(values: z.infer<typeof reportSchema>) {
     setIsSubmitting(true)
     
@@ -128,12 +114,9 @@ export function ReportForm() {
         description: "Thank you for helping keep your community safe.",
       })
       
-      // Handle SMS notifications via server actions
       try {
         await sendNewReportSms(reportData);
         if(reportData.urgency === 'High') {
-            // In a real app, you'd query the DB for nearby users.
-            // For this demo, we assume an admin phone number is available for demonstration.
             const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
             const uniquePhoneNumbers = adminPhoneNumber ? [adminPhoneNumber] : [];
 
@@ -145,7 +128,6 @@ export function ReportForm() {
         console.error("SMS sending failed, but report was saved.", smsError);
       }
 
-      // Redirect user after successful submission
       if(user.role === 'admin') {
         router.push('/admin');
       } else {

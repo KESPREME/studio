@@ -1,4 +1,3 @@
-
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -11,7 +10,7 @@ const statusUpdateSchema = z.object({
 });
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { id:string } }
 ) {
   try {
@@ -25,7 +24,6 @@ export async function GET(
         if (error.code === 'PGRST116') {
              return NextResponse.json({ message: 'Report not found' }, { status: 404 });
         }
-        console.error('API GET by ID Error:', error);
         throw error;
     }
 
@@ -46,7 +44,7 @@ export async function GET(
 
     return NextResponse.json(report);
   } catch (e: any) {
-    console.error('API GET by ID Exception:', e);
+    console.error('API GET by ID Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
@@ -72,28 +70,29 @@ export async function PATCH(
         updateData.resolvedAt = new Date().toISOString();
     }
     
+    // Use the admin client to bypass RLS for status updates by admins
     const { error } = await supabaseAdmin
         .from('reports')
         .update(updateData)
         .eq('id', params.id)
 
     if (error) {
-        console.error('API PATCH Error:', error);
         throw error;
     }
 
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
-    console.error('API PATCH Exception:', e);
+    console.error('API PATCH Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
+    // First, fetch the report to get the image path using the admin client
     const { data: report, error: fetchError } = await supabaseAdmin
       .from('reports')
       .select('imageUrl')
@@ -104,12 +103,12 @@ export async function DELETE(
       if (fetchError?.code === 'PGRST116') {
           return NextResponse.json({ message: 'Report not found' }, { status: 404 });
       }
-      console.error('API DELETE Fetch Error:', fetchError);
       throw fetchError;
     }
     
     const imagePath = report.imageUrl;
 
+    // Primary Operation: Delete the database record using the admin client
     const { error: deleteError } = await supabaseAdmin
       .from('reports')
       .delete()
@@ -120,6 +119,7 @@ export async function DELETE(
       throw new Error('Failed to delete report from the database.');
     }
     
+    // Secondary, Optional Operation: Attempt to delete the image from storage.
     if (imagePath && typeof imagePath === 'string') {
       try {
         const { error: storageError } = await supabaseAdmin.storage
@@ -136,7 +136,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Report deleted successfully' });
   } catch (e: any) {
-    console.error('API DELETE Exception:', e);
+    console.error('API DELETE Error:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
