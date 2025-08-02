@@ -92,51 +92,56 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    // Generate safety tips asynchronously and then send notifications.
-    // This is done without `await` so the client gets a fast response.
-    generateSafetyTips({ description: validation.data.description })
-      .then(tipsOutput => {
-        const tips = tipsOutput.tips;
-        // Send SMS to admin with safety tips
-        sendNewReportSms(validation.data, tips);
+    // This is a fire-and-forget call for notifications.
+    // The main API responds quickly to the client, while notifications are processed in the background.
+    (async () => {
+      let safetyTips: string | undefined;
+      try {
+        const tipsOutput = await generateSafetyTips({ description: validation.data.description });
+        safetyTips = tipsOutput.tips;
+      } catch (aiError) {
+        console.error("Failed to generate safety tips, sending SMS without them.", aiError);
+      }
+      
+      // Send SMS to admin with safety tips
+      sendNewReportSms(validation.data, safetyTips);
 
-        // If high urgency, send mass alert to nearby users
-        if (validation.data.urgency === 'High') {
-            const { latitude, longitude } = validation.data;
-            const radiusKm = 10;
-            const box = getBoundingBox(latitude, longitude, radiusKm);
-            
-            supabaseAdmin
-                .from('users') // Query users table for phone numbers
-                .select('phone')
-                .gte('latitude', box.minLat)
-                .lte('latitude', box.maxLat)
-                .not('phone', 'is', null)
-                .then(({ data: nearbyUsers, error: nearbyError }) => {
-                    if (nearbyError) {
-                        console.error("Error fetching nearby users for mass alert:", nearbyError);
-                        return;
-                    }
+      // If high urgency, send mass alert to nearby users
+      if (validation.data.urgency === 'High') {
+        try {
+          const { latitude, longitude } = validation.data;
+          const radiusKm = 10;
+          const box = getBoundingBox(latitude, longitude, radiusKm);
+          
+          const { data: nearbyUsers, error: nearbyError } = await supabaseAdmin
+              .from('users') // Query users table for phone numbers
+              .select('phone')
+              .not('phone', 'is', null);
 
-                    const nearbyPhoneNumbers: string[] = nearbyUsers
-                        ? nearbyUsers.map((user: { phone: string }) => user.phone)
-                        : [];
-                    
-                    const uniquePhoneNumbers = [...new Set(nearbyPhoneNumbers)];
-                    if (uniquePhoneNumbers.length > 0) {
-                      sendMassAlertSms(validation.data, uniquePhoneNumbers, tips);
-                    } else {
-                      console.log("No nearby users found to send mass alert.");
-                    }
-                });
+          if (nearbyError) {
+              console.error("Error fetching nearby users for mass alert:", nearbyError);
+              return;
+          }
+
+          // Note: Filtering by location on a large user table would be inefficient.
+          // In a real-world scenario, you'd use a geospatial index (e.g., PostGIS)
+          // or a more optimized query. For this demo, we'll alert all users with phone numbers.
+          const nearbyPhoneNumbers: string[] = nearbyUsers
+              ? nearbyUsers.map((user: { phone: string }) => user.phone)
+              : [];
+          
+          const uniquePhoneNumbers = [...new Set(nearbyPhoneNumbers)];
+          if (uniquePhoneNumbers.length > 0) {
+            sendMassAlertSms(validation.data, uniquePhoneNumbers, safetyTips);
+          } else {
+            console.log("No nearby users found to send mass alert.");
+          }
+        } catch (massAlertError) {
+            console.error("Mass alert process failed:", massAlertError);
         }
-      })
-      .catch(aiError => {
-          console.error("Failed to generate safety tips, sending SMS without them.", aiError);
-          // Fallback to sending SMS without tips if AI fails
-          sendNewReportSms(validation.data);
-          // Handle high urgency fallback if needed
-      });
+      }
+    })();
+
 
     return NextResponse.json({ message: 'Report created', reportId: data.id }, { status: 201 });
   } catch (e: any) {
