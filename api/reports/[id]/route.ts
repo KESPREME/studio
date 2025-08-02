@@ -1,10 +1,9 @@
 
 // src/app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
 const statusUpdateSchema = z.object({
@@ -16,33 +15,32 @@ export async function GET(
   { params }: { params: { id:string } }
 ) {
   try {
-    const docRef = doc(db, 'reports', params.id);
-    const docSnap = await getDoc(docRef);
+    const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('id', params.id)
+        .single();
 
-    if (!docSnap.exists()) {
+    if (error) {
+        if (error.code === 'PGRST116') {
+             return NextResponse.json({ message: 'Report not found' }, { status: 404 });
+        }
+        throw error;
+    }
+
+    if (!data) {
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
     
-    const reportData = docSnap.data();
-    
     let imageUrl: string | undefined = undefined;
-    if (reportData.imageUrl) {
-        const { data } = supabaseAdmin.storage.from('images').getPublicUrl(reportData.imageUrl);
-        imageUrl = data.publicUrl;
+    if (data.imageUrl) {
+        const { data: urlData } = supabase.storage.from('images').getPublicUrl(data.imageUrl);
+        imageUrl = urlData.publicUrl;
     }
 
     const report: Report = {
-      id: docSnap.id,
-      description: reportData.description,
-      latitude: reportData.latitude,
-      longitude: reportData.longitude,
-      urgency: reportData.urgency,
-      status: reportData.status,
+      ...data,
       imageUrl: imageUrl,
-      reportedBy: reportData.reportedBy,
-      createdAt: (reportData.createdAt as Timestamp)?.toDate().toISOString(),
-      updatedAt: (reportData.updatedAt as Timestamp)?.toDate().toISOString(),
-      resolvedAt: reportData.resolvedAt ? (reportData.resolvedAt as Timestamp).toDate().toISOString() : undefined,
     };
 
     return NextResponse.json(report);
@@ -64,18 +62,23 @@ export async function PATCH(
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
 
-    const docRef = doc(db, 'reports', params.id);
-    
-    const updateData: { status: string; updatedAt: Timestamp; resolvedAt?: Timestamp } = {
+    const updateData: { status: string; updatedAt: string; resolvedAt?: string } = {
         status: validation.data.status,
-        updatedAt: Timestamp.fromDate(new Date()),
+        updatedAt: new Date().toISOString(),
     };
 
     if (validation.data.status === 'Resolved') {
-        updateData.resolvedAt = Timestamp.fromDate(new Date());
+        updateData.resolvedAt = new Date().toISOString();
     }
+    
+    const { error } = await supabaseAdmin
+        .from('reports')
+        .update(updateData)
+        .eq('id', params.id)
 
-    await updateDoc(docRef, updateData);
+    if (error) {
+        throw error;
+    }
 
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
@@ -89,32 +92,43 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const docRef = doc(db, 'reports', params.id);
-    const docSnap = await getDoc(docRef);
+    // First, fetch the report to get the image path
+    const { data: report, error: fetchError } = await supabaseAdmin
+      .from('reports')
+      .select('imageUrl')
+      .eq('id', params.id)
+      .single();
 
-    if (!docSnap.exists()) {
-      return NextResponse.json({ message: 'Report not found' }, { status: 404 });
+    if (fetchError || !report) {
+      if (fetchError?.code === 'PGRST116') {
+          return NextResponse.json({ message: 'Report not found' }, { status: 404 });
+      }
+      throw fetchError;
     }
+    
+    const imagePath = report.imageUrl;
 
-    const reportData = docSnap.data();
-    const imagePath = reportData?.imageUrl; 
+    // Primary Operation: Delete the database record
+    const { error: deleteError } = await supabaseAdmin
+      .from('reports')
+      .delete()
+      .eq('id', params.id);
 
-    // Primary Operation: Delete the Firestore document. This is the most critical step.
-    await deleteDoc(docRef);
+    if (deleteError) {
+      console.error('Supabase delete error:', deleteError);
+      throw new Error('Failed to delete report from the database.');
+    }
+    
 
     // Secondary, Optional Operation: Attempt to delete the image from storage.
-    // This should not block the success of the overall request.
-    // Check if imagePath is a non-empty string before proceeding.
     if (imagePath && typeof imagePath === 'string') {
       try {
-        const { error: deleteError } = await supabaseAdmin.storage
+        const { error: storageError } = await supabaseAdmin.storage
           .from('images')
           .remove([imagePath]); 
         
-        if (deleteError) {
-          // Log the error but don't cause the request to fail.
-          // This handles cases where the file doesn't exist or other permission issues.
-          console.warn(`Supabase image deletion failed for path: ${imagePath}. Error: ${deleteError.message}. The Firestore document was deleted successfully.`);
+        if (storageError) {
+          console.warn(`Supabase image deletion failed for path: ${imagePath}. Error: ${storageError.message}. The database record was deleted successfully.`);
         }
       } catch (storageError: any) {
          console.error(`An exception occurred during Supabase image deletion for path: ${imagePath}. Error: ${storageError.message}.`);
@@ -127,3 +141,4 @@ export async function DELETE(
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
+
