@@ -11,11 +11,13 @@ import { StatCard } from '@/components/stat-card';
 import type { Report, Status } from '@/lib/types';
 import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
-import { getReports, updateReportStatus, deleteReport } from '@/lib/api';
+import { getReports, deleteReport } from '@/lib/api';
+import { updateReportStatusAsAdmin } from '@/lib/actions';
 import withAuth from '@/components/with-auth';
 import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 
 function AdminDashboard() {
@@ -45,39 +47,50 @@ function AdminDashboard() {
 
   useEffect(() => {
     fetchReports();
-  }, [fetchReports]);
+    
+    const channel = supabase
+      .channel('reports-realtime-admin')
+      .on<Report>(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reports' },
+        (payload) => {
+          console.log('Realtime change received!', payload);
+          toast({
+            title: "Live Update",
+            description: "The reports list has been updated.",
+          });
+          fetchReports();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+
+  }, [fetchReports, toast]);
   
   const handleStatusChange = useCallback(async (reportId: string, newStatus: Status) => {
-    const originalReports = [...reports];
-    
-    // Optimistic UI update
-    setReports(currentReports =>
-      currentReports.map(r => (r.id === reportId ? { ...r, status: newStatus } : r))
-    );
-
+    // We don't need optimistic UI here because the realtime subscription will handle it.
     try {
-      await updateReportStatus(reportId, newStatus);
+      await updateReportStatusAsAdmin(reportId, newStatus);
       toast({
         title: "Status Updated",
         description: `Report status successfully changed to ${newStatus}.`,
       });
-      // Re-fetch to ensure data consistency
-      await fetchReports();
     } catch (error: any) {
       console.error("Update failed:", error);
-      // Revert on failure
-      setReports(originalReports);
       toast({
         title: "Update Failed",
         variant: "destructive",
         description: error.message || "Could not update report status. Please try again.",
       });
     }
-  }, [reports, toast, fetchReports]);
+  }, [toast]);
 
   const handleDelete = useCallback(async (reportId: string) => {
     const originalReports = [...reports];
-    // Optimistic UI update
+    // Optimistic UI update for delete, as it can feel slow otherwise
     setReports(currentReports => currentReports.filter(r => r.id !== reportId));
 
     try {
@@ -86,7 +99,6 @@ function AdminDashboard() {
         title: "Report Deleted",
         description: "The resolved report has been successfully deleted.",
       });
-      // No need to re-fetch, optimistic removal is sufficient
     } catch (error: any) {
       console.error("Delete failed:", error);
       setReports(originalReports); // Revert on failure
