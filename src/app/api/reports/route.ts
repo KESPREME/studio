@@ -1,4 +1,3 @@
-
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
@@ -79,7 +78,7 @@ export async function POST(request: Request) {
       status: 'New' as const,
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
         .from('reports')
         .insert(newReportData)
         .select()
