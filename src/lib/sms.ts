@@ -21,15 +21,18 @@ if (!verifyServiceSid) {
 const client = (accountSid && authToken) ? twilio(accountSid, authToken) : null;
 
 
-export async function sendNewReportSms(report: { description: string; urgency: string; }) {
+export async function sendNewReportSms(report: { description: string; urgency: string; }, tips?: string) {
   if (!client || !twilioPhone || !adminPhone) {
     console.log('Twilio client not initialized or phone numbers missing. Skipping admin SMS.');
     return;
   }
   
+  const tipsMessage = tips ? `\n\n${tips}` : '';
+  const body = `New Hazard Report (${report.urgency}): ${report.description}${tipsMessage}`;
+
   try {
     const message = await client.messages.create({
-      body: `New Hazard Report (${report.urgency}): ${report.description}`,
+      body: body,
       from: twilioPhone,
       to: adminPhone,
     });
@@ -40,7 +43,7 @@ export async function sendNewReportSms(report: { description: string; urgency: s
   }
 }
 
-export async function sendMassAlertSms(report: { description: string; urgency: string; }, toNumbers: string[]) {
+export async function sendMassAlertSms(report: { description: string; urgency: string; }, toNumbers: string[], tips?: string) {
    if (!client || !twilioPhone) {
     console.log('Twilio client not initialized or sending number missing. Skipping mass alert.');
     return;
@@ -49,9 +52,13 @@ export async function sendMassAlertSms(report: { description: string; urgency: s
   const uniqueNumbers = [...new Set(toNumbers)];
   console.log(`Sending mass alert to ${uniqueNumbers.length} unique numbers.`);
 
+  const tipsMessage = tips ? `\n\n${tips}` : '';
+  const body = `**High Urgency Alert**\nA new hazard has been reported in your area: ${report.description}. Please be cautious.${tipsMessage}`;
+
+
   const promises = uniqueNumbers.map(number => {
     return client.messages.create({
-      body: `**High Urgency Alert**\nA new hazard has been reported in your area: ${report.description}. Please be cautious.`,
+      body: body,
       from: twilioPhone,
       to: number,
     }).then(message => {

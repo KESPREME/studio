@@ -5,6 +5,7 @@ import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { generateSafetyTips } from '@/ai/flows/generate-safety-tips';
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -90,41 +91,55 @@ export async function POST(request: Request) {
     if (error) {
       throw error;
     }
-    
-    // Don't await, let them run in the background
-    sendNewReportSms(validation.data);
 
-    if (validation.data.urgency === 'High') {
-        const { latitude, longitude } = validation.data;
-        const radiusKm = 10;
-        const box = getBoundingBox(latitude, longitude, radiusKm);
-        
-        const { data: nearbyReports, error: nearbyError } = await supabaseAdmin
-            .from('reports')
-            .select('phone, longitude')
-            .gte('latitude', box.minLat)
-            .lte('latitude', box.maxLat)
-            .not('phone', 'is', null); // Only select reports that have a phone number
-        
-        if(nearbyError) throw nearbyError;
+    // Generate safety tips asynchronously.
+    const safetyTipsPromise = generateSafetyTips({ description: validation.data.description });
 
-        const nearbyPhoneNumbers: string[] = [];
-        if (nearbyReports) {
-          nearbyReports.forEach((report: { phone: string, longitude: number }) => {
-            if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
-               nearbyPhoneNumbers.push(report.phone);
-            }
-          });
-        }
-        
-        const uniquePhoneNumbers = [...new Set(nearbyPhoneNumbers)];
-        if (uniquePhoneNumbers.length > 0) {
-          sendMassAlertSms(validation.data, uniquePhoneNumbers);
-        } else {
-          console.log("No nearby users found to send mass alert.");
-        }
-    }
+    // Don't await SMS sending, let it run in the background.
+    safetyTipsPromise.then(tipsOutput => {
+      const tips = tipsOutput.tips;
+      sendNewReportSms(validation.data, tips);
 
+      if (validation.data.urgency === 'High') {
+          const { latitude, longitude } = validation.data;
+          const radiusKm = 10;
+          const box = getBoundingBox(latitude, longitude, radiusKm);
+          
+          supabaseAdmin
+              .from('reports')
+              .select('phone, longitude')
+              .gte('latitude', box.minLat)
+              .lte('latitude', box.maxLat)
+              .not('phone', 'is', null)
+              .then(({ data: nearbyReports, error: nearbyError }) => {
+                  if (nearbyError) {
+                      console.error("Error fetching nearby reports for mass alert:", nearbyError);
+                      return;
+                  }
+
+                  const nearbyPhoneNumbers: string[] = [];
+                  if (nearbyReports) {
+                    nearbyReports.forEach((report: { phone: string, longitude: number }) => {
+                      if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
+                         nearbyPhoneNumbers.push(report.phone);
+                      }
+                    });
+                  }
+                  
+                  const uniquePhoneNumbers = [...new Set(nearbyPhoneNumbers)];
+                  if (uniquePhoneNumbers.length > 0) {
+                    sendMassAlertSms(validation.data, uniquePhoneNumbers, tips);
+                  } else {
+                    console.log("No nearby users found to send mass alert.");
+                  }
+              });
+      }
+    }).catch(aiError => {
+        console.error("Failed to generate safety tips:", aiError);
+        // Fallback to sending SMS without tips
+        sendNewReportSms(validation.data);
+        // We could also trigger the high-urgency search here as a fallback
+    });
 
     return NextResponse.json({ message: 'Report created', reportId: data.id }, { status: 201 });
   } catch (e: any) {
