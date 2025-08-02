@@ -1,9 +1,11 @@
+
 // src/app/admin/page.tsx
 "use client";
 
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
@@ -16,6 +18,7 @@ import withAuth from '@/components/with-auth';
 import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 
 function AdminDashboard() {
@@ -24,10 +27,7 @@ function AdminDashboard() {
   const { toast } = useToast();
 
   const fetchReports = useCallback(async () => {
-    // Keep loading true when re-fetching in background
-    if (reports.length === 0) {
-      setIsLoading(true);
-    }
+    setIsLoading(true);
     try {
       const fetchedReports = await getReports();
       setReports(fetchedReports);
@@ -35,68 +35,78 @@ function AdminDashboard() {
        console.error("Failed to fetch reports:", error);
        toast({
         title: "Error",
-        description: "Could not fetch reports.",
+        description: "Could not fetch initial reports.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
-  }, [toast, reports.length]);
+  }, [toast]);
 
   useEffect(() => {
+    // Initial fetch
     fetchReports();
-  }, [fetchReports]);
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('reports-realtime')
+      .on<Report>(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reports' },
+        (payload) => {
+          console.log('Change received!', payload);
+          // Re-fetch all reports to ensure consistency after any change
+          // This is simpler than trying to manage state manually
+           toast({
+            title: "Live Update",
+            description: "The reports have been updated in real-time.",
+          });
+          fetchReports();
+        }
+      )
+      .subscribe();
+      
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchReports, toast]);
   
   const handleStatusChange = useCallback(async (reportId: string, newStatus: Status) => {
-    const originalReports = [...reports];
-    
-    // Optimistic UI update
-    setReports(currentReports =>
-      currentReports.map(r => (r.id === reportId ? { ...r, status: newStatus } : r))
-    );
-
     try {
       await updateReportStatus(reportId, newStatus);
       toast({
         title: "Status Updated",
-        description: `Report status successfully changed to ${newStatus}.`,
+        description: `Report status successfully changed to ${newStatus}. The dashboard will update momentarily.`,
       });
-      // Re-fetch to ensure data consistency
-      await fetchReports();
+      // No need for optimistic update or re-fetch here, the real-time subscription will handle it.
     } catch (error: any) {
       console.error("Update failed:", error);
-      // Revert on failure
-      setReports(originalReports);
       toast({
         title: "Update Failed",
         variant: "destructive",
         description: error.message || "Could not update report status. Please try again.",
       });
     }
-  }, [reports, toast, fetchReports]);
+  }, [toast]);
 
   const handleDelete = useCallback(async (reportId: string) => {
-    const originalReports = [...reports];
-    // Optimistic UI update
-    setReports(currentReports => currentReports.filter(r => r.id !== reportId));
-
-    try {
+     try {
       await deleteReport(reportId);
       toast({
         title: "Report Deleted",
-        description: "The resolved report has been successfully deleted.",
+        description: "The resolved report has been successfully deleted. The dashboard will update momentarily.",
       });
-      // No need to re-fetch, optimistic removal is sufficient
+      // Real-time subscription will handle UI update
     } catch (error: any) {
       console.error("Delete failed:", error);
-      setReports(originalReports); // Revert on failure
       toast({
         title: "Delete Failed",
         variant: "destructive",
         description: error.message || "Could not delete the report. Please try again.",
       });
     }
-  }, [reports, toast]);
+  }, [toast]);
 
   const columns = useMemo(() => getColumns({ 
     onStatusChange: handleStatusChange,

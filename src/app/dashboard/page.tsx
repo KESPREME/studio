@@ -1,9 +1,12 @@
+
 // src/app/dashboard/page.tsx
 "use client";
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { PlusCircle, Map, List, Wind } from 'lucide-react';
+import { RealtimeChannel } from '@supabase/supabase-js';
+
 
 import withAuth from '@/components/with-auth';
 import { useAuth } from '@/hooks/use-auth';
@@ -16,11 +19,15 @@ import { getReports } from '@/lib/api';
 import type { Report } from '@/lib/types';
 import { AppFooter } from '@/components/app-footer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 function ReporterDashboard() {
   const { user } = useAuth();
   const [allReports, setAllReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
 
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
@@ -29,15 +36,42 @@ function ReporterDashboard() {
       setAllReports(fetchedReports);
     } catch (error) {
       console.error("Failed to fetch reports:", error);
-      // Optionally add a toast message here for the user
+      toast({
+        title: "Error",
+        description: "Could not fetch initial reports.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchReports();
-  }, [fetchReports]);
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('reports-realtime-reporter')
+      .on<Report>(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reports' },
+        (payload) => {
+          console.log('Change received!', payload);
+          toast({
+            title: "Live Update",
+            description: "The community reports have been updated.",
+          });
+          fetchReports();
+        }
+      )
+      .subscribe();
+      
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+
+  }, [fetchReports, toast]);
   
   const myReports = useMemo(() => {
     if (!user) return [];
@@ -105,7 +139,7 @@ function ReporterDashboard() {
                  <div className="grid gap-8 lg:grid-cols-2">
                     <div>
                         <h2 className="text-xl font-bold mb-4 font-headline">My Submitted Reports ({myReports.length})</h2>
-                        <ReportList reports={myReports} emptyMessage="You haven't submitted any reports yet." isLoading={isLoading} />
+                        <ReportList reports={myReports} emptyMessage="You haven't submitted any reports yet." isLoading={isLoading && myReports.length === 0} />
                     </div>
                      <div>
                         <h2 className="text-xl font-bold mb-4 font-headline">Latest Community Reports</h2>
