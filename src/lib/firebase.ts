@@ -6,7 +6,7 @@ const firebaseConfig = {
   projectId: "alertfront-czys9",
   appId: "1:752668007574:web:062c2403d39499bd30f6b7",
   storageBucket: "alertfront-czys9.appspot.com",
-  apiKey: "AIzaSyCFvZ5__xwqc0JhWvU1TkqcVF-cveIFHYw",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "alertfront-czys9.firebaseapp.com",
   messagingSenderId: "752668007574"
 };
