@@ -1,3 +1,4 @@
+
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
@@ -12,25 +13,23 @@ const reportSchema = z.object({
   longitude: z.number(),
   imageUrl: z.string().optional(),
   reportedBy: z.string().email(),
+  phone: z.string().optional(), // Added phone number
 });
 
 export async function GET() {
   try {
-    // This is a public route, so we use the public client.
     const { data: reports, error } = await supabase
       .from('reports')
       .select('*')
       .order('createdAt', { ascending: false });
 
     if (error) {
-      // This will throw and be caught by the catch block, returning a 500 error.
       throw error;
     }
 
     const reportsWithUrls = reports.map(report => {
         let publicUrl = undefined;
         if (report.imageUrl) {
-            // We can use the public client here as well, as the bucket is public.
             const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl);
             publicUrl = data.publicUrl;
         }
@@ -45,10 +44,6 @@ export async function GET() {
   } catch (e: any)
   {
     console.error('API GET Error:', e);
-    // Provide a more specific error message if the API key is invalid.
-    if (e.message?.includes('authentication failed')) {
-        return NextResponse.json({ message: 'Internal Server Error', error: 'Invalid Supabase API key or URL.' }, { status: 500 });
-    }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
@@ -77,15 +72,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
     
-    const { reportedBy, ...restOfData } = validation.data;
+    const { reportedBy, phone, ...restOfData } = validation.data;
     
     const newReportData = {
       ...restOfData,
       reportedBy,
+      phone, // Store phone number with the report
       status: 'New' as const,
     };
 
-    // Use the ADMIN client to insert data, bypassing RLS for this trusted server-side operation.
     const { data, error } = await supabaseAdmin
         .from('reports')
         .insert(newReportData)
@@ -96,44 +91,37 @@ export async function POST(request: Request) {
       throw error;
     }
     
-    // Asynchronously send SMS notifications without blocking the response.
-    // These functions now handle their own errors internally.
-    await sendNewReportSms(validation.data);
+    // Don't await, let them run in the background
+    sendNewReportSms(validation.data);
 
     if (validation.data.urgency === 'High') {
         const { latitude, longitude } = validation.data;
         const radiusKm = 10;
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
-        // Use admin client to query all reports for mass alert, bypassing RLS
         const { data: nearbyReports, error: nearbyError } = await supabaseAdmin
             .from('reports')
-            .select('reportedBy, longitude')
+            .select('phone, longitude')
             .gte('latitude', box.minLat)
-            .lte('latitude', box.maxLat);
+            .lte('latitude', box.maxLat)
+            .not('phone', 'is', null); // Only select reports that have a phone number
         
         if(nearbyError) throw nearbyError;
 
-        const nearbyReporters: string[] = [];
-        const adminPhoneNumber = process.env.ADMIN_PHONE_NUMBER;
-
+        const nearbyPhoneNumbers: string[] = [];
         if (nearbyReports) {
-          nearbyReports.forEach((report: { reportedBy: string, longitude: number }) => {
+          nearbyReports.forEach((report: { phone: string, longitude: number }) => {
             if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
-               if (adminPhoneNumber) {
-                  // In a real app, you would look up the user's phone number.
-                  // For this demo, we use the admin's number as a placeholder.
-                  nearbyReporters.push(adminPhoneNumber);
-               }
+               nearbyPhoneNumbers.push(report.phone);
             }
           });
         }
         
-        const uniquePhoneNumbers = [...new Set(nearbyReporters)];
+        const uniquePhoneNumbers = [...new Set(nearbyPhoneNumbers)];
         if (uniquePhoneNumbers.length > 0) {
-          await sendMassAlertSms(validation.data, uniquePhoneNumbers);
+          sendMassAlertSms(validation.data, uniquePhoneNumbers);
         } else {
-          console.log("No nearby reporters found to send mass alert.");
+          console.log("No nearby users found to send mass alert.");
         }
     }
 

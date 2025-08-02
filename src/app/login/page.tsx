@@ -1,9 +1,10 @@
+
 // src/app/login/page.tsx
 "use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldAlert, User, LogIn } from 'lucide-react';
+import { ShieldAlert, User, LogIn, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const { login } = useAuth();
   const [role, setRole] = useState<'reporter' | 'admin'>('reporter');
+  const [phone, setPhone] = useState('');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,6 +29,7 @@ export default function LoginPage() {
       name: role === 'admin' ? 'NDRF Responder' : 'Community Member',
       email: role === 'admin' ? 'responder@ndrf.gov.in' : 'citizen@example.com',
       role: role,
+      phone: phone,
     };
     
     login(user);
@@ -50,7 +53,7 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <ShieldAlert className="mx-auto h-12 w-12 text-primary" />
           <CardTitle className="text-2xl font-bold font-headline mt-4">Welcome to AlertFront</CardTitle>
-          <CardDescription>Sign in to continue</CardDescription>
+          <CardDescription>Sign in or create an account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -61,6 +64,10 @@ export default function LoginPage() {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" defaultValue="password" required />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number (for alerts)</Label>
+              <Input id="phone" type="tel" placeholder="+1234567890" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Select your role</Label>
@@ -77,7 +84,7 @@ export default function LoginPage() {
             </div>
             <Button type="submit" className="w-full">
               <LogIn className="mr-2" />
-              Login
+              Login / Register
             </Button>
           </form>
         </CardContent>

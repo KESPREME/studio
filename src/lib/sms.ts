@@ -1,14 +1,13 @@
 
+"use server";
+
 import twilio from 'twilio';
 
+// This is a server action, so it's safe to use environment variables here.
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
 const twilioPhone = process.env.TWILIO_PHONE;
 const adminPhone = process.env.ADMIN_PHONE_NUMBER;
-
-if (!accountSid || !authToken || !twilioPhone || !adminPhone) {
-  console.warn("Twilio environment variables are not fully configured. SMS notifications will be disabled.");
-}
 
 const client = (accountSid && authToken) ? twilio(accountSid, authToken) : null;
 
@@ -27,7 +26,7 @@ export async function sendNewReportSms(report: { description: string; urgency: s
     console.log('Admin alert SMS sent:', message.sid);
   } catch (error) {
     console.error('Failed to send admin SMS:', error);
-    throw error;
+    // We don't re-throw here because report creation should not fail if SMS does.
   }
 }
 
@@ -49,7 +48,6 @@ export async function sendMassAlertSms(report: { description: string; urgency: s
       console.log(`Mass alert SMS sent to ${number}: ${message.sid}`);
     }).catch(error => {
       console.error(`Failed to send mass alert SMS to ${number}:`, error);
-      // We don't re-throw here to allow other messages to be sent
     });
   });
 

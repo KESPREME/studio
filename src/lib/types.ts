@@ -21,4 +21,6 @@ export type User = {
   name: string;
   email: string;
   role: 'reporter' | 'admin';
+  phone?: string;
 };
+

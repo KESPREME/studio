@@ -1,3 +1,4 @@
+
 // src/hooks/use-auth.tsx
 "use client";
 
@@ -7,6 +8,7 @@ type User = {
   name: string;
   email: string;
   role: 'reporter' | 'admin';
+  phone?: string;
 };
 
 type AuthContextType = {

@@ -75,10 +75,8 @@ export function ReportForm() {
     let imagePath: string | undefined = undefined;
 
     try {
-        // Step 1: Upload image if it exists
         if (imageFile) {
           const file = imageFile;
-          // Create a unique file name to avoid collisions
           const fileName = `${user.email.split('@')[0]}_${Date.now()}_${file.name}`;
           const filePath = `${fileName}`; 
     
@@ -87,24 +85,22 @@ export function ReportForm() {
             .upload(filePath, file);
     
           if (error) {
-            // Don't proceed if image upload fails
             throw new Error(`Image Upload Failed: ${error.message}`);
           }
           
-          imagePath = data.path; // Save the path for the report
+          imagePath = data.path;
         }
     
-        // Step 2: Prepare the report data for our API
         const reportData = {
           description: values.description,
           urgency: values.urgency,
           latitude: values.latitude,
           longitude: values.longitude,
-          imageUrl: imagePath, // Use the path from storage upload
+          imageUrl: imagePath,
           reportedBy: user.email,
+          phone: user.phone, // Include the user's phone number
         };
     
-        // Step 3: Call the API to create the report in the database
         const response = await fetch('/api/reports', {
           method: 'POST',
           headers: {
@@ -115,20 +111,17 @@ export function ReportForm() {
     
         if (!response.ok) {
           const errorData = await response.json();
-          // If the API call fails, try to clean up the uploaded image
           if (imagePath) {
             await supabase.storage.from('images').remove([imagePath]);
           }
           throw new Error(errorData.message || 'Failed to submit report');
         }
     
-        // Success!
         toast({
           title: "Report Submitted!",
           description: "Thank you for helping keep your community safe.",
-        });
+        })
         
-        // Redirect user after successful submission
         if(user.role === 'admin') {
           router.push('/admin');
         } else {
