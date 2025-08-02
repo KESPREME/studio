@@ -78,13 +78,14 @@ export async function POST(request: Request) {
       status: 'New' as const,
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
         .from('reports')
         .insert(newReportData)
         .select()
         .single();
     
     if (error) {
+      console.error('Supabase insert error:', error);
       throw error;
     }
     
