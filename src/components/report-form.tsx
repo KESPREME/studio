@@ -132,11 +132,8 @@ export function ReportForm() {
       try {
         await sendNewReportSms(reportData);
         if(reportData.urgency === 'High') {
-            const radiusKm = 10;
-            const box = getBoundingBox(reportData.latitude, reportData.longitude, radiusKm);
-            
-            // This logic requires an admin client to bypass RLS, so it needs to be in a server action or API route.
-            // For now, we will assume an admin phone number is available for demonstration.
+            // In a real app, you'd query the DB for nearby users.
+            // For this demo, we assume an admin phone number is available for demonstration.
             const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
             const uniquePhoneNumbers = adminPhoneNumber ? [adminPhoneNumber] : [];
 
@@ -146,9 +143,9 @@ export function ReportForm() {
         }
       } catch (smsError: any) {
         console.error("SMS sending failed, but report was saved.", smsError);
-        // Non-blocking, so we don't show a toast for this
       }
 
+      // Redirect user after successful submission
       if(user.role === 'admin') {
         router.push('/admin');
       } else {

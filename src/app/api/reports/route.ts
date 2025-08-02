@@ -10,6 +10,7 @@ export async function GET() {
       .order('createdAt', { ascending: false });
 
     if (error) {
+      console.error('Supabase GET Error:', error);
       throw error;
     }
 
@@ -30,6 +31,8 @@ export async function GET() {
   } catch (e: any)
   {
     console.error('API GET Error:', e);
-    return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
+    // Provide a more specific error message based on the caught error
+    const errorMessage = e.message || 'Internal Server Error';
+    return NextResponse.json({ message: errorMessage, error: e }, { status: 500 });
   }
 }

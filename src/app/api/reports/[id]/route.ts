@@ -11,7 +11,7 @@ const statusUpdateSchema = z.object({
 });
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: { id:string } }
 ) {
   try {
@@ -25,6 +25,7 @@ export async function GET(
         if (error.code === 'PGRST116') {
              return NextResponse.json({ message: 'Report not found' }, { status: 404 });
         }
+        console.error('API GET by ID Error:', error);
         throw error;
     }
 
@@ -45,7 +46,7 @@ export async function GET(
 
     return NextResponse.json(report);
   } catch (e: any) {
-    console.error('API GET by ID Error:', e);
+    console.error('API GET by ID Exception:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
@@ -77,18 +78,19 @@ export async function PATCH(
         .eq('id', params.id)
 
     if (error) {
+        console.error('API PATCH Error:', error);
         throw error;
     }
 
     return NextResponse.json({ message: 'Report status updated' });
   } catch (e: any) {
-    console.error('API PATCH Error:', e);
+    console.error('API PATCH Exception:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -102,6 +104,7 @@ export async function DELETE(
       if (fetchError?.code === 'PGRST116') {
           return NextResponse.json({ message: 'Report not found' }, { status: 404 });
       }
+      console.error('API DELETE Fetch Error:', fetchError);
       throw fetchError;
     }
     
@@ -133,7 +136,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Report deleted successfully' });
   } catch (e: any) {
-    console.error('API DELETE Error:', e);
+    console.error('API DELETE Exception:', e);
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
