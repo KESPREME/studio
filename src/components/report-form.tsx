@@ -32,6 +32,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
 import { supabase } from "@/lib/supabase"
+import { sendNewReportSms, sendMassAlertSms } from "@/lib/sms.actions"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -63,6 +64,20 @@ export function ReportForm() {
     },
   })
 
+  // Helper to calculate bounding box for nearby query
+  const getBoundingBox = (latitude: number, longitude: number, distanceKm: number) => {
+    const latRadian = latitude * (Math.PI / 180);
+    const degLat = distanceKm / 111.132;
+    const degLon = distanceKm / (111.320 * Math.cos(latRadian));
+
+    return {
+      minLat: latitude - degLat,
+      maxLat: latitude + degLat,
+      minLon: longitude - degLon,
+      maxLon: longitude + degLon,
+    };
+  };
+
   async function onSubmit(values: z.infer<typeof reportSchema>) {
     setIsSubmitting(true)
     
@@ -74,69 +89,87 @@ export function ReportForm() {
 
     let imagePath: string | undefined = undefined;
 
-    if (imageFile) {
-      const file = imageFile;
-      const fileName = `${user.email.split('@')[0]}_${Date.now()}_${file.name}`;
-      const filePath = `${fileName}`; 
+    try {
+      if (imageFile) {
+        const fileName = `${user.email.split('@')[0]}_${Date.now()}_${imageFile.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(fileName, imageFile);
 
-      const { data, error } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
+        if (uploadError) {
+          throw new Error(`Image Upload Failed: ${uploadError.message}`);
+        }
+        imagePath = uploadData.path;
+      }
 
-      if (error) {
-        console.error('Supabase upload error:', error);
-        toast({
-          title: "Image Upload Failed",
-          description: `Could not upload your image to storage: ${error.message}`,
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
+      const reportData = {
+        description: values.description,
+        urgency: values.urgency,
+        latitude: values.latitude,
+        longitude: values.longitude,
+        imageUrl: imagePath,
+        reportedBy: user.email,
+        status: 'New' as const,
+      };
+
+      const { data: insertData, error: insertError } = await supabase
+        .from('reports')
+        .insert(reportData)
+        .select()
+        .single();
+      
+      if (insertError) {
+        throw new Error(`Database Error: ${insertError.message}`);
       }
       
-      imagePath = data.path;
-    }
-
-
-    const reportData = {
-      description: values.description,
-      urgency: values.urgency,
-      latitude: values.latitude,
-      longitude: values.longitude,
-      imageUrl: imagePath, // Store the path, not the full URL
-      reportedBy: user.email,
-    };
-    
-    try {
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reportData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit report');
-      }
-
       toast({
         title: "Report Submitted!",
         description: "Thank you for helping keep your community safe.",
       })
       
+      // Handle SMS notifications via server actions
+      try {
+        await sendNewReportSms(reportData);
+        if(reportData.urgency === 'High') {
+            const radiusKm = 10;
+            const box = getBoundingBox(reportData.latitude, reportData.longitude, radiusKm);
+            
+            const { data: nearbyReports, error: nearbyError } = await supabase
+                .from('reports')
+                .select('reportedBy, longitude')
+                .gte('latitude', box.minLat)
+                .lte('latitude', box.maxLat);
+            
+            if(nearbyError) throw nearbyError;
+
+            const nearbyReporters: string[] = [];
+            const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
+
+            if (nearbyReports) {
+              nearbyReports.forEach((report: { reportedBy: string, longitude: number }) => {
+                if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
+                   if (adminPhoneNumber) {
+                      nearbyReporters.push(adminPhoneNumber);
+                   }
+                }
+              });
+            }
+            
+            const uniquePhoneNumbers = [...new Set(nearbyReporters)];
+            if (uniquePhoneNumbers.length > 0) {
+              await sendMassAlertSms(reportData, uniquePhoneNumbers);
+            }
+        }
+      } catch (smsError: any) {
+        console.error("SMS sending failed, but report was saved.", smsError);
+        // Non-blocking, so we don't show a toast for this
+      }
+
       if(user.role === 'admin') {
         router.push('/admin');
       } else {
         router.push('/dashboard');
       }
-      form.reset({
-        description: "",
-        urgency: "Moderate",
-      });
-      setImagePreview(null);
-      setImageFile(null);
 
     } catch (error: any) {
       console.error("Submission error:", error);
@@ -177,6 +210,14 @@ export function ReportForm() {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+         toast({
+            title: "Image too large",
+            description: "Please select an image smaller than 10MB.",
+            variant: "destructive",
+        })
+        return;
+      }
       setImageFile(file);
       form.setValue("image", file)
       const reader = new FileReader()
@@ -267,7 +308,7 @@ export function ReportForm() {
                     <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
                         {imagePreview ? (
                             <div className="relative w-full h-40">
-                                <Image src={imagePreview} alt="Image preview" fill objectFit="contain" />
+                                <Image src={imagePreview} alt="Image preview" fill style={{objectFit: 'contain'}} />
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
