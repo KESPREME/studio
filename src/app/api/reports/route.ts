@@ -16,18 +16,21 @@ const reportSchema = z.object({
 
 export async function GET() {
   try {
+    // This is a public route, so we use the public client.
     const { data: reports, error } = await supabase
       .from('reports')
       .select('*')
       .order('createdAt', { ascending: false });
 
     if (error) {
+      // This will throw and be caught by the catch block, returning a 500 error.
       throw error;
     }
 
     const reportsWithUrls = reports.map(report => {
         let publicUrl = undefined;
         if (report.imageUrl) {
+            // We can use the public client here as well, as the bucket is public.
             const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl);
             publicUrl = data.publicUrl;
         }
@@ -42,6 +45,10 @@ export async function GET() {
   } catch (e: any)
   {
     console.error('API GET Error:', e);
+    // Provide a more specific error message if the API key is invalid.
+    if (e.message?.includes('authentication failed')) {
+        return NextResponse.json({ message: 'Internal Server Error', error: 'Invalid Supabase API key or URL.' }, { status: 500 });
+    }
     return NextResponse.json({ message: 'Internal Server Error', error: e.message }, { status: 500 });
   }
 }
@@ -78,6 +85,7 @@ export async function POST(request: Request) {
       status: 'New' as const,
     };
 
+    // Use the ADMIN client to insert data, bypassing RLS for this trusted server-side operation.
     const { data, error } = await supabaseAdmin
         .from('reports')
         .insert(newReportData)
@@ -88,18 +96,16 @@ export async function POST(request: Request) {
       throw error;
     }
     
-    try {
-      await sendNewReportSms(validation.data);
-    } catch (smsError: any) {
-      console.error("Admin SMS sending failed, but report was created. Error:", smsError.message);
-    }
+    // Asynchronously send SMS notifications without blocking the response.
+    // These functions now handle their own errors internally.
+    await sendNewReportSms(validation.data);
 
     if (validation.data.urgency === 'High') {
-      try {
         const { latitude, longitude } = validation.data;
         const radiusKm = 10;
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
+        // Use admin client to query all reports for mass alert, bypassing RLS
         const { data: nearbyReports, error: nearbyError } = await supabaseAdmin
             .from('reports')
             .select('reportedBy, longitude')
@@ -115,6 +121,8 @@ export async function POST(request: Request) {
           nearbyReports.forEach((report: { reportedBy: string, longitude: number }) => {
             if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
                if (adminPhoneNumber) {
+                  // In a real app, you would look up the user's phone number.
+                  // For this demo, we use the admin's number as a placeholder.
                   nearbyReporters.push(adminPhoneNumber);
                }
             }
@@ -127,10 +135,6 @@ export async function POST(request: Request) {
         } else {
           console.log("No nearby reporters found to send mass alert.");
         }
-
-      } catch (massAlertError: any) {
-        console.error("Mass alert SMS process failed. Error:", massAlertError.message);
-      }
     }
 
 

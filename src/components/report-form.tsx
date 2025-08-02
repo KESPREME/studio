@@ -74,69 +74,69 @@ export function ReportForm() {
 
     let imagePath: string | undefined = undefined;
 
-    if (imageFile) {
-      const file = imageFile;
-      const fileName = `${user.email.split('@')[0]}_${Date.now()}_${file.name}`;
-      const filePath = `${fileName}`; 
-
-      const { data, error } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
-
-      if (error) {
-        console.error('Supabase upload error:', error);
-        toast({
-          title: "Image Upload Failed",
-          description: `Could not upload your image to storage: ${error.message}`,
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-      
-      imagePath = data.path;
-    }
-
-
-    const reportData = {
-      description: values.description,
-      urgency: values.urgency,
-      latitude: values.latitude,
-      longitude: values.longitude,
-      imageUrl: imagePath, // Store the path, not the full URL
-      reportedBy: user.email,
-    };
-    
     try {
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reportData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit report');
-      }
-
-      toast({
-        title: "Report Submitted!",
-        description: "Thank you for helping keep your community safe.",
-      })
-      
-      if(user.role === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
-      form.reset({
-        description: "",
-        urgency: "Moderate",
-      });
-      setImagePreview(null);
-      setImageFile(null);
+        // Step 1: Upload image if it exists
+        if (imageFile) {
+          const file = imageFile;
+          // Create a unique file name to avoid collisions
+          const fileName = `${user.email.split('@')[0]}_${Date.now()}_${file.name}`;
+          const filePath = `${fileName}`; 
+    
+          const { data, error } = await supabase.storage
+            .from('images')
+            .upload(filePath, file);
+    
+          if (error) {
+            // Don't proceed if image upload fails
+            throw new Error(`Image Upload Failed: ${error.message}`);
+          }
+          
+          imagePath = data.path; // Save the path for the report
+        }
+    
+        // Step 2: Prepare the report data for our API
+        const reportData = {
+          description: values.description,
+          urgency: values.urgency,
+          latitude: values.latitude,
+          longitude: values.longitude,
+          imageUrl: imagePath, // Use the path from storage upload
+          reportedBy: user.email,
+        };
+    
+        // Step 3: Call the API to create the report in the database
+        const response = await fetch('/api/reports', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(reportData),
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          // If the API call fails, try to clean up the uploaded image
+          if (imagePath) {
+            await supabase.storage.from('images').remove([imagePath]);
+          }
+          throw new Error(errorData.message || 'Failed to submit report');
+        }
+    
+        // Success!
+        toast({
+          title: "Report Submitted!",
+          description: "Thank you for helping keep your community safe.",
+        });
+        
+        // Redirect user after successful submission
+        if(user.role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
+        form.reset();
+        setImagePreview(null);
+        setImageFile(null);
 
     } catch (error: any) {
       console.error("Submission error:", error);
