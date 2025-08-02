@@ -80,8 +80,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
     
+    // In a real application, you would need to get the user from the session,
+    // not just trust the email from the request body.
+    const { reportedBy, ...restOfData } = validation.data;
+    
     const newReportData = {
-      ...validation.data,
+      ...restOfData,
+      reportedBy,
       status: 'New',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),

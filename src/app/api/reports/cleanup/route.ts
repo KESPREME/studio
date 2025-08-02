@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabase } from '@/lib/supabase';
 
 // In a production environment, you would secure this with a more robust mechanism
 // like checking for a specific role or using a service account.
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     // Failure here should not cause the entire job to fail.
     if (imagePathsToDelete.length > 0) {
       try {
-        const { data, error } = await supabaseAdmin.storage.from('images').remove(imagePathsToDelete);
+        const { data, error } = await supabase.storage.from('images').remove(imagePathsToDelete);
         if (error) {
           console.error('Supabase image deletion failed for some paths, but Firestore cleanup was successful:', error.message);
         } else {
