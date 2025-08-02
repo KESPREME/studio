@@ -8,8 +8,18 @@ const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
 const twilioPhone = process.env.TWILIO_PHONE;
 const adminPhone = process.env.ADMIN_PHONE_NUMBER;
+const verifyServiceSid = process.env.TWILIO_VERIFY_SID;
+
+if (!accountSid || !authToken || !twilioPhone || !adminPhone) {
+  console.warn("Twilio messaging environment variables are not fully configured. SMS notifications will be disabled.");
+}
+
+if (!verifyServiceSid) {
+    console.warn("Twilio Verify Service SID is not configured. OTP functionality will be disabled.");
+}
 
 const client = (accountSid && authToken) ? twilio(accountSid, authToken) : null;
+
 
 export async function sendNewReportSms(report: { description: string; urgency: string; }) {
   if (!client || !twilioPhone || !adminPhone) {
@@ -57,4 +67,22 @@ export async function sendMassAlertSms(report: { description: string; urgency: s
   } catch (error) {
     console.error('An error occurred during mass alert SMS sending:', error);
   }
+}
+
+export async function sendVerificationOtp(phone: string) {
+    if (!client || !verifyServiceSid) {
+        throw new Error("Twilio Verify is not configured on the server.");
+    }
+    return client.verify.v2.services(verifyServiceSid)
+        .verifications
+        .create({ to: phone, channel: 'sms' });
+}
+
+export async function checkVerificationOtp(phone: string, code: string) {
+    if (!client || !verifyServiceSid) {
+        throw new Error("Twilio Verify is not configured on the server.");
+    }
+    return client.verify.v2.services(verifyServiceSid)
+        .verificationChecks
+        .create({ to: phone, code: code });
 }

@@ -15,6 +15,7 @@ export interface Report {
   createdAt: string; 
   updatedAt: string; 
   resolvedAt?: string;
+  phone?: string;
 }
 
 export type User = {
@@ -23,4 +24,3 @@ export type User = {
   role: 'reporter' | 'admin';
   phone?: string;
 };
-
