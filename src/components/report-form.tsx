@@ -32,7 +32,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
 import { supabase } from "@/lib/supabase"
-import { sendNewReportSms, sendMassAlertSms } from "@/lib/sms.actions"
 
 const reportSchema = z.object({
   description: z.string().min(10, {
@@ -75,64 +74,69 @@ export function ReportForm() {
 
     let imagePath: string | undefined = undefined;
 
+    if (imageFile) {
+      const file = imageFile;
+      const fileName = `${user.email.split('@')[0]}_${Date.now()}_${file.name}`;
+      const filePath = `${fileName}`; 
+
+      const { data, error } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (error) {
+        console.error('Supabase upload error:', error);
+        toast({
+          title: "Image Upload Failed",
+          description: `Could not upload your image to storage: ${error.message}`,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      imagePath = data.path;
+    }
+
+
+    const reportData = {
+      description: values.description,
+      urgency: values.urgency,
+      latitude: values.latitude,
+      longitude: values.longitude,
+      imageUrl: imagePath, // Store the path, not the full URL
+      reportedBy: user.email,
+    };
+    
     try {
-      if (imageFile) {
-        const fileName = `${user.email.split('@')[0]}_${Date.now()}_${imageFile.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('images')
-          .upload(fileName, imageFile);
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportData),
+      });
 
-        if (uploadError) {
-          throw new Error(`Image Upload Failed: ${uploadError.message}`);
-        }
-        imagePath = uploadData.path;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit report');
       }
 
-      const reportData = {
-        description: values.description,
-        urgency: values.urgency,
-        latitude: values.latitude,
-        longitude: values.longitude,
-        imageUrl: imagePath,
-        reportedBy: user.email,
-        status: 'New' as const,
-      };
-
-      const { data: insertData, error: insertError } = await supabase
-        .from('reports')
-        .insert(reportData)
-        .select()
-        .single();
-      
-      if (insertError) {
-        console.error('Supabase insert error:', insertError);
-        throw new Error(`Database Error: ${insertError.message}`);
-      }
-      
       toast({
         title: "Report Submitted!",
         description: "Thank you for helping keep your community safe.",
       })
       
-      try {
-        await sendNewReportSms(reportData);
-        if(reportData.urgency === 'High') {
-            const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
-            const uniquePhoneNumbers = adminPhoneNumber ? [adminPhoneNumber] : [];
-
-            if (uniquePhoneNumbers.length > 0) {
-              await sendMassAlertSms(reportData, uniquePhoneNumbers);
-            }
-        }
-      } catch (smsError: any) {
-        console.error("SMS sending failed, but report was saved.", smsError);
-      }
-
       if(user.role === 'admin') {
         router.push('/admin');
       } else {
         router.push('/dashboard');
       }
+      form.reset({
+        description: "",
+        urgency: "Moderate",
+      });
+      setImagePreview(null);
+      setImageFile(null);
 
     } catch (error: any) {
       console.error("Submission error:", error);
@@ -173,14 +177,6 @@ export function ReportForm() {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-         toast({
-            title: "Image too large",
-            description: "Please select an image smaller than 10MB.",
-            variant: "destructive",
-        })
-        return;
-      }
       setImageFile(file);
       form.setValue("image", file)
       const reader = new FileReader()
