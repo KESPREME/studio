@@ -119,17 +119,19 @@ export async function POST(request: Request) {
         const nearbyReporters: string[] = [];
         const adminPhoneNumber = process.env.ADMIN_PHONE_NUMBER;
 
-        nearbyReports.forEach((report) => {
-          // Secondary longitude filter
-          if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
-             // For this demo, we don't have user phone numbers.
-             // We'll use the ADMIN_PHONE_NUMBER as a stand-in for every "nearby" user.
-             // In a real app, you'd look up the user's phone number from their email or user ID.
-             if (adminPhoneNumber) {
-                nearbyReporters.push(adminPhoneNumber);
-             }
-          }
-        });
+        if (nearbyReports) {
+          nearbyReports.forEach((report) => {
+            // Secondary longitude filter
+            if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
+               // For this demo, we don't have user phone numbers.
+               // We'll use the ADMIN_PHONE_NUMBER as a stand-in for every "nearby" user.
+               // In a real app, you'd look up the user's phone number from their email or user ID.
+               if (adminPhoneNumber) {
+                  nearbyReporters.push(adminPhoneNumber);
+               }
+            }
+          });
+        }
         
         const uniquePhoneNumbers = [...new Set(nearbyReporters)];
         if (uniquePhoneNumbers.length > 0) {

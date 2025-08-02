@@ -1,11 +1,10 @@
 
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
 const reportSchema = z.object({
@@ -20,34 +19,29 @@ const reportSchema = z.object({
 
 export async function GET() {
   try {
-    const reportsCollection = collection(db, 'reports');
-    const q = query(reportsCollection, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
+    const { data: reports, error } = await supabase
+      .from('reports')
+      .select('*')
+      .order('createdAt', { ascending: false });
 
-    const reports = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      // Defensive date handling
-      const createdAt = data.createdAt as Timestamp | undefined;
-      const updatedAt = data.updatedAt as Timestamp | undefined;
-      const resolvedAt = data.resolvedAt as Timestamp | undefined;
-      
-      let imageUrl: string | undefined = undefined;
-      if (data.imageUrl) {
-        const { data: publicUrlData } = supabaseAdmin.storage.from('images').getPublicUrl(data.imageUrl);
-        imageUrl = publicUrlData.publicUrl;
-      }
+    if (error) {
+      throw error;
+    }
 
-      return {
-        id: doc.id,
-        ...data,
-        imageUrl,
-        createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
-        updatedAt: updatedAt ? updatedAt.toDate().toISOString() : new Date().toISOString(),
-        resolvedAt: resolvedAt ? resolvedAt.toDate().toISOString() : undefined,
-      } as Report;
+    const reportsWithUrls = reports.map(report => {
+        let publicUrl = undefined;
+        if (report.imageUrl) {
+            const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl);
+            publicUrl = data.publicUrl;
+        }
+        return {
+            ...report,
+            imageUrl: publicUrl,
+        };
     });
 
-    return NextResponse.json(reports);
+
+    return NextResponse.json(reportsWithUrls);
   } catch (e: any)
   {
     console.error('API GET Error:', e);
@@ -87,12 +81,18 @@ export async function POST(request: Request) {
     const newReportData = {
       ...restOfData,
       reportedBy,
-      status: 'New',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      status: 'New' as const,
     };
 
-    const docRef = await addDoc(collection(db, 'reports'), newReportData);
+    const { data, error } = await supabaseAdmin
+        .from('reports')
+        .insert(newReportData)
+        .select()
+        .single();
+    
+    if (error) {
+      throw error;
+    }
     
     // Send SMS notification to admin
     try {
@@ -108,31 +108,30 @@ export async function POST(request: Request) {
         const radiusKm = 10; // 10km radius
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
-        const q = query(
-          collection(db, 'reports'),
-          where('latitude', '>=', box.minLat),
-          where('latitude', '<=', box.maxLat),
-          // Note: Firestore doesn't support range filters on multiple fields.
-          // We'll have to filter longitude in the application code.
-        );
+        const { data: nearbyReports, error: nearbyError } = await supabaseAdmin
+            .from('reports')
+            .select('reportedBy, longitude')
+            .gte('latitude', box.minLat)
+            .lte('latitude', box.maxLat);
         
-        const querySnapshot = await getDocs(q);
+        if(nearbyError) throw nearbyError;
+
         const nearbyReporters: string[] = [];
-        
         const adminPhoneNumber = process.env.ADMIN_PHONE_NUMBER;
 
-        querySnapshot.forEach((doc) => {
-          const report = doc.data() as Report;
-          // Secondary longitude filter
-          if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
-             // For this demo, we don't have user phone numbers.
-             // We'll use the ADMIN_PHONE_NUMBER as a stand-in for every "nearby" user.
-             // In a real app, you'd look up the user's phone number from their email or user ID.
-             if (adminPhoneNumber) {
-                nearbyReporters.push(adminPhoneNumber);
-             }
-          }
-        });
+        if (nearbyReports) {
+          nearbyReports.forEach((report) => {
+            // Secondary longitude filter
+            if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
+               // For this demo, we don't have user phone numbers.
+               // We'll use the ADMIN_PHONE_NUMBER as a stand-in for every "nearby" user.
+               // In a real app, you'd look up the user's phone number from their email or user ID.
+               if (adminPhoneNumber) {
+                  nearbyReporters.push(adminPhoneNumber);
+               }
+            }
+          });
+        }
         
         const uniquePhoneNumbers = [...new Set(nearbyReporters)];
         if (uniquePhoneNumbers.length > 0) {
@@ -147,9 +146,9 @@ export async function POST(request: Request) {
     }
 
 
-    return NextResponse.json({ message: 'Report created', reportId: docRef.id }, { status: 201 });
+    return NextResponse.json({ message: 'Report created', reportId: data.id }, { status: 201 });
   } catch (e: any) {
-    console.error('Firestore POST Error:', e);
+    console.error('Supabase POST Error:', e);
     // If the error is due to payload size, provide a specific message
     if (e.message?.includes('too large')) {
        return NextResponse.json({ message: 'Request body too large. Please upload a smaller image file.' }, { status: 413 });
