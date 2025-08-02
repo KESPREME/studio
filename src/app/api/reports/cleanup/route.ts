@@ -1,9 +1,7 @@
 
 // src/app/api/reports/cleanup/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 // In a production environment, you would secure this with a more robust mechanism
 // like checking for a specific role or using a service account.
@@ -18,44 +16,42 @@ export async function POST(request: Request) {
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const thirtyDaysAgoTimestamp = Timestamp.fromDate(thirtyDaysAgo);
-
-    const reportsCollection = collection(db, 'reports');
     
-    const q = query(
-        reportsCollection, 
-        where('status', '==', 'Resolved'),
-        where('resolvedAt', '<=', thirtyDaysAgoTimestamp)
-    );
+    // 1. Find old, resolved reports
+    const { data: reportsToDelete, error: fetchError } = await supabaseAdmin
+        .from('reports')
+        .select('id, imageUrl')
+        .eq('status', 'Resolved')
+        .lt('resolvedAt', thirtyDaysAgo.toISOString());
 
-    const querySnapshot = await getDocs(q);
+    if (fetchError) throw fetchError;
 
-    if (querySnapshot.empty) {
+    if (!reportsToDelete || reportsToDelete.length === 0) {
       return NextResponse.json({ message: 'No old resolved reports to delete.' });
     }
+    
+    const reportIdsToDelete = reportsToDelete.map(r => r.id);
+    const imagePathsToDelete = reportsToDelete
+        .map(r => r.imageUrl)
+        .filter((path): path is string => !!path);
 
-    const batch = writeBatch(db);
-    const imagePathsToDelete: string[] = [];
+    // 2. Delete the records from the database
+    const { error: deleteError } = await supabaseAdmin
+        .from('reports')
+        .delete()
+        .in('id', reportIdsToDelete);
 
-    querySnapshot.forEach(doc => {
-      const reportData = doc.data();
-      batch.delete(doc.ref);
-      // reportData.imageUrl will be the path
-      if (reportData.imageUrl) {
-        imagePathsToDelete.push(reportData.imageUrl);
-      }
-    });
+    if (deleteError) {
+        console.error("Supabase delete error during cleanup:", deleteError);
+        throw new Error("Failed to delete old reports from database.");
+    }
 
-    // Commit the Firestore deletions first.
-    await batch.commit();
-
-    // After successful deletion from Firestore, attempt to delete from storage.
-    // Failure here should not cause the entire job to fail.
+    // 3. After successful deletion from db, attempt to delete from storage.
     if (imagePathsToDelete.length > 0) {
       try {
-        const { data, error } = await supabase.storage.from('images').remove(imagePathsToDelete);
+        const { data, error } = await supabaseAdmin.storage.from('images').remove(imagePathsToDelete);
         if (error) {
-          console.error('Supabase image deletion failed for some paths, but Firestore cleanup was successful:', error.message);
+          console.error('Supabase image deletion failed for some paths, but database cleanup was successful:', error.message);
         } else {
            console.log('Successfully deleted images from Supabase:', data);
         }
@@ -65,7 +61,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      message: `Successfully deleted ${querySnapshot.size} old resolved reports from Firestore.`,
+      message: `Successfully deleted ${reportsToDelete.length} old resolved reports from Supabase.`,
       attemptedImageDeletions: imagePathsToDelete.length,
     });
 
