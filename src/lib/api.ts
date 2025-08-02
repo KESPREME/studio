@@ -17,21 +17,6 @@ export async function getReports(): Promise<Report[]> {
   }
 }
 
-
-export async function updateReportStatus(reportId: string, status: Status): Promise<any> {
-  const response = await fetch(`/api/reports/${reportId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to update status');
-  }
-  return await response.json();
-}
-
 export async function deleteReport(reportId: string): Promise<any> {
   const response = await fetch(`/api/reports/${reportId}`, {
     method: 'DELETE',
