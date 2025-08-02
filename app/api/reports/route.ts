@@ -1,9 +1,7 @@
-
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
-import type { Report } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
@@ -12,7 +10,6 @@ const reportSchema = z.object({
   urgency: z.enum(["Low", "Moderate", "High"]),
   latitude: z.number(),
   longitude: z.number(),
-  // Store the image path from Supabase, not the full URL. This is more robust.
   imageUrl: z.string().optional(),
   reportedBy: z.string().email(),
 });
@@ -49,7 +46,6 @@ export async function GET() {
   }
 }
 
-// Function to calculate bounding box for nearby query
 const getBoundingBox = (latitude: number, longitude: number, distanceKm: number) => {
   const latRadian = latitude * (Math.PI / 180);
   const degLat = distanceKm / 111.132; 
@@ -74,8 +70,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid input', errors: validation.error.issues }, { status: 400 });
     }
     
-    // In a real application, you would need to get the user from the session,
-    // not just trust the email from the request body.
     const { reportedBy, ...restOfData } = validation.data;
     
     const newReportData = {
@@ -94,18 +88,16 @@ export async function POST(request: Request) {
       throw error;
     }
     
-    // Send SMS notification to admin
     try {
       await sendNewReportSms(validation.data);
     } catch (smsError: any) {
       console.error("Admin SMS sending failed, but report was created. Error:", smsError.message);
     }
 
-    // If urgency is High, send mass alert to nearby reporters
     if (validation.data.urgency === 'High') {
       try {
         const { latitude, longitude } = validation.data;
-        const radiusKm = 10; // 10km radius
+        const radiusKm = 10;
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
         const { data: nearbyReports, error: nearbyError } = await supabaseAdmin
@@ -120,12 +112,8 @@ export async function POST(request: Request) {
         const adminPhoneNumber = process.env.ADMIN_PHONE_NUMBER;
 
         if (nearbyReports) {
-          nearbyReports.forEach((report) => {
-            // Secondary longitude filter
+          nearbyReports.forEach((report: { reportedBy: string, longitude: number }) => {
             if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
-               // For this demo, we don't have user phone numbers.
-               // We'll use the ADMIN_PHONE_NUMBER as a stand-in for every "nearby" user.
-               // In a real app, you'd look up the user's phone number from their email or user ID.
                if (adminPhoneNumber) {
                   nearbyReporters.push(adminPhoneNumber);
                }
@@ -149,7 +137,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Report created', reportId: data.id }, { status: 201 });
   } catch (e: any) {
     console.error('Supabase POST Error:', e);
-    // If the error is due to payload size, provide a specific message
     if (e.message?.includes('too large')) {
        return NextResponse.json({ message: 'Request body too large. Please upload a smaller image file.' }, { status: 413 });
     }

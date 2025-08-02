@@ -1,4 +1,3 @@
-
 // src/app/api/reports/cleanup/route.ts
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';

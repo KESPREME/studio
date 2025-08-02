@@ -3,8 +3,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
-// In a production environment, you would secure this with a more robust mechanism
-// like checking for a specific role or using a service account.
 const CRON_SECRET = process.env.CRON_SECRET || 'your-super-secret-key';
 
 export async function POST(request: Request) {
@@ -17,7 +15,6 @@ export async function POST(request: Request) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
-    // 1. Find old, resolved reports
     const { data: reportsToDelete, error: fetchError } = await supabaseAdmin
         .from('reports')
         .select('id, imageUrl')
@@ -35,7 +32,6 @@ export async function POST(request: Request) {
         .map(r => r.imageUrl)
         .filter((path): path is string => !!path);
 
-    // 2. Delete the records from the database
     const { error: deleteError } = await supabaseAdmin
         .from('reports')
         .delete()
@@ -46,7 +42,6 @@ export async function POST(request: Request) {
         throw new Error("Failed to delete old reports from database.");
     }
 
-    // 3. After successful deletion from db, attempt to delete from storage.
     if (imagePathsToDelete.length > 0) {
       try {
         const { data, error } = await supabaseAdmin.storage.from('images').remove(imagePathsToDelete);

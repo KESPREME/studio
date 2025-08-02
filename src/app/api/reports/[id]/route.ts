@@ -92,7 +92,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // First, fetch the report to get the image path
     const { data: report, error: fetchError } = await supabaseAdmin
       .from('reports')
       .select('imageUrl')
@@ -108,7 +107,6 @@ export async function DELETE(
     
     const imagePath = report.imageUrl;
 
-    // Primary Operation: Delete the database record
     const { error: deleteError } = await supabaseAdmin
       .from('reports')
       .delete()
@@ -119,8 +117,6 @@ export async function DELETE(
       throw new Error('Failed to delete report from the database.');
     }
     
-
-    // Secondary, Optional Operation: Attempt to delete the image from storage.
     if (imagePath && typeof imagePath === 'string') {
       try {
         const { error: storageError } = await supabaseAdmin.storage
