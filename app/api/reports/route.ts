@@ -78,6 +78,7 @@ export async function POST(request: Request) {
       status: 'New' as const,
     };
 
+    // Use the PUBLIC client to respect RLS for user submissions
     const { data, error } = await supabase
         .from('reports')
         .insert(newReportData)
@@ -101,6 +102,7 @@ export async function POST(request: Request) {
         const radiusKm = 10;
         const box = getBoundingBox(latitude, longitude, radiusKm);
         
+        // Use admin client to query all reports for mass alert, bypassing RLS
         const { data: nearbyReports, error: nearbyError } = await supabaseAdmin
             .from('reports')
             .select('reportedBy, longitude')

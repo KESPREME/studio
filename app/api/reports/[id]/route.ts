@@ -70,6 +70,7 @@ export async function PATCH(
         updateData.resolvedAt = new Date().toISOString();
     }
     
+    // Use the admin client to bypass RLS for status updates by admins
     const { error } = await supabaseAdmin
         .from('reports')
         .update(updateData)
@@ -91,7 +92,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // First, fetch the report to get the image path
+    // First, fetch the report to get the image path using the admin client
     const { data: report, error: fetchError } = await supabaseAdmin
       .from('reports')
       .select('imageUrl')
@@ -107,7 +108,7 @@ export async function DELETE(
     
     const imagePath = report.imageUrl;
 
-    // Primary Operation: Delete the database record
+    // Primary Operation: Delete the database record using the admin client
     const { error: deleteError } = await supabaseAdmin
       .from('reports')
       .delete()
@@ -118,7 +119,6 @@ export async function DELETE(
       throw new Error('Failed to delete report from the database.');
     }
     
-
     // Secondary, Optional Operation: Attempt to delete the image from storage.
     if (imagePath && typeof imagePath === 'string') {
       try {
