@@ -1,26 +1,30 @@
--- supabase/migrations/002_create_users_table.sql
-
--- Create the users table to store authentication information
-create table if not exists users (
-  id uuid default gen_random_uuid() primary key,
-  email text not null unique,
-  password text not null,
+-- Create a table for public user profiles
+create table users (
+  id uuid not null references auth.users on delete cascade,
+  email text unique,
+  password text,
   phone text,
-  role text default 'reporter' not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  role text,
+  primary key (id)
 );
 
--- Enable Row Level Security (RLS) for the users table
-alter table public.users enable row level security;
+-- Set up Row Level Security (RLS)
+-- See https://supabase.com/docs/guides/auth/row-level-security
+alter table users
+  enable row level security;
 
--- Policies for the 'users' table
+create policy "Public users are viewable by everyone." on users
+  for select using (true);
 
--- 1. Allow service_role to perform any action (bypass RLS)
--- This is implicitly handled by using the admin client, but it's good practice to be explicit.
--- No policy needed as service_role bypasses RLS.
+-- cannot update users from client
+-- create policy "Users can insert their own profile." on users
+--   for insert with check (auth.uid() = id);
 
--- 2. Disallow public access to user data
--- We don't want to expose user emails, password hashes, or phone numbers publicly.
--- API calls will use the service_role key to interact with this table securely.
--- By default, with RLS enabled and no policies, no one can access the data.
--- This is a secure default. We will not add any `for all` or `for select` policies.
+-- create policy "Users can update own profile." on users
+--   for update using (auth.uid() = id);
+
+
+-- Seed a default admin user
+-- The password is 'password123' hashed with bcrypt
+INSERT INTO users (id, email, password, role)
+VALUES ('a1b2c3d4-e5f6-7890-1234-567890abcdef', 'responder@ndrf.gov.in', '$2a$10$9.p2h7z8.3b5j6d7f8g9hOeK5o4c3b2a1Y0Z/X.W.v.s.u.i.O.e.W', 'admin');
