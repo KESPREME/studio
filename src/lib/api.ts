@@ -1,23 +1,16 @@
-
 // src/lib/api.ts
 import type { Report, Status } from '@/lib/types';
-import { supabase } from './supabase';
 
 export async function getReports(): Promise<Report[]> {
   try {
-    const { data: reports, error } = await supabase
-      .from('reports')
-      .select('*')
-      .order('createdAt', { ascending: false });
-
-    if (error) {
-      throw error;
+    const response = await fetch('/api/reports', { cache: 'no-store' });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Failed to fetch reports:", response.status, errorText);
+      return [];
     }
-
-    // Supabase already gives us the full URL if the bucket is public
-    // So we don't need to manually construct it.
-    return reports.map(r => ({ ...r, imageUrl: r.imageUrl ? supabase.storage.from('images').getPublicUrl(r.imageUrl).data.publicUrl : undefined }));
-
+    const reports = await response.json();
+    return reports;
   } catch (error) {
     console.error('Error fetching reports:', error);
     return [];

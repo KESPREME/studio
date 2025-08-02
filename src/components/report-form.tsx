@@ -119,6 +119,7 @@ export function ReportForm() {
         .single();
       
       if (insertError) {
+        console.error('Supabase insert error:', insertError);
         throw new Error(`Database Error: ${insertError.message}`);
       }
       
@@ -134,28 +135,11 @@ export function ReportForm() {
             const radiusKm = 10;
             const box = getBoundingBox(reportData.latitude, reportData.longitude, radiusKm);
             
-            const { data: nearbyReports, error: nearbyError } = await supabase
-                .from('reports')
-                .select('reportedBy, longitude')
-                .gte('latitude', box.minLat)
-                .lte('latitude', box.maxLat);
-            
-            if(nearbyError) throw nearbyError;
-
-            const nearbyReporters: string[] = [];
+            // This logic requires an admin client to bypass RLS, so it needs to be in a server action or API route.
+            // For now, we will assume an admin phone number is available for demonstration.
             const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
+            const uniquePhoneNumbers = adminPhoneNumber ? [adminPhoneNumber] : [];
 
-            if (nearbyReports) {
-              nearbyReports.forEach((report: { reportedBy: string, longitude: number }) => {
-                if (report.longitude >= box.minLon && report.longitude <= box.maxLon) {
-                   if (adminPhoneNumber) {
-                      nearbyReporters.push(adminPhoneNumber);
-                   }
-                }
-              });
-            }
-            
-            const uniquePhoneNumbers = [...new Set(nearbyReporters)];
             if (uniquePhoneNumbers.length > 0) {
               await sendMassAlertSms(reportData, uniquePhoneNumbers);
             }
