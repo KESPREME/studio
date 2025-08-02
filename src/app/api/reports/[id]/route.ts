@@ -10,9 +10,12 @@ const statusUpdateSchema = z.object({
 });
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: { id:string } }
 ) {
+  // Awaiting the request is not strictly necessary for GET, but good practice for consistency.
+  await request.text();
+  
   try {
     const { data, error } = await supabase
         .from('reports')
@@ -54,6 +57,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Await the request body before accessing params
     const body = await request.json();
     const validation = statusUpdateSchema.safeParse(body);
 
@@ -87,9 +91,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
+  // Await the request before accessing params
+  await request.text();
+
   try {
     // First, fetch the report to get the image path
     const { data: report, error: fetchError } = await supabaseAdmin
