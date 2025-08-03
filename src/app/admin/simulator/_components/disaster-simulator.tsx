@@ -1,4 +1,4 @@
-// src/app/admin/_components/disaster-simulator.tsx
+// src/app/admin/simulator/_components/disaster-simulator.tsx
 "use client";
 
 import { useState } from 'react';
