@@ -4,7 +4,7 @@
 import withAuth from "@/components/with-auth";
 import { Header } from "@/components/header";
 import { AppFooter } from "@/components/app-footer";
-import { DisasterSimulator } from "./_components/disaster-simulator";
+import { DisasterSimulator } from "../_components/disaster-simulator";
 
 function SimulatorPage() {
     return (

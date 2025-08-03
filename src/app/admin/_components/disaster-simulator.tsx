@@ -1,4 +1,4 @@
-// src/app/admin/simulator/_components/disaster-simulator.tsx
+// src/app/admin/_components/disaster-simulator.tsx
 "use client";
 
 import { useState } from 'react';
@@ -94,7 +94,7 @@ export function DisasterSimulator() {
               <SelectItem value="Earthquake">Earthquake (Magnitude 7.2)</SelectItem>
               <SelectItem value="Cyclone">Cyclone (Category 4)</SelectItem>
               <SelectItem value="Forest Fire">Forest Fire</SelectItem>
-              <SelectItem value="Chemical Spill">Industrial Chemical Spill</SelectItem>
+              <SelectItem value="Industrial Chemical Spill">Industrial Chemical Spill</SelectItem>
             </SelectContent>
           </Select>
           <Input 
