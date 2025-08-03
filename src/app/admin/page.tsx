@@ -19,6 +19,7 @@ import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { DisasterSimulator } from './_components/disaster-simulator';
+import { Separator } from '@/components/ui/separator';
 
 
 function AdminDashboard() {
@@ -164,9 +165,13 @@ function AdminDashboard() {
             </div>
           </div>
           
-          <div className="space-y-6 pt-8 border-t">
-             <h2 className="text-xl font-bold font-headline">AI-Powered Preparedness</h2>
-             <DisasterSimulator />
+          <Separator />
+
+          <div className="space-y-6">
+             <h2 className="text-2xl font-bold font-headline text-center">AI-Powered Preparedness</h2>
+             <div className="max-w-4xl mx-auto">
+              <DisasterSimulator />
+             </div>
           </div>
 
         </div>
