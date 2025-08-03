@@ -86,6 +86,24 @@ const DynamicMap = ({ reports }: HazardMapProps) => {
       
       marker.bindPopup(popupContent);
       markerClusterGroup.addLayer(marker);
+
+      // Add circles to visualize impact areas
+      const urgencyStyles = {
+        High: { color: 'hsl(var(--destructive))', radius: 10000, opacity: 0.2 },
+        Moderate: { color: '#f1c40f', radius: 5000, opacity: 0.2 },
+        Low: { color: 'hsl(var(--primary))', radius: 2000, opacity: 0.2 },
+      };
+
+      const style = urgencyStyles[report.urgency];
+      if (style) {
+        L.circle([report.latitude, report.longitude], {
+          radius: style.radius,
+          color: style.color,
+          fillColor: style.color,
+          fillOpacity: style.opacity,
+          weight: 1,
+        }).addTo(markerClusterGroup);
+      }
     });
   }, [reports]); // Re-run whenever reports change
 

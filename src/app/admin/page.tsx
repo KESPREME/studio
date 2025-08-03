@@ -1,7 +1,7 @@
 // src/app/admin/page.tsx
 "use client";
 
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, TestTube } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 
@@ -117,12 +117,20 @@ function AdminDashboard() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Dashboard</h1>
-            <Button asChild>
-              <Link href="/report/new">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Report
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild variant="outline">
+                <Link href="/admin/simulator">
+                  <TestTube className="mr-2 h-4 w-4" />
+                  Simulator
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href="/report/new">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  New Report
+                </Link>
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
