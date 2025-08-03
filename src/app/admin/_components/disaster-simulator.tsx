@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin } from 'lucide-react';
 
-const SimulatorMap = dynamic(() => import('@/app/simulator/_components/simulator-map'), {
+const SimulatorMap = dynamic(() => import('@/app/admin/_components/simulator-map'), {
   ssr: false,
   loading: () => (
     <div className="h-[500px] w-full bg-muted rounded-lg flex flex-col items-center justify-center gap-4">

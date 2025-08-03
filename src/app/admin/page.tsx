@@ -3,7 +3,7 @@
 
 import { PlusCircle, LayoutDashboard, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
@@ -129,7 +129,7 @@ function AdminDashboardPage() {
       <main className="flex-1 p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Control Center</h1>
             <Button asChild>
               <Link href="/report/new">
                 <PlusCircle className="mr-2 h-4 w-4" />
