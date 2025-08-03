@@ -57,7 +57,7 @@ export function Header() {
                     <span>Dashboard</span>
                   </DropdownMenuItem>
                    {user.role === 'admin' && (
-                    <DropdownMenuItem onClick={() => router.push('/admin?view=simulator')}>
+                    <DropdownMenuItem onClick={() => router.push('/simulator')}>
                       <Zap className="mr-2 h-4 w-4" />
                       <span>Simulator</span>
                     </DropdownMenuItem>

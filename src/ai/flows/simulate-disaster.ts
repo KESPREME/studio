@@ -23,11 +23,15 @@ const SimulateDisasterOutputSchema = z.object({
     location: z.string(),
     description: z.string().describe('A brief, 1-2 sentence description of the simulated disaster scenario.'),
   }),
+  mapCenter: z.object({
+    lat: z.number().describe('The latitude for the center of the map view.'),
+    lon: z.number().describe('The longitude for the center of the map view.'),
+  }),
   affectedZones: z.array(z.object({
     name: z.string().describe('The name of the affected area or neighborhood.'),
     lat: z.number().describe('The latitude of the center of the zone.'),
     lon: z.number().describe('The longitude of the center of the zone.'),
-    impactLevel: z.number().min(1).max(10).describe('A rating from 1 (low) to 10 (catastrophic) of the disaster\'s impact on this zone.'),
+    impactLevel: z.number().min(1).max(10).describe('A rating from 1 (low) to 10 (catastrophic) of the disaster\'s impact on this zone. 8-10 is heavy-hit, 4-7 is normal-hit, 1-3 is low-hit.'),
   })).describe('A list of the most critically affected zones.'),
   resourceAllocation: z.array(z.object({
     type: z.enum(['Personnel', 'Heavy Equipment', 'Medical Units', 'Emergency Shelters', 'Command Vehicles']),
@@ -57,7 +61,7 @@ Analyze the following disaster and generate a comprehensive plan. Be specific an
 - **Type:** {{disasterType}}
 - **Location:** {{location}}
 
-Generate the response plan. Provide realistic latitude and longitude for the affected zones within the specified location.
+Generate the response plan. Provide realistic latitude and longitude for the map center and the affected zones within the specified location. The impact level should realistically reflect the disaster type.
 `,
 });
 
