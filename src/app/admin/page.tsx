@@ -1,7 +1,7 @@
 // src/app/admin/page.tsx
 "use client";
 
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, LayoutDashboard, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 
@@ -18,7 +18,8 @@ import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DisasterSimulator } from './_components/disaster-simulator';
 
 function AdminDashboard() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -26,7 +27,6 @@ function AdminDashboard() {
   const { toast } = useToast();
 
   const fetchReports = useCallback(async () => {
-    // Keep loading true when re-fetching in background
     if (reports.length === 0) {
       setIsLoading(true);
     }
@@ -53,8 +53,7 @@ function AdminDashboard() {
       .on<Report>(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'reports' },
-        (payload) => {
-          console.log('Realtime change received!', payload);
+        () => {
           toast({
             title: "Live Update",
             description: "The reports list has been updated.",
@@ -71,7 +70,6 @@ function AdminDashboard() {
   }, [fetchReports, toast]);
   
   const handleStatusChange = useCallback(async (reportId: string, newStatus: Status) => {
-    // We don't need optimistic UI here because the realtime subscription will handle it.
     try {
       await updateReportStatusAsAdmin(reportId, newStatus);
       toast({
@@ -90,7 +88,6 @@ function AdminDashboard() {
 
   const handleDelete = useCallback(async (reportId: string) => {
     const originalReports = [...reports];
-    // Optimistic UI update for delete, as it can feel slow otherwise
     setReports(currentReports => currentReports.filter(r => r.id !== reportId));
 
     try {
@@ -101,7 +98,7 @@ function AdminDashboard() {
       });
     } catch (error: any) {
       console.error("Delete failed:", error);
-      setReports(originalReports); // Revert on failure
+      setReports(originalReports);
       toast({
         title: "Delete Failed",
         variant: "destructive",
@@ -137,29 +134,39 @@ function AdminDashboard() {
             </Button>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-            <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
-            <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
-            <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
-            <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-1">
-              <h2 className="text-xl font-bold mb-4 font-headline">Hazard Map</h2>
-              <div className="rounded-lg overflow-hidden shadow-md">
-                <MapWrapper reports={reports} isLoading={isLoading} />
+          <Tabs defaultValue="dashboard" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
+              <TabsTrigger value="dashboard"><LayoutDashboard className="mr-2" />Live Dashboard</TabsTrigger>
+              <TabsTrigger value="simulator"><Zap className="mr-2"/>Simulator</TabsTrigger>
+            </TabsList>
+            <TabsContent value="dashboard" className="mt-6">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
+                <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
+                <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
+                <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
               </div>
-            </div>
 
-            <div className="lg:col-span-2">
-              <h2 className="text-xl font-bold mb-4 font-headline">All Reports</h2>
-              <div className="space-y-4">
-                 <ReportsDataTable columns={columns} data={reports} isLoading={isLoading} />
+              <div className="grid gap-8 lg:grid-cols-3">
+                <div className="lg:col-span-1">
+                  <h2 className="text-xl font-bold mb-4 font-headline">Hazard Map</h2>
+                  <div className="rounded-lg overflow-hidden shadow-md">
+                    <MapWrapper reports={reports} isLoading={isLoading} />
+                  </div>
+                </div>
+
+                <div className="lg:col-span-2">
+                  <h2 className="text-xl font-bold mb-4 font-headline">All Reports</h2>
+                  <div className="space-y-4">
+                     <ReportsDataTable columns={columns} data={reports} isLoading={isLoading} />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
+            </TabsContent>
+            <TabsContent value="simulator" className="mt-6">
+              <DisasterSimulator />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       <AppFooter />
