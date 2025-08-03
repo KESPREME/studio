@@ -1,7 +1,7 @@
 // src/app/admin/_components/disaster-simulator.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Bot, Zap, Loader2, Users, Truck, Stethoscope, Building, Siren, AreaChart, StepForward, ListChecks } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { simulateDisaster, type SimulateDisasterOutput } from '@/ai/flows/simulate-disaster';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import dynamic from 'next/dynamic'; // Import dynamic for client-side only rendering
+import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin } from 'lucide-react';
 
@@ -81,7 +81,7 @@ export function DisasterSimulator() {
     'Medical Units': <Stethoscope className="h-6 w-6" />,
     'Emergency Shelters': <Building className="h-6 w-6" />,
     'Command Vehicles': <Siren className="h-6 w-6" />,
-  }
+  };
 
   return (
     <div className="space-y-8">
@@ -112,7 +112,7 @@ export function DisasterSimulator() {
                 </SelectContent>
             </Select>
             <Input 
-                placeholder="Enter Location (e.g., 'Mumbai, Maharashtra')" 
+                placeholder="Enter Location (e.g., 'Chennai, Tamil Nadu')" 
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="md:col-span-2 font-semibold"
