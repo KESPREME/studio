@@ -28,7 +28,10 @@ function AdminDashboard() {
   const { toast } = useToast();
 
   const fetchReports = useCallback(async () => {
-    if (reports.length === 0) setIsLoading(true);
+    // Keep loading true when re-fetching in background
+    if (reports.length === 0) {
+      setIsLoading(true);
+    }
     try {
       const fetchedReports = await getReports();
       setReports(fetchedReports);
@@ -70,6 +73,7 @@ function AdminDashboard() {
   }, [fetchReports, toast]);
   
   const handleStatusChange = useCallback(async (reportId: string, newStatus: Status) => {
+    // We don't need optimistic UI here because the realtime subscription will handle it.
     try {
       await updateReportStatusAsAdmin(reportId, newStatus);
       toast({
@@ -83,12 +87,12 @@ function AdminDashboard() {
         variant: "destructive",
         description: error.message || "Could not update report status. Please try again.",
       });
-      fetchReports(); // Re-fetch to revert optimistic UI
     }
-  }, [toast, fetchReports]);
+  }, [toast]);
 
   const handleDelete = useCallback(async (reportId: string) => {
     const originalReports = [...reports];
+    // Optimistic UI update for delete, as it can feel slow otherwise
     setReports(currentReports => currentReports.filter(r => r.id !== reportId));
 
     try {
@@ -99,7 +103,7 @@ function AdminDashboard() {
       });
     } catch (error: any) {
       console.error("Delete failed:", error);
-      setReports(originalReports);
+      setReports(originalReports); // Revert on failure
       toast({
         title: "Delete Failed",
         variant: "destructive",
