@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { generateSafetyTips } from '@/ai/flows/generate-safety-tips';
+import { Report } from '@/lib/types';
 
 const reportSchema = z.object({
   description: z.string().min(10).max(500),
@@ -27,7 +28,7 @@ export async function GET() {
       throw error;
     }
 
-    const reportsWithUrls = reports.map(report => {
+    const reportsWithUrls = reports.map((report: Report) => {
         let publicUrl = undefined;
         if (report.imageUrl) {
             const { data } = supabase.storage.from('images').getPublicUrl(report.imageUrl);

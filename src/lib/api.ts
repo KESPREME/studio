@@ -1,5 +1,6 @@
 // src/lib/api.ts
 import type { Report, Status } from '@/lib/types';
+import { updateReportStatusAsAdmin } from './actions';
 
 export async function getReports(): Promise<Report[]> {
   try {
@@ -15,6 +16,12 @@ export async function getReports(): Promise<Report[]> {
     console.error('Error fetching reports:', error);
     return [];
   }
+}
+
+
+export async function updateReportStatus(reportId: string, status: Status): Promise<any> {
+  // This function now calls the server action directly for better security and revalidation.
+  return updateReportStatusAsAdmin(reportId, status);
 }
 
 export async function deleteReport(reportId: string): Promise<any> {

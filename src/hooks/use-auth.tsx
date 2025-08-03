@@ -1,10 +1,10 @@
-
 // src/hooks/use-auth.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type User = {
+  id: string;
   name: string;
   email: string;
   role: 'reporter' | 'admin';
