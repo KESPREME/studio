@@ -1,80 +1,23 @@
-"use client"
+// src/app/admin/simulator/page.tsx
+"use client";
 
-import Link from "next/link"
-import { ShieldAlert, UserCircle, LogOut, Settings, LayoutDashboard } from "lucide-react"
+import { Header } from "@/components/header";
+import { AppFooter } from "@/components/app-footer";
+import { DisasterSimulator } from "@/app/admin/_components/disaster-simulator";
+import withAuth from "@/components/with-auth";
 
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "next/navigation"
-
-export function Header() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
-
-  const getDashboardLink = () => {
-    if (!user) return '/';
-    return user.role === 'admin' ? '/admin' : '/dashboard';
-  }
-
+function SimulatorPage() {
   return (
-    <header className="bg-card border-b shadow-sm sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link href={getDashboardLink()} className="flex items-center gap-2">
-            <ShieldAlert className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold font-headline text-foreground">AlertFront</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <UserCircle className="h-6 w-6" />
-                    <span className="hidden sm:inline">{user.name}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="font-medium">{user.name}</div>
-                    <div className="text-xs text-muted-foreground">{user.email}</div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push(getDashboardLink())}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/settings')}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-            )}
-          </div>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1 p-4 sm:p-6 md:p-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+            <DisasterSimulator />
         </div>
-      </div>
-    </header>
-  )
+      </main>
+      <AppFooter />
+    </div>
+  );
 }
+
+export default withAuth(SimulatorPage, { roles: ['admin'] });

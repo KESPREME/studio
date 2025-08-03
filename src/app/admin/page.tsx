@@ -18,8 +18,6 @@ import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { DisasterSimulator } from './_components/disaster-simulator';
-import { Separator } from '@/components/ui/separator';
 
 
 function AdminDashboard() {
@@ -128,8 +126,8 @@ function AdminDashboard() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 p-4 sm:p-6 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex justify-between items-center">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Dashboard</h1>
             <Button asChild>
               <Link href="/report/new">
@@ -138,40 +136,28 @@ function AdminDashboard() {
               </Link>
             </Button>
           </div>
-          
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold font-headline">Live Hazard Reports</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
-              <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
-              <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
-              <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
-            </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
-              <div className="lg:col-span-1">
-                <h3 className="text-lg font-bold mb-4 font-headline">Hazard Map</h3>
-                <div className="rounded-lg overflow-hidden shadow-md">
-                  <MapWrapper reports={reports} isLoading={isLoading} />
-                </div>
-              </div>
-
-              <div className="lg:col-span-2">
-                <h3 className="text-lg font-bold mb-4 font-headline">All Reports</h3>
-                <div className="space-y-4">
-                  <ReportsDataTable columns={columns} data={reports} isLoading={isLoading} />
-                </div>
-              </div>
-            </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+            <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
+            <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
+            <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
+            <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
           </div>
-          
-          <Separator />
 
-          <div className="space-y-6">
-             <h2 className="text-2xl font-bold font-headline text-center">AI-Powered Preparedness</h2>
-             <div className="max-w-4xl mx-auto">
-              <DisasterSimulator />
-             </div>
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <h2 className="text-xl font-bold mb-4 font-headline">Hazard Map</h2>
+              <div className="rounded-lg overflow-hidden shadow-md">
+                <MapWrapper reports={reports} isLoading={isLoading} />
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <h2 className="text-xl font-bold mb-4 font-headline">All Reports</h2>
+              <div className="space-y-4">
+                 <ReportsDataTable columns={columns} data={reports} isLoading={isLoading} />
+              </div>
+            </div>
           </div>
 
         </div>
