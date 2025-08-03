@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
 import withAuth from '@/components/with-auth';
-import { DisasterSimulationTool } from '@/components/disaster-simulation-tool';
+import { GlobalDisasterSimulator } from '@/components/global-disaster-simulator';
 
 function AdminDashboard() {
   return (
@@ -27,7 +27,7 @@ function AdminDashboard() {
           </div>
 
           <div className="mt-6">
-            <DisasterSimulationTool />
+            <GlobalDisasterSimulator />
           </div>
         </div>
       </main>

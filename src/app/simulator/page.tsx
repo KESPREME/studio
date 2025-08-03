@@ -3,7 +3,7 @@
 
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
-import { DisasterSimulationTool } from '@/components/disaster-simulation-tool';
+import { GlobalDisasterSimulator } from '@/components/global-disaster-simulator';
 import withAuth from '@/components/with-auth';
 
 function SimulatorPage() {
@@ -12,7 +12,7 @@ function SimulatorPage() {
       <Header />
       <main className="flex-1 p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <DisasterSimulationTool />
+          <GlobalDisasterSimulator />
         </div>
       </main>
       <AppFooter />

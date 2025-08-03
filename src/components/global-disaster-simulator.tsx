@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin } from 'lucide-react';
 
-const SimulatorMap = dynamic(() => import('@/components/simulator-map'), {
+const GlobalSimulatorMap = dynamic(() => import('@/components/global-simulator-map'), {
   ssr: false,
   loading: () => (
     <div className="h-[500px] w-full bg-muted rounded-lg flex flex-col items-center justify-center gap-4">
@@ -24,7 +24,7 @@ const SimulatorMap = dynamic(() => import('@/components/simulator-map'), {
   ),
 });
 
-export function DisasterSimulationTool() {
+export function GlobalDisasterSimulator() {
   const [disasterType, setDisasterType] = useState<string>('');
   const [location, setLocation] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
