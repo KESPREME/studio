@@ -127,7 +127,7 @@ function AdminDashboard() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Dashboard</h1>
             <div className="flex items-center gap-2">
-              <Button asChild variant="outline">
+               <Button asChild variant="outline">
                 <Link href="/simulator">
                   <Zap className="mr-2 h-4 w-4" />
                   Disaster Simulator
