@@ -1,4 +1,4 @@
-// src/app/admin/_components/simulator-map.tsx
+// src/app/simulator/_components/simulator-map.tsx
 "use client";
 
 import { useEffect, useRef } from 'react';
@@ -14,9 +14,9 @@ L.Icon.Default.mergeOptions({
 });
 
 const getImpactColor = (level: number) => {
-  if (level >= 8) return 'hsl(0 84.2% 60.2%)'; // Destructive red
-  if (level >= 4) return 'hsl(210 40% 96.1%)';   // Accent blue-gray
- return 'hsl(222.2 47.4% 11.2%)';                     // Primary dark blue
+  if (level >= 8) return 'hsl(var(--destructive))'; // Destructive red
+  if (level >= 4) return 'hsl(var(--accent))';   // Accent orange
+  return 'hsl(var(--primary))';                     // Primary blue
 };
 
 type SimulatorMapProps = {
