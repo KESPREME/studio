@@ -1,4 +1,3 @@
-
 // src/app/api/reports/route.ts
 import { NextResponse } from 'next/server';
 import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
