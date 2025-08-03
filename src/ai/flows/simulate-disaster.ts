@@ -23,16 +23,19 @@ const SimulateDisasterOutputSchema = z.object({
     location: z.string(),
     description: z.string().describe('A brief, 1-2 sentence description of the simulated disaster scenario.'),
   }),
-  mapCenter: z.object({
-    lat: z.number().describe('The latitude for the center of the map view.'),
-    lon: z.number().describe('The longitude for the center of the map view.'),
+  mapData: z.object({
+    center: z.object({
+      lat: z.number().describe('The latitude for the center of the map view.'),
+      lng: z.number().describe('The longitude for the center of the map view.'),
+    }),
+    zoom: z.number().describe('The appropriate zoom level for the map.'),
+    impactAreas: z.array(z.object({
+      name: z.string().describe('The name of the affected area or neighborhood.'),
+      impact: z.enum(['High', 'Medium', 'Low', 'Potential']).describe('The impact level of the disaster on this zone.'),
+      populationAffected: z.number().describe('The estimated number of people affected in this zone.'),
+      geoJson: z.any().describe('A GeoJSON object representing the boundary of the impact area.'),
+    })).describe('A list of the affected zones with their impact levels and geographical data.'),
   }),
-  affectedZones: z.array(z.object({
-    name: z.string().describe('The name of the affected area or neighborhood.'),
-    lat: z.number().describe('The latitude of the center of the zone.'),
-    lon: z.number().describe('The longitude of the center of the zone.'),
-    impactLevel: z.number().min(1).max(10).describe('A rating from 1 (low) to 10 (catastrophic) of the disaster\'s impact on this zone. 8-10 is heavy-hit, 4-7 is normal-hit, 1-3 is low-hit.'),
-  })).describe('A list of the most critically affected zones.'),
   resourceAllocation: z.array(z.object({
     type: z.enum(['Personnel', 'Heavy Equipment', 'Medical Units', 'Emergency Shelters', 'Command Vehicles']),
     count: z.number().describe('The number of units of this resource to deploy.'),
@@ -55,13 +58,31 @@ const simulateDisasterPrompt = ai.definePrompt({
   output: { schema: SimulateDisasterOutputSchema },
   prompt: `You are an expert disaster response strategist for the Indian National Disaster Response Force (NDRF). Your task is to create a realistic, actionable simulation and response plan based on a given disaster scenario.
 
-Analyze the following disaster and generate a comprehensive plan. Be specific and use realistic resource numbers and action items.
+Analyze the following disaster and generate a comprehensive plan. Be specific, creative, and use realistic data.
 
 **Disaster Scenario:**
 - **Type:** {{disasterType}}
 - **Location:** {{location}}
 
-Generate the response plan. Provide realistic latitude and longitude for the map center and the affected zones within the specified location. The impact level should realistically reflect the disaster type.
+**Your Output Must Include:**
+
+1.  **Scenario Description:** A brief, 1-2 sentence description of the disaster.
+2.  **Map Data:**
+    *   **Center:** Latitude and Longitude for the map's center.
+    *   **Zoom:** An appropriate zoom level (e.g., 10-12).
+    *   **Impact Areas:** An array of affected zones. For each zone:
+        *   **Name:** Name of the area (e.g., a neighborhood or district).
+        *   **Impact:** The level of impact, categorized as:
+            *   **"High"**: Will be directly and severely affected.
+            *   **"Medium"**: Can be significantly affected.
+            *   **"Low"**: May be lightly affected.
+            *   **"Potential"**: Not currently affected, but at risk if the situation escalates (e.g., downstream from a flood).
+        *   **Population Affected:** A realistic estimate of the population in the zone.
+        *   **GeoJSON:** A simple GeoJSON Polygon object representing the zone's boundary. Be creative and make the shapes irregular and realistic for the location.
+3.  **Resource Allocation:** Optimized list of NDRF resources.
+4.  **Action Plan:** A multi-phase action plan for the NDRF.
+
+Generate the response plan. Ensure the geographic data (lat/lng, GeoJSON) is realistic for the specified location.
 `,
 });
 

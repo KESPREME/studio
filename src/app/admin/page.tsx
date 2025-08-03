@@ -1,122 +1,16 @@
 // src/app/admin/page.tsx
 "use client";
 
-import { PlusCircle, LayoutDashboard, Zap } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
-import { StatCard } from '@/components/stat-card';
-import type { Report, Status } from '@/lib/types';
-import MapWrapper from '@/components/map-wrapper';
 import { AppFooter } from '@/components/app-footer';
-import { getReports, deleteReport } from '@/lib/api';
-import { updateReportStatusAsAdmin } from '@/lib/actions';
 import withAuth from '@/components/with-auth';
-import { ReportsDataTable } from './_components/reports-data-table';
-import { getColumns } from './_components/columns';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { DisasterSimulator } from './_components/disaster-simulator';
+import { DisasterSimulationTool } from '@/components/disaster-simulation-tool';
+
 function AdminDashboard() {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-
-  const fetchReports = useCallback(async () => {
-    if (reports.length === 0) {
-      setIsLoading(true);
-    }
-    try {
-      const fetchedReports = await getReports();
-      setReports(fetchedReports);
-    } catch (error) {
-       console.error("Failed to fetch reports:", error);
-       toast({
-        title: "Error",
-        description: "Could not fetch reports.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast, reports.length]);
-
-  useEffect(() => {
-    fetchReports();
-    
-    const channel = supabase
-      .channel('reports-realtime-admin')
-      .on<Report>(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'reports' },
-        () => {
-          toast({
-            title: "Live Update",
-            description: "The reports list has been updated.",
-          });
-          fetchReports();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-
-  }, [fetchReports, toast]);
-  
-  const handleStatusChange = useCallback(async (reportId: string, newStatus: Status) => {
-    try {
-      await updateReportStatusAsAdmin(reportId, newStatus);
-      toast({
-        title: "Status Updated",
-        description: `Report status successfully changed to ${newStatus}.`,
-      });
-    } catch (error: any) {
-      console.error("Update failed:", error);
-      toast({
-        title: "Update Failed",
-        variant: "destructive",
-        description: error.message || "Could not update report status. Please try again.",
-      });
-    }
-  }, [toast]);
-
-  const handleDelete = useCallback(async (reportId: string) => {
-    const originalReports = [...reports];
-    setReports(currentReports => currentReports.filter(r => r.id !== reportId));
-
-    try {
-      await deleteReport(reportId);
-      toast({
-        title: "Report Deleted",
-        description: "The resolved report has been successfully deleted.",
-      });
-    } catch (error: any) {
-      console.error("Delete failed:", error);
-      setReports(originalReports);
-      toast({
-        title: "Delete Failed",
-        variant: "destructive",
-        description: error.message || "Could not delete the report. Please try again.",
-      });
-    }
-  }, [reports, toast]);
-
-  const columns = useMemo(() => getColumns({ 
-    onStatusChange: handleStatusChange,
-    onDelete: handleDelete 
-  }), [handleStatusChange, handleDelete]);
-
-  const stats = useMemo(() => ({
-    total: reports.length,
-    new: reports.filter((r) => r.status === 'New').length,
-    inProgress: reports.filter((r) => r.status === 'In Progress').length,
-    resolved: reports.filter((r) => r.status === 'Resolved').length,
-  }), [reports]);
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -133,10 +27,8 @@ function AdminDashboard() {
           </div>
 
           <div className="mt-6">
-            <h2 className="text-xl md:text-2xl font-bold font-headline mb-4">Disaster Simulator</h2>
-              <DisasterSimulator />
-            </TabsContent>
-          </Tabs>
+            <DisasterSimulationTool />
+          </div>
         </div>
       </main>
       <AppFooter />

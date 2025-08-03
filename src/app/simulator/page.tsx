@@ -3,7 +3,7 @@
 
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
-import { DisasterSimulationTool } from './_components/disaster-simulation-tool';
+import { DisasterSimulationTool } from '@/components/disaster-simulation-tool';
 import withAuth from '@/components/with-auth';
 
 function SimulatorPage() {
