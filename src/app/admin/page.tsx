@@ -3,7 +3,9 @@
 
 import { PlusCircle, LayoutDashboard, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+
 
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
@@ -18,11 +20,12 @@ import { ReportsDataTable } from './_components/reports-data-table';
 import { getColumns } from './_components/columns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DisasterSimulator } from './_components/disaster-simulator';
 
-
-function AdminDashboard() {
+function AdminDashboardContent() {
+  const searchParams = useSearchParams();
+  const view = searchParams.get('view');
+  
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -124,6 +127,43 @@ function AdminDashboard() {
     resolved: reports.filter((r) => r.status === 'Resolved').length,
   }), [reports]);
 
+  if (view === 'simulator') {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <DisasterSimulator />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
+        <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
+        <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
+        <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <h2 className="text-xl font-bold mb-4 font-headline">Hazard Map</h2>
+          <div className="rounded-lg overflow-hidden shadow-md">
+            <MapWrapper reports={reports} isLoading={isLoading} />
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <h2 className="text-xl font-bold mb-4 font-headline">All Reports</h2>
+          <div className="space-y-4">
+             <ReportsDataTable columns={columns} data={reports} isLoading={isLoading} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AdminDashboardPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -138,45 +178,9 @@ function AdminDashboard() {
               </Link>
             </Button>
           </div>
-
-          <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:w-[400px] mb-6">
-              <TabsTrigger value="dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Live Dashboard</TabsTrigger>
-              <TabsTrigger value="simulator"><Zap className="mr-2 h-4 w-4"/>Simulator</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="dashboard">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-                <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
-                <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
-                <StatCard title="In Progress" value={stats.inProgress} variant="inProgress" isLoading={isLoading} />
-                <StatCard title="Resolved" value={stats.resolved} variant="resolved" isLoading={isLoading} />
-              </div>
-
-              <div className="grid gap-8 lg:grid-cols-3">
-                <div className="lg:col-span-1">
-                  <h2 className="text-xl font-bold mb-4 font-headline">Hazard Map</h2>
-                  <div className="rounded-lg overflow-hidden shadow-md">
-                    <MapWrapper reports={reports} isLoading={isLoading} />
-                  </div>
-                </div>
-
-                <div className="lg:col-span-2">
-                  <h2 className="text-xl font-bold mb-4 font-headline">All Reports</h2>
-                  <div className="space-y-4">
-                     <ReportsDataTable columns={columns} data={reports} isLoading={isLoading} />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="simulator">
-               <div className="max-w-4xl mx-auto">
-                  <DisasterSimulator />
-               </div>
-            </TabsContent>
-          </Tabs>
-
+          <Suspense fallback={<div>Loading...</div>}>
+            <AdminDashboardContent />
+          </Suspense>
         </div>
       </main>
       <AppFooter />
@@ -184,4 +188,4 @@ function AdminDashboard() {
   );
 }
 
-export default withAuth(AdminDashboard, { roles: ['admin'] });
+export default withAuth(AdminDashboardPage, { roles: ['admin'] });
