@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ShieldAlert, UserCircle, LogOut, Settings, LayoutDashboard } from "lucide-react"
+import { ShieldAlert, UserCircle, LogOut, Settings, LayoutDashboard, Zap } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -56,6 +56,12 @@ export function Header() {
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
+                  {user.role === 'admin' && (
+                     <DropdownMenuItem onClick={() => router.push('/simulator')}>
+                        <Zap className="mr-2 h-4 w-4" />
+                        <span>Simulator</span>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => router.push('/settings')}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
