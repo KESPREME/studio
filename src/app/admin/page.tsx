@@ -130,7 +130,7 @@ function AdminDashboard() {
       <main className="flex-1 p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Control Center</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-headline">Admin Dashboard</h1>
             <Button asChild>
               <Link href="/report/new">
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -140,11 +140,12 @@ function AdminDashboard() {
           </div>
 
           <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-              <TabsTrigger value="dashboard"><LayoutDashboard className="mr-2" />Live Dashboard</TabsTrigger>
-              <TabsTrigger value="simulator"><Zap className="mr-2"/>Simulator</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:w-[400px] mb-6">
+              <TabsTrigger value="dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Live Dashboard</TabsTrigger>
+              <TabsTrigger value="simulator"><Zap className="mr-2 h-4 w-4"/>Simulator</TabsTrigger>
             </TabsList>
-            <TabsContent value="dashboard" className="mt-6">
+
+            <TabsContent value="dashboard">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
                 <StatCard title="Total Reports" value={stats.total} isLoading={isLoading} />
                 <StatCard title="New" value={stats.new} variant="new" isLoading={isLoading} />
@@ -168,12 +169,14 @@ function AdminDashboard() {
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="simulator" className="mt-6">
+
+            <TabsContent value="simulator">
                <div className="max-w-4xl mx-auto">
                   <DisasterSimulator />
                </div>
             </TabsContent>
           </Tabs>
+
         </div>
       </main>
       <AppFooter />
