@@ -348,7 +348,7 @@ export default function HomePage() {
            <div className="container px-4 md:px-6 mx-auto">
               <ScrollReveal>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">Ready to Make Your Community Safer?</h2>
-                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
+                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed mt-4">
                   Join AlertFront today. Your involvement is crucial for building a more resilient and secure environment for everyone.
                 </p>
                 <div className="mt-8">
