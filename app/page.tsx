@@ -1,9 +1,10 @@
 
+import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
-import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren } from 'lucide-react';
+import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity } from 'lucide-react';
 import { ScrollReveal } from '@/components/scroll-reveal';
 
 // Custom SVG Icon Components for a more unique look
@@ -22,87 +23,242 @@ const IconDirectLine = () => (
     </svg>
 );
 
-const FeatureCard = ({ icon, title, children, delay = 0.1 }: { icon: React.ReactNode, title: string, children: React.ReactNode, delay?: number }) => (
+const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradientTo }: { 
+  icon: React.ReactNode, 
+  title: string, 
+  children: React.ReactNode, 
+  delay?: number,
+  gradientFrom: string,
+  gradientTo: string
+}) => (
   <ScrollReveal delay={delay}>
-    <div className="grid gap-4 text-center p-6 rounded-lg hover:bg-primary/5 transition-colors duration-300 transform hover:-translate-y-1">
-      <div className="flex items-center justify-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-          {icon}
+    <div className="group relative transform transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+      <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
+      <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
+        <div className="flex flex-col items-center text-center space-y-6">
+          <div className={`p-4 bg-gradient-to-br ${gradientFrom} ${gradientTo} rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+            {React.cloneElement(icon as React.ReactElement, { className: "h-8 w-8 text-white" })}
+          </div>
+          <h3 className={`text-xl font-bold bg-gradient-to-r ${gradientFrom.replace('from-', 'from-').replace('/20', '')} ${gradientTo.replace('to-', 'to-').replace('/20', '')} bg-clip-text text-transparent`}>
+            {title}
+          </h3>
+          <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{children}</p>
+        </div>
+        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
         </div>
       </div>
-      <h3 className="text-xl font-bold font-headline">{title}</h3>
-      <p className="text-muted-foreground">{children}</p>
     </div>
   </ScrollReveal>
 );
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <div className="flex flex-col min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-950 dark:via-blue-950/30 dark:to-purple-950/20"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-green-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+      </div>
+
       <Header />
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40 relative overflow-hidden bg-primary/5">
+      <main className="flex-1 relative">
+        {/* Enhanced Hero Section */}
+        <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40 relative overflow-hidden">
           <div className="container px-4 md:px-6 z-10 mx-auto">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-24">
-              <div className="flex flex-col justify-center space-y-4">
+              <div className="flex flex-col justify-center space-y-6">
                 <ScrollReveal delay={0.1}>
-                  <div className="space-y-4">
-                    <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm font-semibold shadow-sm">
-                      Community Safety, Amplified
+                  <div className="space-y-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur"></div>
+                      <div className="relative inline-block bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-2xl px-6 py-3 shadow-lg">
+                        <div className="flex items-center space-x-2">
+                          <Activity className="h-4 w-4 text-blue-600 animate-pulse" />
+                          <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            Community Safety, Amplified
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
+                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent animate-pulse">
                       Report Hazards, Protect Your Community
                     </h1>
-                    <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                    <p className="max-w-[600px] text-slate-600 dark:text-slate-300 md:text-xl leading-relaxed">
                       AlertFront empowers you to report local hazards quickly and efficiently, connecting you with response teams to make your area safer.
                     </p>
                   </div>
                 </ScrollReveal>
                 <ScrollReveal delay={0.2}>
-                  <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                    <Button asChild size="lg" className="shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow">
+                  <div className="flex flex-col gap-4 min-[400px]:flex-row">
+                    <Button asChild size="lg" className="group bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300 border-0">
                       <Link href="/login">
+                        <Zap className="mr-2 h-5 w-5 group-hover:animate-pulse" />
                         Get Started
+                      </Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline" className="group bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border-2 border-blue-500/30 dark:border-blue-400/30 hover:bg-blue-50 dark:hover:bg-slate-700 hover:border-blue-500 dark:hover:border-blue-400 hover:scale-105 transition-all duration-300">
+                      <Link href="/community">
+                        <Globe className="mr-2 h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:animate-pulse" />
+                        View Community
                       </Link>
                     </Button>
                   </div>
                 </ScrollReveal>
               </div>
 
-              {/* Interactive Hero Visual */}
-              <div className="relative flex items-center justify-center min-h-[300px] lg:min-h-[400px]">
-                  <ScrollReveal delay={0.3} className="w-full h-full">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <Map className="h-48 w-48 text-primary/10 animate-pulse-slow" />
-                    </div>
-                    <div className="absolute top-0 left-10 w-48 h-28 bg-card p-4 rounded-lg shadow-xl animate-float-slow-1">
-                        <div className="flex items-center gap-3">
-                            <AlertTriangle className="h-6 w-6 text-destructive" />
-                            <div>
-                                <h4 className="font-bold">Pothole Reported</h4>
-                                <p className="text-xs text-muted-foreground">Main St & 2nd Ave</p>
-                            </div>
+              {/* Enhanced Interactive Hero Visual - Rotating Circle Design */}
+              <div className="relative flex items-center justify-center min-h-[800px] lg:min-h-[900px] overflow-hidden">
+                <ScrollReveal delay={0.3} className="w-full h-full">
+                  <div className="relative w-full max-w-7xl mx-auto">
+                    {/* Central Hub Container */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+                    
+                    {/* Rotating Circle System */}
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      
+                      {/* Central Command Hub */}
+                      <div className="relative z-20">
+                        <div className="w-48 h-48 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-slate-800/80 backdrop-blur-2xl rounded-full border-2 border-white/30 dark:border-slate-700/30 shadow-2xl flex items-center justify-center">
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full animate-pulse" style={{animationDuration: '4s'}}></div>
+                          <div className="relative z-10 text-center">
+                            <Map className="h-16 w-16 text-blue-500/40 dark:text-blue-400/40 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
+                            <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">AlertFront</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">Command Center</div>
+                          </div>
                         </div>
-                    </div>
-                    <div className="absolute bottom-0 right-10 w-56 h-32 bg-card p-4 rounded-lg shadow-xl animate-float-slow-2">
-                         <div className="flex items-center gap-3">
-                            <ShieldCheck className="h-6 w-6 text-green-500" />
-                            <div>
-                                <h4 className="font-bold">Team Dispatched</h4>
-                                <p className="text-xs text-muted-foreground">Status: In Progress</p>
+                      </div>
+                      
+                      {/* Rotating Cards in Perfect Circle */}
+                      <div className="absolute inset-0 animate-rotate-slow">
+                        
+                        {/* Card 1: Pothole Report - Top Position (12 o'clock) */}
+                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 animate-counter-rotate">
+                          <div className="group relative">
+                            <div className="absolute -inset-3 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border-2 border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-80 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
+                              <div className="flex items-start gap-4">
+                                <div className="p-3 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl shadow-xl">
+                                  <AlertTriangle className="h-6 w-6 text-white" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-base text-slate-900 dark:text-white mb-1">Pothole Reported</h4>
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Main St & 2nd Ave</p>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" style={{animationDuration: '2s'}}></div>
+                                      <span className="text-sm text-red-600 dark:text-red-400 font-semibold">Active</span>
+                                    </div>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">2 min ago</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
+                          </div>
                         </div>
-                    </div>
-                     <div className="absolute -bottom-8 left-16 w-44 h-24 bg-card p-4 rounded-lg shadow-xl animate-float-slow-3">
-                         <div className="flex items-center gap-3">
-                            <UserCheck className="h-6 w-6 text-primary" />
-                            <div>
-                                <h4 className="font-bold">Report Verified</h4>
-                                <p className="text-xs text-muted-foreground">Urgency: High</p>
+                        
+                        {/* Card 2: Team Dispatched - Right Position (4 o'clock) */}
+                        <div className="absolute top-2/3 right-8 transform -translate-y-1/2 animate-counter-rotate">
+                          <div className="group relative">
+                            <div className="absolute -inset-3 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border-2 border-green-200/50 dark:border-green-700/30 hover:scale-110 transition-all duration-500 w-80 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
+                              <div className="flex items-start gap-4">
+                                <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl">
+                                  <ShieldCheck className="h-6 w-6 text-white" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-base text-slate-900 dark:text-white mb-1">Team Dispatched</h4>
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Response Unit #42</p>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" style={{animationDuration: '2s'}}></div>
+                                      <span className="text-sm text-green-600 dark:text-green-400 font-semibold">En Route</span>
+                                    </div>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">5 min ago</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
+                          </div>
                         </div>
+                        
+                        {/* Card 3: Report Verified - Left Position (8 o'clock) */}
+                        <div className="absolute top-2/3 left-8 transform -translate-y-1/2 animate-counter-rotate">
+                          <div className="group relative">
+                            <div className="absolute -inset-3 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border-2 border-blue-200/50 dark:border-blue-700/30 hover:scale-110 transition-all duration-500 w-80 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
+                              <div className="flex items-start gap-4">
+                                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-xl">
+                                  <UserCheck className="h-6 w-6 text-white" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-base text-slate-900 dark:text-white mb-1">Report Verified</h4>
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Priority: High</p>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" style={{animationDuration: '2s'}}></div>
+                                      <span className="text-sm text-blue-600 dark:text-blue-400 font-semibold">Verified</span>
+                                    </div>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">1 min ago</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* 3D Animated Connection Lines */}
+                      <div className="absolute inset-0 pointer-events-none z-10">
+                        <svg className="w-full h-full opacity-30" viewBox="0 0 1000 800">
+                          <defs>
+                            <linearGradient id="connectionGradient3D" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
+                              <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.8" />
+                              <stop offset="100%" stopColor="#10b981" stopOpacity="0.6" />
+                            </linearGradient>
+                            <filter id="glow">
+                              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                              <feMerge> 
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/> 
+                              </feMerge>
+                            </filter>
+                          </defs>
+                          <g className="animate-pulse" style={{animationDuration: '8s'}}>
+                            {/* Central hub to top card */}
+                            <path d="M500 400 Q500 200 500 100" stroke="url(#connectionGradient3D)" strokeWidth="3" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '4s'}} />
+                            {/* Central hub to right card */}
+                            <path d="M500 400 Q700 400 800 500" stroke="url(#connectionGradient3D)" strokeWidth="3" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '5s'}} />
+                            {/* Central hub to left card */}
+                            <path d="M500 400 Q300 400 200 500" stroke="url(#connectionGradient3D)" strokeWidth="3" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '6s'}} />
+                            {/* Connecting the outer cards */}
+                            <path d="M500 100 Q650 250 800 500" stroke="url(#connectionGradient3D)" strokeWidth="2" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '7s'}} />
+                            <path d="M800 500 Q500 600 200 500" stroke="url(#connectionGradient3D)" strokeWidth="2" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '8s'}} />
+                            <path d="M200 500 Q350 250 500 100" stroke="url(#connectionGradient3D)" strokeWidth="2" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '9s'}} />
+                          </g>
+                          
+                          {/* Flowing Data Particles */}
+                          <g className="animate-pulse" style={{animationDuration: '3s'}}>
+                            <circle cx="500" cy="250" r="3" fill="#3b82f6" opacity="0.8" className="animate-bounce" style={{animationDuration: '2s'}} />
+                            <circle cx="650" cy="450" r="2" fill="#10b981" opacity="0.8" className="animate-bounce" style={{animationDuration: '2.5s', animationDelay: '0.5s'}} />
+                            <circle cx="350" cy="450" r="2.5" fill="#8b5cf6" opacity="0.8" className="animate-bounce" style={{animationDuration: '2s', animationDelay: '1s'}} />
+                          </g>
+                        </svg>
+                      </div>
+                      
+                      {/* Orbital Ring Indicators */}
+                      <div className="absolute inset-0 pointer-events-none z-5">
+                        <div className="w-full h-full relative">
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-blue-200/20 dark:border-blue-700/20 rounded-full animate-spin" style={{animationDuration: '60s'}}></div>
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-purple-200/20 dark:border-purple-700/20 rounded-full animate-spin" style={{animationDuration: '45s', animationDirection: 'reverse'}}></div>
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-green-200/20 dark:border-green-700/20 rounded-full animate-spin" style={{animationDuration: '30s'}}></div>
+                        </div>
+                      </div>
                     </div>
+                  </div>
                   </ScrollReveal>
               </div>
             </div>
@@ -123,13 +279,31 @@ export default function HomePage() {
               </div>
             </ScrollReveal>
             <div className="mx-auto grid max-w-5xl items-start gap-12 py-12 lg:grid-cols-3 lg:gap-8">
-              <FeatureCard title="1. Report an Issue" icon={<AlertTriangle className="h-8 w-8" />} delay={0.1}>
+              <FeatureCard 
+                title="1. Report an Issue" 
+                icon={<AlertTriangle className="h-8 w-8" />} 
+                delay={0.1}
+                gradientFrom="from-red-500/20"
+                gradientTo="to-orange-500/20"
+              >
                 See a hazard? Open the app, fill out a quick form with details, photo, and location. Your report is instantly logged.
               </FeatureCard>
-              <FeatureCard title="2. Team Dispatch" icon={<ShieldCheck className="h-8 w-8" />} delay={0.2}>
+              <FeatureCard 
+                title="2. Team Dispatch" 
+                icon={<ShieldCheck className="h-8 w-8" />} 
+                delay={0.2}
+                gradientFrom="from-green-500/20"
+                gradientTo="to-emerald-500/20"
+              >
                 The nearest NDRF team is immediately notified with all the details, ensuring a rapid and informed response.
               </FeatureCard>
-              <FeatureCard title="3. Resolution & Update" icon={<UserCheck className="h-8 w-8" />} delay={0.3}>
+              <FeatureCard 
+                title="3. Resolution & Update" 
+                icon={<UserCheck className="h-8 w-8" />} 
+                delay={0.3}
+                gradientFrom="from-blue-500/20"
+                gradientTo="to-purple-500/20"
+              >
                 The response team addresses the hazard, and the status is updated in real-time for everyone's awareness.
               </FeatureCard>
             </div>
@@ -152,24 +326,60 @@ export default function HomePage() {
                 </div>
               </div>
             </ScrollReveal>
-            <div className="mx-auto grid max-w-5xl items-start gap-12 py-12 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-               <FeatureCard title="Real-Time Alerts" icon={<IconRealTime />} delay={0.1}>
-                  Instantly report hazards and receive notifications about new dangers in your area.
+            <div className="mx-auto grid max-w-6xl items-center gap-8 py-12 lg:grid-cols-3 lg:gap-8">
+              <FeatureCard 
+                title="Quick Reporting" 
+                icon={<AlertTriangle className="h-8 w-8" />} 
+                delay={0.3}
+                gradientFrom="from-red-500/20"
+                gradientTo="to-orange-500/20"
+              >
+                Report hazards instantly with our streamlined interface. Upload photos, add descriptions, and pinpoint exact locations.
               </FeatureCard>
-               <FeatureCard title="Interactive Map" icon={<Map className="h-8 w-8" />} delay={0.2}>
-                  Visualize all reported hazards on a live, interactive map to stay aware of your surroundings.
+              <FeatureCard 
+                title="Real-time Mapping" 
+                icon={<Map className="h-8 w-8" />} 
+                delay={0.4}
+                gradientFrom="from-blue-500/20"
+                gradientTo="to-cyan-500/20"
+              >
+                View all reported incidents on an interactive map. Track patterns and stay informed about your area's safety status.
               </FeatureCard>
-               <FeatureCard title="Direct Line to Responders" icon={<IconDirectLine />} delay={0.3}>
-                  Your reports are sent directly to NDRF teams, ensuring a fast and effective response.
+              <FeatureCard 
+                title="Direct Response" 
+                icon={<IconDirectLine />} 
+                delay={0.5}
+                gradientFrom="from-green-500/20"
+                gradientTo="to-emerald-500/20"
+              >
+                Your reports go directly to NDRF teams and local authorities for immediate action and coordinated response.
               </FeatureCard>
-               <FeatureCard title="Community Powered" icon={<Users className="h-8 w-8" />} delay={0.4}>
-                  Be the eyes and ears of your community. Every report you make contributes to a safer neighborhood.
+              <FeatureCard 
+                title="Community Insights" 
+                icon={<Users className="h-8 w-8" />} 
+                delay={0.4}
+                gradientFrom="from-purple-500/20"
+                gradientTo="to-pink-500/20"
+              >
+                Access AI-powered community safety insights, trends, and actionable recommendations based on collective data.
               </FeatureCard>
-               <FeatureCard title="Targeted Notifications" icon={<Target className="h-8 w-8" />} delay={0.5}>
-                  Receive high-urgency alerts only when a hazard is reported in your immediate vicinity.
+              <FeatureCard 
+                title="Smart Alerts" 
+                icon={<Target className="h-8 w-8" />} 
+                delay={0.5}
+                gradientFrom="from-yellow-500/20"
+                gradientTo="to-orange-500/20"
+              >
+                Receive intelligent notifications about hazards in your area and safety tips tailored to your location.
               </FeatureCard>
-               <FeatureCard title="Status Tracking" icon={<Siren className="h-8 w-8" />} delay={0.6}>
-                  Follow the progress of your reported issue from submission to resolution in real-time.
+              <FeatureCard 
+                title="Status Tracking" 
+                icon={<Siren className="h-8 w-8" />} 
+                delay={0.6}
+                gradientFrom="from-indigo-500/20"
+                gradientTo="to-purple-500/20"
+              >
+                Follow the progress of your reported issue from submission to resolution in real-time.
               </FeatureCard>
             </div>
           </div>
