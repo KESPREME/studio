@@ -66,7 +66,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1 relative">
         {/* Enhanced Hero Section */}
-        <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40 relative overflow-hidden">
+        <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40 relative">
           <div className="container px-4 md:px-6 z-10 mx-auto">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-24">
               <div className="flex flex-col justify-center space-y-6">
@@ -110,47 +110,49 @@ export default function HomePage() {
               </div>
 
               {/* Enhanced Interactive Hero Visual - Rotating Circle Design */}
-              <div className="relative flex items-center justify-center h-[400px] lg:h-[500px] w-full">
+              <div className="relative flex items-center justify-center min-h-[500px] lg:min-h-[600px]">
                 <ScrollReveal delay={0.3} className="w-full h-full">
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    
+                  <div className="relative w-full aspect-square max-w-lg mx-auto">
                     {/* Central Hub Container */}
-                    <div className="relative z-10">
-                      <div className="w-40 h-40 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-slate-800/80 backdrop-blur-2xl rounded-full border-2 border-white/30 dark:border-slate-700/30 shadow-2xl flex items-center justify-center">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full animate-pulse" style={{animationDuration: '4s'}}></div>
-                        <div className="relative z-10 text-center">
-                          <Map className="h-12 w-12 text-blue-500/40 dark:text-blue-400/40 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
-                          <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">AlertFront</div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">Command Center</div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="relative z-20">
+                        <div className="w-40 h-40 lg:w-48 lg:h-48 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-slate-800/80 backdrop-blur-2xl rounded-full border-2 border-white/30 dark:border-slate-700/30 shadow-2xl flex items-center justify-center">
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full animate-pulse" style={{animationDuration: '4s'}}></div>
+                          <div className="relative z-10 text-center">
+                            <Map className="h-12 w-12 lg:h-16 lg:w-16 text-blue-500/40 dark:text-blue-400/40 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
+                            <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">AlertFront</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">Command Center</div>
+                          </div>
                         </div>
                       </div>
                     </div>
                     
                     {/* Rotating Circle System */}
-                    <div className="absolute inset-0 animate-rotate-slow" style={{ animationDuration: '45s' }}>
+                    <div className="absolute inset-0 animate-rotate-slow">
+                      
                       {/* Card 1: Pothole Report */}
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[130px] animate-counter-rotate" style={{ animationDuration: '45s' }}>
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 animate-counter-rotate" style={{ transform: 'translateY(-140px)'}}>
                         <div className="group relative">
-                           <div className="absolute -inset-2 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
-                           <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-3 rounded-lg shadow-lg border border-red-200/50 dark:border-red-700/50 w-60">
-                             <div className="flex items-center gap-2">
-                               <div className="p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg shadow-md"><AlertTriangle className="h-4 w-4 text-white" /></div>
-                               <div>
-                                 <h4 className="font-bold text-sm">Pothole Reported</h4>
-                                 <p className="text-xs text-slate-500 dark:text-slate-400">Main St & 2nd Ave</p>
-                               </div>
-                             </div>
-                           </div>
+                          <div className="absolute -inset-2 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                          <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg shadow-lg"><AlertTriangle className="h-5 w-5 text-white" /></div>
+                              <div>
+                                <h4 className="font-bold text-sm">Pothole Reported</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Main St & 2nd Ave</p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
                       {/* Card 2: Team Dispatched */}
-                      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-[140px] animate-counter-rotate" style={{ animationDuration: '45s' }}>
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(120deg) translateX(180px) rotate(-120deg)' }}>
                          <div className="group relative">
-                           <div className="absolute -inset-2 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
-                           <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-3 rounded-lg shadow-lg border border-green-200/50 dark:border-green-700/50 w-60">
-                             <div className="flex items-center gap-2">
-                               <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-md"><ShieldCheck className="h-4 w-4 text-white" /></div>
+                           <div className="absolute -inset-2 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                           <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-green-200/50 dark:border-green-700/50 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
+                             <div className="flex items-center gap-3">
+                               <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-lg"><ShieldCheck className="h-5 w-5 text-white" /></div>
                                <div>
                                  <h4 className="font-bold text-sm">Team Dispatched</h4>
                                  <p className="text-xs text-slate-500 dark:text-slate-400">Response Unit #42</p>
@@ -161,12 +163,12 @@ export default function HomePage() {
                       </div>
                       
                       {/* Card 3: Report Verified */}
-                      <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[140px] animate-counter-rotate" style={{ animationDuration: '45s' }}>
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(240deg) translateX(180px) rotate(-240deg)' }}>
                          <div className="group relative">
-                            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <div className="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-3 rounded-lg shadow-lg border border-blue-200/50 dark:border-blue-700/50 w-60">
-                              <div className="flex items-center gap-2">
-                                <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-md"><UserCheck className="h-4 w-4 text-white" /></div>
+                            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-lg"><UserCheck className="h-5 w-5 text-white" /></div>
                                 <div>
                                   <h4 className="font-bold text-sm">Report Verified</h4>
                                   <p className="text-xs text-slate-500 dark:text-slate-400">Priority: High</p>
