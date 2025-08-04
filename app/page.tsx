@@ -54,19 +54,19 @@ const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradien
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10">
+    <div className="flex flex-col min-h-screen">
+      {/* Animated Background is now a sibling to Header and Main, preventing clipping */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-950 dark:via-blue-950/30 dark:to-purple-950/20"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-green-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 -right-4 w-80 h-80 bg-gradient-to-r from-green-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
       </div>
 
       <Header />
       <main className="flex-1 relative">
         {/* Enhanced Hero Section */}
-        <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40 relative overflow-hidden">
+        <section className="w-full pt-20 pb-24 md:pt-28 md:pb-32 lg:pt-32 lg:pb-40">
           <div className="container px-4 md:px-6 z-10 mx-auto">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-24">
               <div className="flex flex-col justify-center space-y-6">
@@ -109,157 +109,77 @@ export default function HomePage() {
                 </ScrollReveal>
               </div>
 
-              {/* Enhanced Interactive Hero Visual - Rotating Circle Design */}
-              <div className="relative flex items-center justify-center min-h-[800px] lg:min-h-[900px] overflow-hidden">
+              {/* Enhanced Interactive Hero Visual - Increased container size to prevent clipping */}
+              <div className="relative flex items-center justify-center min-h-[600px] lg:min-h-[700px]">
                 <ScrollReveal delay={0.3} className="w-full h-full">
-                  <div className="relative w-full max-w-7xl mx-auto">
+                  <div className="relative w-full aspect-square max-w-xl mx-auto">
                     {/* Central Hub Container */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
-                    
-                    {/* Rotating Circle System */}
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      
-                      {/* Central Command Hub */}
+                    <div className="absolute inset-0 flex items-center justify-center">
                       <div className="relative z-20">
-                        <div className="w-48 h-48 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-slate-800/80 backdrop-blur-2xl rounded-full border-2 border-white/30 dark:border-slate-700/30 shadow-2xl flex items-center justify-center">
+                        <div className="w-40 h-40 lg:w-48 lg:h-48 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-slate-800/80 backdrop-blur-2xl rounded-full border-2 border-white/30 dark:border-slate-700/30 shadow-2xl flex items-center justify-center">
                           <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full animate-pulse" style={{animationDuration: '4s'}}></div>
                           <div className="relative z-10 text-center">
-                            <Map className="h-16 w-16 text-blue-500/40 dark:text-blue-400/40 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
+                            <Map className="h-12 w-12 lg:h-16 lg:w-16 text-blue-500/40 dark:text-blue-400/40 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
                             <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">AlertFront</div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">Command Center</div>
                           </div>
                         </div>
                       </div>
+                    </div>
+                    
+                    {/* Rotating Circle System */}
+                    <div className="absolute inset-0 animate-rotate-slow">
                       
-                      {/* Rotating Cards in Perfect Circle */}
-                      <div className="absolute inset-0 animate-rotate-slow">
-                        
-                        {/* Card 1: Pothole Report - Top Position (12 o'clock) */}
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 animate-counter-rotate">
-                          <div className="group relative">
-                            <div className="absolute -inset-3 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border-2 border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-80 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
-                              <div className="flex items-start gap-4">
-                                <div className="p-3 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl shadow-xl">
-                                  <AlertTriangle className="h-6 w-6 text-white" />
-                                </div>
-                                <div className="flex-1">
-                                  <h4 className="font-bold text-base text-slate-900 dark:text-white mb-1">Pothole Reported</h4>
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Main St & 2nd Ave</p>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" style={{animationDuration: '2s'}}></div>
-                                      <span className="text-sm text-red-600 dark:text-red-400 font-semibold">Active</span>
-                                    </div>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">2 min ago</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Card 2: Team Dispatched - Right Position (4 o'clock) */}
-                        <div className="absolute top-2/3 right-8 transform -translate-y-1/2 animate-counter-rotate">
-                          <div className="group relative">
-                            <div className="absolute -inset-3 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border-2 border-green-200/50 dark:border-green-700/30 hover:scale-110 transition-all duration-500 w-80 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
-                              <div className="flex items-start gap-4">
-                                <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl">
-                                  <ShieldCheck className="h-6 w-6 text-white" />
-                                </div>
-                                <div className="flex-1">
-                                  <h4 className="font-bold text-base text-slate-900 dark:text-white mb-1">Team Dispatched</h4>
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Response Unit #42</p>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" style={{animationDuration: '2s'}}></div>
-                                      <span className="text-sm text-green-600 dark:text-green-400 font-semibold">En Route</span>
-                                    </div>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">5 min ago</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Card 3: Report Verified - Left Position (8 o'clock) */}
-                        <div className="absolute top-2/3 left-8 transform -translate-y-1/2 animate-counter-rotate">
-                          <div className="group relative">
-                            <div className="absolute -inset-3 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border-2 border-blue-200/50 dark:border-blue-700/30 hover:scale-110 transition-all duration-500 w-80 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
-                              <div className="flex items-start gap-4">
-                                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-xl">
-                                  <UserCheck className="h-6 w-6 text-white" />
-                                </div>
-                                <div className="flex-1">
-                                  <h4 className="font-bold text-base text-slate-900 dark:text-white mb-1">Report Verified</h4>
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Priority: High</p>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" style={{animationDuration: '2s'}}></div>
-                                      <span className="text-sm text-blue-600 dark:text-blue-400 font-semibold">Verified</span>
-                                    </div>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">1 min ago</span>
-                                  </div>
-                                </div>
+                      {/* Card 1: Pothole Report */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(0deg) translateX(250px) rotate(0deg)'}}>
+                        <div className="group relative">
+                          <div className="absolute -inset-2 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                          <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg shadow-lg"><AlertTriangle className="h-5 w-5 text-white" /></div>
+                              <div>
+                                <h4 className="font-bold text-sm">Pothole Reported</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Main St & 2nd Ave</p>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* 3D Animated Connection Lines */}
-                      <div className="absolute inset-0 pointer-events-none z-10">
-                        <svg className="w-full h-full opacity-30" viewBox="0 0 1000 800">
-                          <defs>
-                            <linearGradient id="connectionGradient3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
-                              <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.8" />
-                              <stop offset="100%" stopColor="#10b981" stopOpacity="0.6" />
-                            </linearGradient>
-                            <filter id="glow">
-                              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                              <feMerge> 
-                                <feMergeNode in="coloredBlur"/>
-                                <feMergeNode in="SourceGraphic"/> 
-                              </feMerge>
-                            </filter>
-                          </defs>
-                          <g className="animate-pulse" style={{animationDuration: '8s'}}>
-                            {/* Central hub to top card */}
-                            <path d="M500 400 Q500 200 500 100" stroke="url(#connectionGradient3D)" strokeWidth="3" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '4s'}} />
-                            {/* Central hub to right card */}
-                            <path d="M500 400 Q700 400 800 500" stroke="url(#connectionGradient3D)" strokeWidth="3" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '5s'}} />
-                            {/* Central hub to left card */}
-                            <path d="M500 400 Q300 400 200 500" stroke="url(#connectionGradient3D)" strokeWidth="3" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '6s'}} />
-                            {/* Connecting the outer cards */}
-                            <path d="M500 100 Q650 250 800 500" stroke="url(#connectionGradient3D)" strokeWidth="2" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '7s'}} />
-                            <path d="M800 500 Q500 600 200 500" stroke="url(#connectionGradient3D)" strokeWidth="2" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '8s'}} />
-                            <path d="M200 500 Q350 250 500 100" stroke="url(#connectionGradient3D)" strokeWidth="2" fill="none" filter="url(#glow)" className="animate-pulse" style={{animationDuration: '9s'}} />
-                          </g>
-                          
-                          {/* Flowing Data Particles */}
-                          <g className="animate-pulse" style={{animationDuration: '3s'}}>
-                            <circle cx="500" cy="250" r="3" fill="#3b82f6" opacity="0.8" className="animate-bounce" style={{animationDuration: '2s'}} />
-                            <circle cx="650" cy="450" r="2" fill="#10b981" opacity="0.8" className="animate-bounce" style={{animationDuration: '2.5s', animationDelay: '0.5s'}} />
-                            <circle cx="350" cy="450" r="2.5" fill="#8b5cf6" opacity="0.8" className="animate-bounce" style={{animationDuration: '2s', animationDelay: '1s'}} />
-                          </g>
-                        </svg>
+                      {/* Card 2: Team Dispatched */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(120deg) translateX(250px) rotate(-120deg)' }}>
+                         <div className="group relative">
+                           <div className="absolute -inset-2 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                           <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-green-200/50 dark:border-green-700/50 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
+                             <div className="flex items-center gap-3">
+                               <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-lg"><ShieldCheck className="h-5 w-5 text-white" /></div>
+                               <div>
+                                 <h4 className="font-bold text-sm">Team Dispatched</h4>
+                                 <p className="text-xs text-slate-500 dark:text-slate-400">Response Unit #42</p>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
                       </div>
                       
-                      {/* Orbital Ring Indicators */}
-                      <div className="absolute inset-0 pointer-events-none z-5">
-                        <div className="w-full h-full relative">
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-blue-200/20 dark:border-blue-700/20 rounded-full animate-spin" style={{animationDuration: '60s'}}></div>
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-purple-200/20 dark:border-purple-700/20 rounded-full animate-spin" style={{animationDuration: '45s', animationDirection: 'reverse'}}></div>
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-green-200/20 dark:border-green-700/20 rounded-full animate-spin" style={{animationDuration: '30s'}}></div>
-                        </div>
+                      {/* Card 3: Report Verified */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(240deg) translateX(250px) rotate(-240deg)' }}>
+                         <div className="group relative">
+                            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-lg"><UserCheck className="h-5 w-5 text-white" /></div>
+                                <div>
+                                  <h4 className="font-bold text-sm">Report Verified</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">Priority: High</p>
+                                </div>
+                              </div>
+                           </div>
+                         </div>
                       </div>
                     </div>
                   </div>
-                  </ScrollReveal>
+                </ScrollReveal>
               </div>
             </div>
           </div>
