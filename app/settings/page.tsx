@@ -7,9 +7,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Header } from "@/components/header"
-import { Settings, User, Mail, Shield, Sparkles } from "lucide-react"
+import { Settings, User, Mail, Shield, Sparkles, Moon, Sun, Palette } from "lucide-react"
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, Palette } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { useEffect, useState } from 'react';
 
 function SettingsPage() {
@@ -19,13 +19,16 @@ function SettingsPage() {
 
   useEffect(() => {
     setMounted(true);
-    // Check for saved theme preference or default to light mode
+    // Check for saved theme preference without automatically applying it
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    
+
     setIsDark(shouldBeDark);
-    document.documentElement.classList.toggle('dark', shouldBeDark);
+    // Only apply the theme if it's explicitly saved, don't auto-switch
+    if (savedTheme) {
+      document.documentElement.classList.toggle('dark', shouldBeDark);
+    }
   }, []);
 
   const toggleTheme = () => {
@@ -169,6 +172,101 @@ function SettingsPage() {
                       </p>
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Theme Preferences Card */}
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <Card className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-2xl hover:shadow-3xl transition-all duration-500 rounded-3xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl">
+                  <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                    <Palette className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
+                    Theme Preferences
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-slate-600 dark:text-slate-300">
+                  Customize your visual experience with light and dark mode options.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Dark Mode Toggle */}
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-blue-200/50 dark:border-blue-700/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                      {isDark ? (
+                        <Moon className="h-5 w-5 text-white" />
+                      ) : (
+                        <Sun className="h-5 w-5 text-white" />
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="dark-mode" className="text-slate-700 dark:text-slate-300 font-medium text-sm">
+                        {isDark ? 'Dark Mode' : 'Light Mode'}
+                      </Label>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {isDark ? 'Switch to light mode for better visibility in bright environments' : 'Switch to dark mode for reduced eye strain in low light'}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="dark-mode"
+                    checked={isDark}
+                    onCheckedChange={toggleTheme}
+                    className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-slate-300"
+                  />
+                </div>
+
+                {/* Theme Info */}
+                <div className="p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-blue-200/50 dark:border-blue-700/50">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1 bg-blue-500/20 rounded">
+                      <Sparkles className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
+                        Theme Status: {isDark ? 'Dark Mode Active' : 'Light Mode Active'}
+                      </p>
+                      <p className="text-xs text-blue-600 dark:text-blue-400">
+                        Your theme preference is automatically saved and will persist across all your sessions. You can also use the theme toggle in the header for quick switching.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Theme Actions */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsDark(false);
+                      localStorage.setItem('theme', 'light');
+                      document.documentElement.classList.remove('dark');
+                    }}
+                    className={`flex-1 ${!isDark ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'hover:bg-yellow-50 hover:border-yellow-300'}`}
+                  >
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light Mode
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsDark(true);
+                      localStorage.setItem('theme', 'dark');
+                      document.documentElement.classList.add('dark');
+                    }}
+                    className={`flex-1 ${isDark ? 'bg-slate-100 dark:bg-slate-800 border-slate-400 dark:border-slate-600 text-slate-700 dark:text-slate-300' : 'hover:bg-slate-100 hover:border-slate-400'}`}
+                  >
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark Mode
+                  </Button>
                 </div>
               </CardContent>
             </Card>

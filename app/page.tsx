@@ -23,18 +23,18 @@ const IconDirectLine = () => (
     </svg>
 );
 
-const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradientTo }: { 
-  icon: React.ReactNode, 
-  title: string, 
-  children: React.ReactNode, 
+const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradientTo }: {
+  icon: React.ReactNode,
+  title: string,
+  children: React.ReactNode,
   delay?: number,
   gradientFrom: string,
   gradientTo: string
 }) => (
-  <ScrollReveal delay={delay}>
-    <div className="group relative transform transition-all duration-500 hover:scale-105 hover:-translate-y-2">
-      <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
-      <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
+  <ScrollReveal delay={delay} forceVisible={true}>
+    <div className="group relative transform transition-all duration-500 hover:scale-105 hover:-translate-y-2 opacity-100">
+      <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur opacity-5 group-hover:opacity-20 transition-opacity duration-300`}></div>
+      <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/30 dark:border-slate-700/60 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
         <div className="flex flex-col items-center text-center space-y-6">
           <div className={`p-4 bg-gradient-to-br ${gradientFrom} ${gradientTo} rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
             {React.cloneElement(icon as React.ReactElement, { className: "h-8 w-8 text-white" })}
@@ -44,7 +44,7 @@ const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradien
           </h3>
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{children}</p>
         </div>
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-4 right-4 opacity-30 group-hover:opacity-100 transition-opacity duration-300">
           <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
         </div>
       </div>

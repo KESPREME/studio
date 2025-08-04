@@ -6,6 +6,7 @@ import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
 import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity } from 'lucide-react';
 import { ScrollReveal } from '@/components/scroll-reveal';
+import { RotatingFeatureCards } from '@/components/rotating-feature-cards';
 
 // Custom SVG Icon Components for a more unique look
 const IconRealTime = () => (
@@ -23,28 +24,28 @@ const IconDirectLine = () => (
     </svg>
 );
 
-const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradientTo }: { 
-  icon: React.ReactNode, 
-  title: string, 
-  children: React.ReactNode, 
+const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradientTo }: {
+  icon: React.ReactNode,
+  title: string,
+  children: React.ReactNode,
   delay?: number,
   gradientFrom: string,
   gradientTo: string
 }) => (
-  <ScrollReveal delay={delay}>
-    <div className="group relative transform transition-all duration-500 hover:scale-105 hover:-translate-y-2">
-      <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
-      <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
+  <ScrollReveal delay={delay} forceVisible={true}>
+    <div className="group relative transform transition-all duration-500 hover:scale-105 hover:-translate-y-2" style={{ opacity: 1, visibility: 'visible' }}>
+      <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300`}></div>
+      <div className="relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
         <div className="flex flex-col items-center text-center space-y-6">
           <div className={`p-4 bg-gradient-to-br ${gradientFrom} ${gradientTo} rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
             {React.cloneElement(icon as React.ReactElement, { className: "h-8 w-8 text-white" })}
           </div>
-          <h3 className={`text-xl font-bold bg-gradient-to-r ${gradientFrom.replace('from-', 'from-').replace('/20', '')} ${gradientTo.replace('to-', 'to-').replace('/20', '')} bg-clip-text text-transparent`}>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
             {title}
           </h3>
-          <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{children}</p>
+          <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium">{children}</p>
         </div>
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-4 right-4 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
           <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
         </div>
       </div>
@@ -113,28 +114,69 @@ export default function HomePage() {
               <div className="relative flex items-center justify-center min-h-[500px] lg:min-h-[600px]">
                 <ScrollReveal delay={0.3} className="w-full h-full">
                   <div className="relative w-full aspect-square max-w-lg mx-auto">
+
+                    {/* Animated Connecting Lines */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg className="absolute w-full h-full animate-rotate-slow opacity-30" viewBox="0 0 400 400">
+                        <defs>
+                          <linearGradient id="lineGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
+                            <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.4" />
+                            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.6" />
+                          </linearGradient>
+                          <linearGradient id="lineGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#10b981" stopOpacity="0.6" />
+                            <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.4" />
+                            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.6" />
+                          </linearGradient>
+                        </defs>
+
+                        {/* Pentagon connecting lines */}
+                        <path d="M 200 60 L 338 152 L 276 288 L 124 288 L 62 152 Z"
+                              fill="none"
+                              stroke="url(#lineGradient1)"
+                              strokeWidth="2"
+                              strokeDasharray="8,4"
+                              className="animate-pulse"
+                              style={{animationDuration: '3s'}} />
+
+                        {/* Inner connecting lines to center */}
+                        <g stroke="url(#lineGradient2)" strokeWidth="1.5" strokeDasharray="4,6" className="animate-pulse" style={{animationDuration: '4s', animationDelay: '1s'}}>
+                          <line x1="200" y1="200" x2="200" y2="60" />
+                          <line x1="200" y1="200" x2="338" y2="152" />
+                          <line x1="200" y1="200" x2="276" y2="288" />
+                          <line x1="200" y1="200" x2="124" y2="288" />
+                          <line x1="200" y1="200" x2="62" y2="152" />
+                        </g>
+
+                        {/* Orbital rings */}
+                        <circle cx="200" cy="200" r="140" fill="none" stroke="url(#lineGradient1)" strokeWidth="1" opacity="0.3" strokeDasharray="2,8" />
+                        <circle cx="200" cy="200" r="100" fill="none" stroke="url(#lineGradient2)" strokeWidth="1" opacity="0.2" strokeDasharray="4,4" />
+                      </svg>
+                    </div>
+
                     {/* Central Hub Container */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="relative z-20">
-                        <div className="w-40 h-40 lg:w-48 lg:h-48 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-slate-800/80 backdrop-blur-2xl rounded-full border-2 border-white/30 dark:border-slate-700/30 shadow-2xl flex items-center justify-center">
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full animate-pulse" style={{animationDuration: '4s'}}></div>
+                      <div className="relative z-30">
+                        <div className="w-40 h-40 lg:w-48 lg:w-48 bg-gradient-to-br from-white/90 to-blue-50/90 dark:from-slate-900/90 dark:to-slate-800/90 backdrop-blur-2xl rounded-full border-2 border-white/40 dark:border-slate-700/40 shadow-2xl flex items-center justify-center">
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/15 to-purple-400/15 rounded-full animate-pulse" style={{animationDuration: '4s'}}></div>
                           <div className="relative z-10 text-center">
-                            <Map className="h-12 w-12 lg:h-16 lg:w-16 text-blue-500/40 dark:text-blue-400/40 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
+                            <Map className="h-12 w-12 lg:h-16 lg:w-16 text-blue-500/50 dark:text-blue-400/50 mx-auto mb-2 animate-pulse" style={{animationDuration: '6s'}} />
                             <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">AlertFront</div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">Command Center</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Rotating Circle System */}
+
+                    {/* Enhanced Rotating Circle System with 5 Components */}
                     <div className="absolute inset-0 animate-rotate-slow">
-                      
-                      {/* Card 1: Pothole Report */}
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 animate-counter-rotate" style={{ transform: 'translateY(-140px)'}}>
+
+                      {/* Card 1: Pothole Report - Top */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(0deg) translateX(200px) rotate(0deg)' }}>
                         <div className="group relative">
                           <div className="absolute -inset-2 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                          <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
+                          <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg shadow-lg"><AlertTriangle className="h-5 w-5 text-white" /></div>
                               <div>
@@ -145,12 +187,12 @@ export default function HomePage() {
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Card 2: Team Dispatched */}
-                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(120deg) translateX(180px) rotate(-120deg)' }}>
+
+                      {/* Card 2: Team Dispatched - Top Right */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(72deg) translateX(200px) rotate(-72deg)' }}>
                          <div className="group relative">
                            <div className="absolute -inset-2 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                           <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-green-200/50 dark:border-green-700/50 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
+                           <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-green-200/50 dark:border-green-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
                              <div className="flex items-center gap-3">
                                <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-lg"><ShieldCheck className="h-5 w-5 text-white" /></div>
                                <div>
@@ -161,12 +203,12 @@ export default function HomePage() {
                            </div>
                          </div>
                       </div>
-                      
-                      {/* Card 3: Report Verified */}
-                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate" style={{ transform: 'rotate(240deg) translateX(180px) rotate(-240deg)' }}>
+
+                      {/* Card 3: Report Verified - Bottom Right */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(144deg) translateX(200px) rotate(-144deg)' }}>
                          <div className="group relative">
                             <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50 hover:scale-110 transition-all duration-500 w-64 sm:w-72 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-lg"><UserCheck className="h-5 w-5 text-white" /></div>
                                 <div>
@@ -177,9 +219,120 @@ export default function HomePage() {
                            </div>
                          </div>
                       </div>
+
+                      {/* Card 4: Emergency Alert - Bottom Left */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(216deg) translateX(200px) rotate(-216deg)' }}>
+                         <div className="group relative">
+                            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-purple-200/50 dark:border-purple-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-purple-200/50 dark:hover:shadow-purple-900/30">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg"><Siren className="h-5 w-5 text-white" /></div>
+                                <div>
+                                  <h4 className="font-bold text-sm">Emergency Alert</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">Flood Warning</p>
+                                </div>
+                              </div>
+                           </div>
+                         </div>
+                      </div>
+
+                      {/* Card 5: Status Update - Top Left */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(288deg) translateX(200px) rotate(-288deg)' }}>
+                         <div className="group relative">
+                            <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/20 to-amber-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-yellow-200/50 dark:border-yellow-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-yellow-200/50 dark:hover:shadow-yellow-900/30">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-lg shadow-lg"><Activity className="h-5 w-5 text-white" /></div>
+                                <div>
+                                  <h4 className="font-bold text-sm">Status Update</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">Issue Resolved</p>
+                                </div>
+                              </div>
+                           </div>
+                         </div>
+                      </div>
                     </div>
                   </div>
                   </ScrollReveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Interactive Feature Showcase */}
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+          <div className="w-full px-4 md:px-6">
+            <ScrollReveal>
+              <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Comprehensive Safety Features</h2>
+                  <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mx-auto">
+                    Explore our complete suite of safety tools designed to keep your community protected.
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Enhanced Feature Cards Grid - Robust and Scalable */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              <div className="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="p-4 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <AlertTriangle className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Instant Reporting</h3>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">Report hazards instantly with photos, location, and details. Your report goes directly to emergency responders.</p>
+                </div>
+              </div>
+
+              <div className="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Activity className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Real-Time Updates</h3>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">Track the status of your report in real-time as response teams are dispatched and work to resolve the issue.</p>
+                </div>
+              </div>
+
+              <div className="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Users className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Direct Communication</h3>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">Communicate directly with response teams through our secure messaging system for critical updates.</p>
+                </div>
+              </div>
+
+              <div className="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Globe className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Photo Documentation</h3>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">Capture and upload photos of hazards directly from your mobile device for accurate reporting.</p>
+                </div>
+              </div>
+
+              <div className="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="p-4 bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Map className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">GPS Location</h3>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">Automatic location detection for precise hazard reporting and response team dispatch.</p>
+                </div>
+              </div>
+
+              <div className="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <ShieldCheck className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Team Coordination</h3>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">Dedicated dashboards for response teams to manage and coordinate multiple incidents simultaneously.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -292,10 +445,10 @@ export default function HomePage() {
               >
                 Receive intelligent notifications about hazards in your area and safety tips tailored to your location.
               </FeatureCard>
-              <FeatureCard 
-                title="Status Tracking" 
-                icon={<Siren className="h-8 w-8" />} 
-                delay={0.6}
+              <FeatureCard
+                title="Status Tracking"
+                icon={<Siren className="h-8 w-8" />}
+                delay={0.1}
                 gradientFrom="from-indigo-500/20"
                 gradientTo="to-purple-500/20"
               >

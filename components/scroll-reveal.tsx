@@ -17,9 +17,12 @@ export function ScrollReveal({
   threshold = 0.1,
 }: ScrollRevealProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -29,6 +32,7 @@ export function ScrollReveal({
       },
       {
         threshold,
+        rootMargin: '50px', // Start animation 50px before element enters viewport
       }
     );
 
@@ -43,10 +47,13 @@ export function ScrollReveal({
     };
   }, [threshold]);
 
+  // Improved visibility logic - show content immediately if above fold or after mount
+  const shouldBeVisible = isVisible || (isMounted && ref.current && ref.current.getBoundingClientRect().top < window.innerHeight);
+
   const style = {
     transition: `opacity 0.6s ease-out, transform 0.6s ease-out`,
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+    opacity: shouldBeVisible ? 1 : 0.3, // Start with some opacity instead of completely hidden
+    transform: shouldBeVisible ? 'translateY(0)' : 'translateY(20px)',
     transitionDelay: `${delay}s`,
   };
 

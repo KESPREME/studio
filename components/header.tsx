@@ -92,9 +92,9 @@ export function Header() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <UserCircle className="h-6 w-6" />
-                    <span className="hidden sm:inline">{user.name}</span>
+                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <UserCircle className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+                    <span className="hidden sm:inline text-slate-700 dark:text-slate-300">{user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -104,20 +104,20 @@ export function Header() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => router.push(getDashboardLink())}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <LayoutDashboard className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => router.push('/community')}>
-                    <Users className="mr-2 h-4 w-4" />
+                    <Users className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
                     <span>Community Insights</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => router.push('/settings')}>
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400" />
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
                     <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
