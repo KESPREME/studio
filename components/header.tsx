@@ -5,6 +5,7 @@ import { ShieldAlert, UserCircle, LogOut, Settings, LayoutDashboard, Users, Moon
 import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/animated-button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -237,38 +238,17 @@ export function Header() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-4">
-                <Button asChild variant="ghost" className="group relative overflow-hidden h-12 px-6 rounded-2xl bg-gradient-to-r from-slate-50/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-700/80 border-2 border-white/40 dark:border-slate-600/40 hover:border-blue-400/70 dark:hover:border-purple-400/70 hover:shadow-xl hover:scale-105 transition-all duration-700 backdrop-blur-md transform-gpu hover:-translate-y-1">
-                  <Link href="/login" className="relative flex items-center gap-2 z-10">
-                    {/* Enhanced animated background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/15 to-purple-400/15 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl"></div>
+                <Link href="/login">
+                  <AnimatedButton variant="outline" className="h-12 px-6">
+                    <span className="font-medium">Login</span>
+                  </AnimatedButton>
+                </Link>
 
-                    {/* 3D shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-20 group-hover:opacity-40 transition-opacity duration-700 rounded-2xl"></div>
-
-                    {/* Moving shine */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1200 ease-out rounded-2xl"></div>
-
-                    <span className="relative font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-700 dark:group-hover:text-purple-300 transition-colors duration-700">Login</span>
-
-                    {/* 3D bottom shadow */}
-                    <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-black/10 to-transparent rounded-b-2xl group-hover:via-black/20 transition-all duration-700"></div>
-                  </Link>
-                </Button>
-
-                <Button asChild className="group relative overflow-hidden h-12 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-700 transform-gpu hover:-translate-y-1">
-                  <Link href="/signup" className="relative flex items-center gap-2 z-10">
-                    {/* Enhanced shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1200 ease-out rounded-2xl"></div>
-
-                    {/* Pulsing glow */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-green-400/30 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-pulse scale-150"></div>
-
-                    <span className="relative font-bold">Sign Up</span>
-
-                    {/* 3D bottom shadow */}
-                    <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-black/20 to-transparent rounded-b-2xl"></div>
-                  </Link>
-                </Button>
+                <Link href="/signup">
+                  <AnimatedButton variant="gradient" className="h-12 px-6">
+                    <span className="font-bold">Sign Up</span>
+                  </AnimatedButton>
+                </Link>
               </div>
             )}
           </div>

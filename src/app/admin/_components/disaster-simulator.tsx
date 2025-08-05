@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { simulateDisaster, type SimulateDisasterOutput } from '@/ai/flows/simulate-disaster';
+import { simulateDisaster, type SimulateDisasterOutput } from '@/src/ai/flows/simulate-disaster';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';

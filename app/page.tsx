@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
+import { AnimatedButton } from '@/components/animated-button';
+import { FloatingElementsBlue } from '@/components/floating-elements';
 import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity, Camera, Lock, ChevronRight, ArrowRight } from 'lucide-react';
 import { ScrollReveal } from '@/components/scroll-reveal';
 import { SolarSystem } from '../components/solar-system';
@@ -67,27 +69,51 @@ const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradien
 
 export default function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [smoothPosition, setSmoothPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    let animationFrame: number;
+    let lastTime = 0;
+    const throttleDelay = 16; // ~60fps
+
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      const currentTime = Date.now();
+      if (currentTime - lastTime >= throttleDelay) {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+        lastTime = currentTime;
+      }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    // Smooth interpolation for the gradient position
+    const smoothUpdate = () => {
+      setSmoothPosition(prev => ({
+        x: prev.x + (mousePosition.x - prev.x) * 0.1, // Smooth interpolation factor
+        y: prev.y + (mousePosition.y - prev.y) * 0.1
+      }));
+      animationFrame = requestAnimationFrame(smoothUpdate);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    animationFrame = requestAnimationFrame(smoothUpdate);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [mousePosition.x, mousePosition.y]);
 
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden">
+      <FloatingElementsBlue />
       {/* Enhanced mouse-following gradient for both themes */}
       <div
-        className="fixed inset-0 -z-10 pointer-events-none transition-opacity duration-700 opacity-20 dark:opacity-30"
+        className="fixed inset-0 -z-10 pointer-events-none transition-opacity duration-1000 opacity-15 dark:opacity-25"
         style={{
-          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px,
-            rgba(59, 130, 246, 0.08),
-            rgba(147, 51, 234, 0.05),
-            rgba(34, 197, 94, 0.05),
-            transparent 70%)`
+          background: `radial-gradient(800px circle at ${smoothPosition.x}px ${smoothPosition.y}px,
+            rgba(59, 130, 246, 0.06),
+            rgba(147, 51, 234, 0.04),
+            rgba(34, 197, 94, 0.04),
+            transparent 60%)`
         }}
       />
 
@@ -96,14 +122,14 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-purple-50/30"></div>
         <div className="absolute inset-0 bg-gradient-to-tl from-green-50/40 via-transparent to-blue-50/40 animate-gradient-flow-slow"></div>
 
-        {/* Gentle floating particles for light mode */}
+        {/* Gentle floating particles for light mode - Optimized */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-0.5 h-0.5 bg-blue-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: '0s' }}></div>
-          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400/25 rounded-full animate-bounce-gentle" style={{ animationDelay: '5s' }}></div>
-          <div className="absolute bottom-1/3 left-1/3 w-0.5 h-0.5 bg-green-400/35 rounded-full animate-bounce-gentle" style={{ animationDelay: '10s' }}></div>
-          <div className="absolute top-1/2 right-1/3 w-0.5 h-0.5 bg-orange-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: '7s' }}></div>
-          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-cyan-400/25 rounded-full animate-bounce-gentle" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute top-1/3 left-3/4 w-0.5 h-0.5 bg-pink-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: '12s' }}></div>
+          <div className="absolute top-1/4 left-1/4 w-0.5 h-0.5 bg-blue-400/15 rounded-full animate-bounce-gentle" style={{ animationDelay: '0s', animationDuration: '8s' }}></div>
+          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400/12 rounded-full animate-bounce-gentle" style={{ animationDelay: '5s', animationDuration: '10s' }}></div>
+          <div className="absolute bottom-1/3 left-1/3 w-0.5 h-0.5 bg-green-400/18 rounded-full animate-bounce-gentle" style={{ animationDelay: '10s', animationDuration: '12s' }}></div>
+          <div className="absolute top-1/2 right-1/3 w-0.5 h-0.5 bg-orange-400/15 rounded-full animate-bounce-gentle" style={{ animationDelay: '7s', animationDuration: '9s' }}></div>
+          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-cyan-400/12 rounded-full animate-bounce-gentle" style={{ animationDelay: '3s', animationDuration: '11s' }}></div>
+          <div className="absolute top-1/3 left-3/4 w-0.5 h-0.5 bg-pink-400/15 rounded-full animate-bounce-gentle" style={{ animationDelay: '12s', animationDuration: '13s' }}></div>
         </div>
       </div>
       {/* Subtle and Elegant Animated Background */}

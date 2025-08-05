@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { AnimatedButton } from '@/components/animated-button';
 import { Header } from '@/components/header';
 import { StatCard } from '@/components/stat-card';
 import type { Report, Status } from '@/lib/types';
@@ -242,18 +243,18 @@ function AdminDashboard() {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button asChild variant="outline" className="group bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border-2 border-purple-500/30 dark:border-purple-400/30 hover:bg-purple-50 dark:hover:bg-slate-700 hover:border-purple-500 dark:hover:border-purple-400 hover:scale-105 transition-all duration-300">
-                    <Link href="/admin/simulator">
-                      <TestTube className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400 group-hover:animate-pulse" />
+                  <Link href="/admin/simulator">
+                    <AnimatedButton variant="outline" className="group bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border-2 border-purple-500/30 dark:border-purple-400/30">
+                      <TestTube className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400" />
                       Simulator
-                    </Link>
-                  </Button>
-                  <Button asChild className="group bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0">
-                    <Link href="/report/new">
-                      <Plus className="mr-2 h-4 w-4 group-hover:animate-pulse" />
+                    </AnimatedButton>
+                  </Link>
+                  <Link href="/report/new">
+                    <AnimatedButton variant="gradient" className="font-semibold">
+                      <Plus className="mr-2 h-4 w-4" />
                       New Report
-                    </Link>
-                  </Button>
+                    </AnimatedButton>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -354,7 +355,7 @@ function AdminDashboard() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Quick Actions</label>
                   <div className="flex gap-2">
-                    <Button
+                    <AnimatedButton
                       onClick={handleExportCSV}
                       variant="outline"
                       size="sm"
@@ -362,8 +363,8 @@ function AdminDashboard() {
                     >
                       <Download className="h-4 w-4 mr-1" />
                       Export
-                    </Button>
-                    <Button
+                    </AnimatedButton>
+                    <AnimatedButton
                       onClick={() => fetchReports()}
                       variant="outline"
                       size="sm"
@@ -371,7 +372,7 @@ function AdminDashboard() {
                     >
                       <RefreshCw className="h-4 w-4 mr-1" />
                       Refresh
-                    </Button>
+                    </AnimatedButton>
                   </div>
                 </div>
               </div>
@@ -384,20 +385,20 @@ function AdminDashboard() {
                       Bulk Actions ({filteredReports.length} reports):
                     </span>
                     <div className="flex gap-2">
-                      <Button
+                      <AnimatedButton
                         onClick={() => handleBulkStatusUpdate('In Progress')}
                         variant="outline"
                         size="sm"
                       >
                         Mark as In Progress
-                      </Button>
-                      <Button
+                      </AnimatedButton>
+                      <AnimatedButton
                         onClick={() => handleBulkStatusUpdate('Resolved')}
                         variant="outline"
                         size="sm"
                       >
                         Mark as Resolved
-                      </Button>
+                      </AnimatedButton>
                     </div>
                   </div>
                 </div>

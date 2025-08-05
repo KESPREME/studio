@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useOptimizedVariants, useAnimationSettings } from '@/hooks/use-performance';
+import { useOptimizedVariants, useAnimationSettings } from '@/src/hooks/use-performance';
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -218,7 +218,7 @@ export function PageTransition({ children }: PageTransitionProps) {
         variants={variants}
         className="min-h-screen"
         style={{
-          ...(shouldUseGPUAcceleration() && {
+          ...(shouldUseGPUAcceleration && {
             willChange: 'opacity, transform',
             backfaceVisibility: 'hidden',
             perspective: 1000,

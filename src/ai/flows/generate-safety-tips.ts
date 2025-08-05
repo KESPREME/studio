@@ -8,7 +8,7 @@
  * - GenerateSafetyTipsOutput - The return type for the function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/src/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateSafetyTipsInputSchema = z.object({

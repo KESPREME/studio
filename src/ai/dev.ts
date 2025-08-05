@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/translate-to-tamil.ts';
-import '@/ai/flows/generate-safety-tips.ts';
-import '@/ai/flows/simulate-disaster.ts';
-import '@/ai/flows/analyze-community-reports.ts';
+import '@/src/ai/flows/translate-to-tamil.ts';
+import '@/src/ai/flows/generate-safety-tips.ts';
+import '@/src/ai/flows/simulate-disaster.ts';
+import '@/src/ai/flows/analyze-community-reports.ts';

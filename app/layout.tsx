@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from '@/lib/utils';
 import { AuthProvider } from '@/hooks/use-auth';
+import { PageTransition } from '@/src/components/page-transition';
 
 export const metadata: Metadata = {
   title: 'AlertFront',
@@ -37,7 +38,9 @@ export default function RootLayout({
       </head>
       <body className={cn("font-body antialiased", "min-h-screen bg-background font-sans")}>
         <AuthProvider>
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
           <Toaster />
         </AuthProvider>
       </body>

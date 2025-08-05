@@ -1,0 +1,393 @@
+/* Advanced 3D Animations for Simulator Page */
+
+/* Custom 3D perspective utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* 3D Rotation utilities */
+.rotate-y-2 {
+  transform: rotateY(2deg);
+}
+
+.-rotate-y-2 {
+  transform: rotateY(-2deg);
+}
+
+.rotate-x-2 {
+  transform: rotateX(2deg);
+}
+
+.-rotate-x-2 {
+  transform: rotateX(-2deg);
+}
+
+/* Z-axis translation utilities */
+.translate-z-4 {
+  transform: translateZ(4px);
+}
+
+.translate-z-2 {
+  transform: translateZ(2px);
+}
+
+/* Advanced hover effects */
+.card-3d-hover {
+  transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+}
+
+.card-3d-hover:hover {
+  transform: translateY(-12px) rotateX(5deg) rotateY(5deg) scale(1.02);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(-5px) rotate(-1deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Pulse glow effect */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Morphing button effect */
+.morph-button {
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.morph-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.morph-button:hover::before {
+  left: 100%;
+}
+
+/* Elastic scale animation */
+@keyframes elastic-scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1.02);
+  }
+}
+
+.animate-elastic-scale {
+  animation: elastic-scale 0.6s ease-out;
+}
+
+/* Tilt effect */
+.tilt-effect {
+  transition: transform 0.3s ease-out;
+}
+
+.tilt-effect:hover {
+  transform: perspective(1000px) rotateX(10deg) rotateY(10deg) scale3d(1.05, 1.05, 1.05);
+}
+
+/* Magnetic hover effect */
+.magnetic-hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.magnetic-hover:hover {
+  transform: translate3d(0, -8px, 0) scale(1.03);
+  filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.15));
+}
+
+/* Ripple effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+/* Gradient border animation */
+@keyframes gradient-border {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animated-gradient-border {
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+  background-size: 400% 400%;
+  animation: gradient-border 3s ease infinite;
+  padding: 2px;
+  border-radius: 12px;
+}
+
+.animated-gradient-border > * {
+  border-radius: 10px;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: transform, box-shadow, background-color, border-color, color, filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent overlapping issues in form elements */
+.form-field-container {
+  position: relative;
+  z-index: 1;
+}
+
+.form-field-container:focus-within {
+  z-index: 10;
+}
+
+/* Ensure dropdowns appear above other elements */
+.dropdown-container {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Prevent transform effects from causing overlaps */
+.no-transform-overlap {
+  transform: none !important;
+}
+
+/* Ensure proper spacing between form elements */
+.form-spacing {
+  margin-bottom: 1.5rem;
+}
+
+/* Fix z-index stacking for location dropdown */
+.location-dropdown {
+  z-index: 10001 !important;
+}
+
+/* Enhanced focus states */
+.focus-3d:focus {
+  outline: none;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* Stagger animation for form fields */
+.stagger-animation {
+  animation-delay: calc(var(--stagger) * 100ms);
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.6s ease-out forwards;
+}
+
+/* Glass morphism effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Neon glow effect */
+.neon-glow {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+/* Particle effect background */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: particle-float 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.particle:nth-child(1) { animation-delay: 0s; }
+.particle:nth-child(2) { animation-delay: 0.5s; }
+.particle:nth-child(3) { animation-delay: 1s; }
+.particle:nth-child(4) { animation-delay: 1.5s; }
+.particle:nth-child(5) { animation-delay: 2s; }
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Enhanced caution symbol animations */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1) rotate(2deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  25% {
+    transform: translateY(-5px) scale(1.02);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+  75% {
+    transform: translateY(-3px) scale(1.02);
+  }
+}
+
+/* Text wave animation for heading */
+@keyframes text-wave {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  75% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 2s ease-in-out infinite;
+}
+
+.animate-text-wave {
+  animation: text-wave 2s ease-in-out infinite;
+}

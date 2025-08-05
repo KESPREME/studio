@@ -8,7 +8,7 @@
  * - TranslateToTamilOutput - The return type for the translateToTamil function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/src/ai/genkit';
 import {z} from 'genkit';
 
 const TranslateToTamilInputSchema = z.object({

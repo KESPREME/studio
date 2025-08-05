@@ -8,12 +8,13 @@
  * - SimulateDisasterOutput - The return type for the function.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai } from '@/src/ai/genkit';
 import { z } from 'genkit';
 
 const SimulateDisasterInputSchema = z.object({
   disasterType: z.string().describe('The type of disaster to simulate (e.g., "Urban Flood", "Earthquake").'),
   location: z.string().describe('The city or region where the disaster is occurring (e.g., "Chennai, Tamil Nadu").'),
+  description: z.string().optional().describe('Additional details about the disaster scenario that should be analyzed and incorporated into the simulation.'),
 });
 export type SimulateDisasterInput = z.infer<typeof SimulateDisasterInputSchema>;
 
@@ -21,7 +22,7 @@ const SimulateDisasterOutputSchema = z.object({
   scenario: z.object({
     disasterType: z.string(),
     location: z.string(),
-    description: z.string().describe('A brief, 1-2 sentence description of the simulated disaster scenario.'),
+    description: z.string().describe('A brief, 1-2 sentence description of the simulated disaster scenario. If additional details were provided, incorporate them into this description to show how they influenced the simulation.'),
   }),
   mapCenter: z.object({
     lat: z.number().describe('The latitude for the center of the map view.'),
@@ -60,8 +61,20 @@ Analyze the following disaster and generate a comprehensive plan. Be specific an
 **Disaster Scenario:**
 - **Type:** {{disasterType}}
 - **Location:** {{location}}
+{{#if description}}
+- **Additional Details:** {{description}}
 
-Generate the response plan. Provide realistic latitude and longitude for the map center and the affected zones within the specified location. The impact level should realistically reflect the disaster type.
+**Important:** Carefully analyze the additional details provided above. These details should significantly influence:
+1. The severity and impact levels of affected zones
+2. The specific types and quantities of resources needed
+3. The action plan phases and steps
+4. The scenario description and affected areas
+5. The overall response strategy
+
+Incorporate these details into every aspect of your simulation to create a more accurate and contextual disaster response plan.
+{{/if}}
+
+Generate the response plan. Provide realistic latitude and longitude for the map center and the affected zones within the specified location. The impact level should realistically reflect the disaster type{{#if description}} and the additional details provided{{/if}}.
 `,
 });
 
@@ -72,7 +85,9 @@ const simulateDisasterFlow = ai.defineFlow(
     outputSchema: SimulateDisasterOutputSchema,
   },
   async (input) => {
+    console.log('Genkit flow input:', JSON.stringify(input, null, 2));
     const { output } = await simulateDisasterPrompt(input);
+    console.log('Genkit flow output scenario description:', output?.scenario?.description);
     return output!;
   }
 );

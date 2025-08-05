@@ -1,7 +1,7 @@
 'use server';
 
 // src/ai/flows/analyze-community-reports.ts
-import { ai } from '@/ai/genkit';
+import { ai } from '@/src/ai/genkit';
 import { z } from 'genkit';
 
 // Input schema for community report analysis

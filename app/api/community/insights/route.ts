@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase-server';
-import { analyzeCommunityReports } from '@/ai/flows/analyze-community-reports';
+import { analyzeCommunityReports } from '@/src/ai/flows/analyze-community-reports';
 
 // Request schema
 const InsightsRequestSchema = z.object({

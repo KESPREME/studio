@@ -92,7 +92,7 @@ const DynamicMap = ({ reports }: HazardMapProps) => {
     });
   }, [reports]); // Re-run whenever reports change
 
-  return <div ref={mapContainerRef} style={{ height: '500px', width: '100%' }} />;
+  return <div ref={mapContainerRef} className="h-full min-h-[500px] w-full" />;
 };
 
 export default DynamicMap;

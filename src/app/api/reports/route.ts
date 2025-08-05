@@ -4,7 +4,7 @@ import { sendNewReportSms, sendMassAlertSms } from '@/lib/sms';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
-import { generateSafetyTips } from '@/ai/flows/generate-safety-tips';
+import { generateSafetyTips } from '@/src/ai/flows/generate-safety-tips';
 import { Report } from '@/lib/types';
 
 const reportSchema = z.object({

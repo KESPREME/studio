@@ -8,6 +8,8 @@ import { LogIn, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedButton } from '@/components/animated-button';
+import { AnimatedCard } from '@/components/animated-card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -79,7 +81,7 @@ export default function LoginPage() {
       {/* Enhanced Login Card - Increased Size */}
       <div className="relative group w-full max-w-md mx-auto p-4">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-green-500/20 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <Card className="relative bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-2xl hover:shadow-3xl transition-all duration-500 rounded-3xl">
+        <AnimatedCard variant="glass" hover3d={true} glowColor="blue" className="rounded-3xl">
           <CardHeader className="text-center pb-8">
             {/* Enhanced Logo Area */}
             <div className="relative mb-8 py-8">
@@ -224,10 +226,12 @@ export default function LoginPage() {
                   )}
                 </div>
               </div>
-              <Button
+              <AnimatedButton
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-green-600 hover:from-blue-600 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-lg h-12 text-base border-0 mt-2"
+                variant="gradient"
+                className="w-full h-12 text-base mt-2"
                 disabled={isLoading}
+                loading={isLoading}
               >
                 {isLoading ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -235,7 +239,7 @@ export default function LoginPage() {
                   <LogIn className="mr-2 h-5 w-5" />
                 )}
                 {isLoading ? 'Signing In...' : 'Sign In'}
-              </Button>
+              </AnimatedButton>
               <div className="mt-6 text-center">
                 <p className="text-base text-slate-600 dark:text-slate-400">
                   Don&apos;t have an account?{' '}
@@ -262,7 +266,7 @@ export default function LoginPage() {
               </div>
             </form>
           </CardContent>
-        </Card>
+        </AnimatedCard>
       </div>
     </div>
   );
