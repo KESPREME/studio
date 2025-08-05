@@ -1,4 +1,4 @@
-// src/app/api/auth/login/route.ts
+// app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -40,11 +40,11 @@ export async function POST(request: Request) {
 
     // Don't send the password hash back to the client
     const { password: _, ...userToReturn } = user;
-    
+
     // In a real app, you would generate a JWT here.
     // For this demo, we'll return the user object to be stored in localStorage.
-    return NextResponse.json({ 
-        message: 'Login successful', 
+    return NextResponse.json({
+        message: 'Login successful',
         user: {
           id: userToReturn.id,
           name: userToReturn.email.split('@')[0], // Simple name generation

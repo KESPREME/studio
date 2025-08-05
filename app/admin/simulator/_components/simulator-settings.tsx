@@ -51,14 +51,14 @@ export function SimulatorSettings({
   const [locationQuery, setLocationQuery] = useState("");
   const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  
+
   // Geocoding function using OpenStreetMap Nominatim API (free)
   const searchLocation = async (query: string) => {
     if (!query.trim()) {
       setLocationSuggestions([]);
       return;
     }
-    
+
     setIsSearching(true);
     try {
       const response = await fetch(
@@ -73,7 +73,7 @@ export function SimulatorSettings({
       setIsSearching(false);
     }
   };
-  
+
   // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -81,10 +81,10 @@ export function SimulatorSettings({
         searchLocation(locationQuery);
       }
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [locationQuery]);
-  
+
   const selectLocation = (location: any) => {
     const locationName = location.display_name;
     form.setValue('location', locationName);
@@ -137,7 +137,7 @@ export function SimulatorSettings({
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="intensity"
@@ -163,7 +163,7 @@ export function SimulatorSettings({
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="location"
@@ -189,7 +189,7 @@ export function SimulatorSettings({
                   )}
                 </div>
               </FormControl>
-              
+
               {/* Location Suggestions Dropdown */}
               {locationSuggestions.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
@@ -212,7 +212,7 @@ export function SimulatorSettings({
                   ))}
                 </div>
               )}
-              
+
               <FormDescription>
                 Search and select a location for the disaster simulation.
               </FormDescription>
@@ -220,7 +220,7 @@ export function SimulatorSettings({
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="description"
@@ -240,7 +240,7 @@ export function SimulatorSettings({
             </FormItem>
           )}
         />
-        
+
         <div className="flex gap-2">
           <Button type="submit" className="w-full" disabled={isSimulating}>
             {isSimulating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

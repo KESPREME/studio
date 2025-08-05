@@ -226,16 +226,16 @@ function CommunityDashboard() {
                 <Brain className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
               </div>
-              <span className="text-sm font-semibold bg-gradient-to-r from-blue-700 to-purple-700 dark:from-blue-300 dark:to-purple-300 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-300 drop-shadow-sm">
                 AI-Powered Community Analysis
               </span>
               <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 animate-pulse" />
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-800 dark:from-white dark:via-blue-200 dark:to-indigo-200 bg-clip-text text-transparent mb-6 tracking-tight">
+              <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 tracking-tight drop-shadow-lg">
                 Community
-                <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                <span className="block text-blue-600 dark:text-blue-400">
                   Insights
                 </span>
               </h1>
@@ -270,7 +270,7 @@ function CommunityDashboard() {
                   <Brain className="absolute inset-0 m-auto h-8 w-8 text-blue-600 animate-pulse" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 drop-shadow-sm">
                     Analyzing Community Data
                   </h3>
                   <p className="text-slate-600 dark:text-slate-400">
@@ -306,7 +306,7 @@ function CommunityDashboard() {
                       </div>
                     </CardHeader>
                     <CardContent className="relative">
-                      <div className="text-4xl font-black bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+                      <div className="text-4xl font-black text-blue-600 dark:text-blue-400 mb-2 drop-shadow-sm">
                         {insights.summary.totalReports}
                       </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Last {timeframe} days</p>
@@ -327,7 +327,7 @@ function CommunityDashboard() {
                       </div>
                     </CardHeader>
                     <CardContent className="relative">
-                      <div className="text-4xl font-black bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent mb-2">
+                      <div className="text-4xl font-black text-red-600 dark:text-red-400 mb-2 drop-shadow-sm">
                         {insights.summary.highPriorityCount || 0}
                       </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Urgent incidents</p>
@@ -348,7 +348,7 @@ function CommunityDashboard() {
                       </div>
                     </CardHeader>
                     <CardContent className="relative">
-                      <div className="text-4xl font-black bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2">
+                      <div className="text-4xl font-black text-green-600 dark:text-green-400 mb-2 drop-shadow-sm">
                         {insights.summary.resolvedCount || 0}
                       </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Completed incidents</p>
@@ -369,7 +369,7 @@ function CommunityDashboard() {
                       </div>
                     </CardHeader>
                     <CardContent className="relative">
-                      <div className="text-4xl font-black bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2">
+                      <div className="text-4xl font-black text-purple-600 dark:text-purple-400 mb-2 drop-shadow-sm">
                         {insights.summary.averageResponseTime}
                       </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Response time</p>

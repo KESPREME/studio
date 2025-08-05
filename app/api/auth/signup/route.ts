@@ -1,4 +1,4 @@
-// src/app/api/auth/signup/route.ts
+// app/api/auth/signup/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         .select('id')
         .eq('email', email)
         .single();
-    
+
     if (existingUser) {
         return NextResponse.json({ message: 'An account with this email already exists.'}, { status: 409 });
     }
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     }
 
     // Return the new user object (without password)
-    return NextResponse.json({ 
+    return NextResponse.json({
         message: 'Account created successfully', 
         user: {
             id: newUser.id,

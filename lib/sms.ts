@@ -86,3 +86,21 @@ export async function checkVerificationOtp(phone: string, code: string) {
         .verificationChecks
         .create({ to: phone, code: code });
 }
+
+export async function sendVerificationOtp(phone: string) {
+    if (!client || !verifyServiceSid) {
+        throw new Error("Twilio Verify is not configured on the server.");
+    }
+    return client.verify.v2.services(verifyServiceSid)
+        .verifications
+        .create({ to: phone, channel: 'sms' });
+}
+
+export async function checkVerificationOtp(phone: string, code: string) {
+    if (!client || !verifyServiceSid) {
+        throw new Error("Twilio Verify is not configured on the server.");
+    }
+    return client.verify.v2.services(verifyServiceSid)
+        .verificationChecks
+        .create({ to: phone, code: code });
+}

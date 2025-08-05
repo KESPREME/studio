@@ -1,4 +1,3 @@
-// src/app/admin/_components/reports-data-table.tsx
 "use client"
 
 import * as React from "react"

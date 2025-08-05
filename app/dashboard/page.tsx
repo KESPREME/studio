@@ -26,9 +26,11 @@ function ReporterDashboard() {
     setIsLoading(true);
     try {
       const fetchedReports = await getReports();
-      setAllReports(fetchedReports);
+      // Ensure we always have an array
+      setAllReports(Array.isArray(fetchedReports) ? fetchedReports : []);
     } catch (error) {
       console.error("Failed to fetch reports:", error);
+      setAllReports([]); // Set empty array on error
       // Optionally add a toast message here for the user
     } finally {
       setIsLoading(false);
@@ -40,7 +42,7 @@ function ReporterDashboard() {
   }, [fetchReports]);
   
   const myReports = useMemo(() => {
-    if (!user) return [];
+    if (!user || !Array.isArray(allReports)) return [];
     return allReports.filter(r => r.reportedBy === user.email);
   }, [allReports, user]);
 
@@ -97,7 +99,7 @@ function ReporterDashboard() {
                       <Activity className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent animate-pulse">
+                      <h1 className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-400 animate-pulse drop-shadow-lg">
                         Community Dashboard
                       </h1>
                       <p className="text-slate-600 dark:text-slate-300 text-lg font-medium">
@@ -118,7 +120,7 @@ function ReporterDashboard() {
                     </div>
                     <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-full border border-orange-200/50 dark:border-orange-700/50">
                       <AlertTriangle className="h-4 w-4 text-orange-600" />
-                      <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Active: {allReports.filter(r => r.urgency === 'High').length}</span>
+                      <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Active: {Array.isArray(allReports) ? allReports.filter(r => r.urgency === 'High').length : 0}</span>
                     </div>
                   </div>
                 </div>
@@ -171,7 +173,7 @@ function ReporterDashboard() {
                       <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
                         <Map className="h-5 w-5 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 drop-shadow-sm">
                         Interactive Community Map
                       </h3>
                     </div>
@@ -193,7 +195,7 @@ function ReporterDashboard() {
                         <CheckCircle className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                        <h2 className="text-xl font-bold text-green-600 dark:text-green-400 drop-shadow-sm">
                           My Submitted Reports
                         </h2>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -214,7 +216,7 @@ function ReporterDashboard() {
                         <Users className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        <h2 className="text-xl font-bold text-purple-600 dark:text-purple-400 drop-shadow-sm">
                           Latest Community Reports
                         </h2>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -222,7 +224,7 @@ function ReporterDashboard() {
                         </p>
                       </div>
                     </div>
-                    <ReportList reports={allReports.slice(0, 10)} emptyMessage="No community reports yet. Be the first!" isLoading={isLoading} />
+                    <ReportList reports={Array.isArray(allReports) ? allReports.slice(0, 10) : []} emptyMessage="No community reports yet. Be the first!" isLoading={isLoading} />
                   </div>
                 </div>
               </div>

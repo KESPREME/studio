@@ -1,8 +1,7 @@
-// src/app/api/reports/[id]/route.ts
+// app/api/reports/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import type { Report } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
 const statusUpdateSchema = z.object({
@@ -11,10 +10,10 @@ const statusUpdateSchema = z.object({
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id:string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
         .from('reports')
         .select('*')
         .eq('id', params.id)
@@ -30,10 +29,10 @@ export async function GET(
     if (!data) {
       return NextResponse.json({ message: 'Report not found' }, { status: 404 });
     }
-    
+
     let imageUrl: string | undefined = undefined;
     if (data.imageUrl) {
-        const { data: urlData } = supabase.storage.from('images').getPublicUrl(data.imageUrl);
+        const { data: urlData } = supabaseAdmin.storage.from('images').getPublicUrl(data.imageUrl);
         imageUrl = urlData.publicUrl;
     }
 
@@ -69,7 +68,7 @@ export async function PATCH(
     if (validation.data.status === 'Resolved') {
         updateData.resolvedAt = new Date().toISOString();
     }
-    
+
     const { error } = await supabaseAdmin
         .from('reports')
         .update(updateData)
@@ -104,7 +103,7 @@ export async function DELETE(
       }
       throw fetchError;
     }
-    
+
     const imagePath = report.imageUrl;
 
     // Primary Operation: Delete the database record
@@ -117,15 +116,14 @@ export async function DELETE(
       console.error('Supabase delete error:', deleteError);
       throw new Error('Failed to delete report from the database.');
     }
-    
 
     // Secondary, Optional Operation: Attempt to delete the image from storage.
     if (imagePath && typeof imagePath === 'string') {
       try {
         const { error: storageError } = await supabaseAdmin.storage
           .from('images')
-          .remove([imagePath]); 
-        
+          .remove([imagePath]);
+
         if (storageError) {
           console.warn(`Supabase image deletion failed for path: ${imagePath}. Error: ${storageError.message}. The database record was deleted successfully.`);
         }

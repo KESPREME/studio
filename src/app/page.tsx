@@ -111,9 +111,9 @@ export default function HomePage() {
               </div>
 
               {/* Enhanced Interactive Hero Visual - Rotating Circle Design */}
-              <div className="relative flex items-center justify-center min-h-[500px] lg:min-h-[600px]">
+              <div className="relative flex items-center justify-center min-h-[800px] lg:min-h-[900px]">
                 <ScrollReveal delay={0.3} className="w-full h-full">
-                  <div className="relative w-full aspect-square max-w-lg mx-auto">
+                  <div className="relative w-full aspect-square max-w-4xl mx-auto">
 
                     {/* Animated Connecting Lines */}
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -169,19 +169,19 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    {/* Enhanced Rotating Circle System with 5 Components */}
+                    {/* Enhanced Rotating Circle System with 6 Components */}
                     <div className="absolute inset-0 animate-rotate-slow">
 
                       {/* Card 1: Pothole Report - Top */}
                       <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(0deg) translateX(200px) rotate(0deg)' }}>
                         <div className="group relative">
-                          <div className="absolute -inset-2 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                          <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-red-200/50 dark:hover:shadow-red-900/30">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg shadow-lg"><AlertTriangle className="h-5 w-5 text-white" /></div>
+                          <div className="absolute -inset-2 bg-gradient-to-r from-red-400/10 to-orange-400/10 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700"></div>
+                          <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-2 sm:p-3 md:p-4 rounded-xl shadow-lg border border-red-200/50 dark:border-red-700/30 hover:scale-110 transition-all duration-500 w-32 sm:w-40 md:w-48 lg:w-56 hover:shadow-red-200/30 dark:hover:shadow-red-900/20">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg shadow-md"><AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-white" /></div>
                               <div>
-                                <h4 className="font-bold text-sm">Pothole Reported</h4>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Main St & 2nd Ave</p>
+                                <h4 className="font-bold text-xs sm:text-sm">Pothole Reported</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Main St & 2nd Ave</p>
                               </div>
                             </div>
                           </div>
@@ -189,15 +189,15 @@ export default function HomePage() {
                       </div>
 
                       {/* Card 2: Team Dispatched - Top Right */}
-                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(72deg) translateX(200px) rotate(-72deg)' }}>
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(60deg) translateX(200px) rotate(-60deg)' }}>
                          <div className="group relative">
-                           <div className="absolute -inset-2 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                           <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-green-200/50 dark:border-green-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-green-200/50 dark:hover:shadow-green-900/30">
-                             <div className="flex items-center gap-3">
-                               <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-lg"><ShieldCheck className="h-5 w-5 text-white" /></div>
+                           <div className="absolute -inset-2 bg-gradient-to-r from-green-400/10 to-emerald-400/10 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700"></div>
+                           <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-2 sm:p-3 md:p-4 rounded-xl shadow-lg border border-green-200/50 dark:border-green-700/50 hover:scale-110 transition-all duration-500 w-32 sm:w-40 md:w-48 lg:w-56 hover:shadow-green-200/30 dark:hover:shadow-green-900/20">
+                             <div className="flex items-center gap-2 sm:gap-3">
+                               <div className="p-1.5 sm:p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-md"><ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-white" /></div>
                                <div>
-                                 <h4 className="font-bold text-sm">Team Dispatched</h4>
-                                 <p className="text-xs text-slate-500 dark:text-slate-400">Response Unit #42</p>
+                                 <h4 className="font-bold text-xs sm:text-sm">Team Dispatched</h4>
+                                 <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Response Unit #42</p>
                                </div>
                              </div>
                            </div>
@@ -205,15 +205,15 @@ export default function HomePage() {
                       </div>
 
                       {/* Card 3: Report Verified - Bottom Right */}
-                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(144deg) translateX(200px) rotate(-144deg)' }}>
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(120deg) translateX(200px) rotate(-120deg)' }}>
                          <div className="group relative">
-                            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-lg"><UserCheck className="h-5 w-5 text-white" /></div>
+                            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-2 sm:p-3 md:p-4 rounded-xl shadow-lg border border-blue-200/50 dark:border-blue-700/50 hover:scale-110 transition-all duration-500 w-32 sm:w-40 md:w-48 lg:w-56 hover:shadow-blue-200/30 dark:hover:shadow-blue-900/20">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-md"><UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-white" /></div>
                                 <div>
-                                  <h4 className="font-bold text-sm">Report Verified</h4>
-                                  <p className="text-xs text-slate-500 dark:text-slate-400">Priority: High</p>
+                                  <h4 className="font-bold text-xs sm:text-sm">Report Verified</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Priority: High</p>
                                 </div>
                               </div>
                            </div>
@@ -221,15 +221,15 @@ export default function HomePage() {
                       </div>
 
                       {/* Card 4: Emergency Alert - Bottom Left */}
-                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(216deg) translateX(200px) rotate(-216deg)' }}>
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(180deg) translateX(200px) rotate(-180deg)' }}>
                          <div className="group relative">
-                            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-purple-200/50 dark:border-purple-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-purple-200/50 dark:hover:shadow-purple-900/30">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg"><Siren className="h-5 w-5 text-white" /></div>
+                            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-2 sm:p-3 md:p-4 rounded-xl shadow-lg border border-purple-200/50 dark:border-purple-700/50 hover:scale-110 transition-all duration-500 w-32 sm:w-40 md:w-48 lg:w-56 hover:shadow-purple-200/30 dark:hover:shadow-purple-900/20">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-md"><Siren className="h-4 w-4 sm:h-5 sm:w-5 text-white" /></div>
                                 <div>
-                                  <h4 className="font-bold text-sm">Emergency Alert</h4>
-                                  <p className="text-xs text-slate-500 dark:text-slate-400">Flood Warning</p>
+                                  <h4 className="font-bold text-xs sm:text-sm">Emergency Alert</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Flood Warning</p>
                                 </div>
                               </div>
                            </div>
@@ -237,15 +237,31 @@ export default function HomePage() {
                       </div>
 
                       {/* Card 5: Status Update - Top Left */}
-                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(288deg) translateX(200px) rotate(-288deg)' }}>
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(240deg) translateX(200px) rotate(-240deg)' }}>
                          <div className="group relative">
-                            <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/20 to-amber-400/20 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 transition-all duration-700"></div>
-                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-2xl border border-yellow-200/50 dark:border-yellow-700/50 hover:scale-110 transition-all duration-500 w-56 sm:w-64 hover:shadow-yellow-200/50 dark:hover:shadow-yellow-900/30">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-lg shadow-lg"><Activity className="h-5 w-5 text-white" /></div>
+                            <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/10 to-amber-400/10 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-2 sm:p-3 md:p-4 rounded-xl shadow-lg border border-yellow-200/50 dark:border-yellow-700/50 hover:scale-110 transition-all duration-500 w-32 sm:w-40 md:w-48 lg:w-56 hover:shadow-yellow-200/30 dark:hover:shadow-yellow-900/20">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-lg shadow-md"><Activity className="h-4 w-4 sm:h-5 sm:w-5 text-white" /></div>
                                 <div>
-                                  <h4 className="font-bold text-sm">Status Update</h4>
-                                  <p className="text-xs text-slate-500 dark:text-slate-400">Issue Resolved</p>
+                                  <h4 className="font-bold text-xs sm:text-sm">Status Update</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Issue Resolved</p>
+                                </div>
+                              </div>
+                           </div>
+                         </div>
+                      </div>
+
+                      {/* Card 6: Community Alert - Left */}
+                      <div className="absolute top-1/2 left-1/2 animate-counter-rotate z-20" style={{ transform: 'rotate(300deg) translateX(200px) rotate(-300deg)' }}>
+                         <div className="group relative">
+                            <div className="absolute -inset-2 bg-gradient-to-r from-indigo-400/10 to-violet-400/10 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700"></div>
+                            <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-2 sm:p-3 md:p-4 rounded-xl shadow-lg border border-indigo-200/50 dark:border-indigo-700/50 hover:scale-110 transition-all duration-500 w-32 sm:w-40 md:w-48 lg:w-56 hover:shadow-indigo-200/30 dark:hover:shadow-indigo-900/20">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-lg shadow-md"><Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" /></div>
+                                <div>
+                                  <h4 className="font-bold text-xs sm:text-sm">Community Alert</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Safety Advisory</p>
                                 </div>
                               </div>
                            </div>

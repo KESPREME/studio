@@ -150,10 +150,369 @@ body {
   }
 }
 
+/* Solar System Animation Keyframes - Mathematically collision-free */
+@keyframes orbit-1 {
+  from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+@keyframes orbit-2 {
+  from { transform: rotate(72deg) translateX(220px) rotate(-72deg); }
+  to { transform: rotate(432deg) translateX(220px) rotate(-432deg); }
+}
+@keyframes orbit-3 {
+  from { transform: rotate(144deg) translateX(290px) rotate(-144deg); }
+  to { transform: rotate(504deg) translateX(290px) rotate(-504deg); }
+}
+@keyframes orbit-4 {
+  from { transform: rotate(216deg) translateX(360px) rotate(-216deg); }
+  to { transform: rotate(576deg) translateX(360px) rotate(-576deg); }
+}
+@keyframes orbit-5 {
+  from { transform: rotate(288deg) translateX(430px) rotate(-288deg); }
+  to { transform: rotate(648deg) translateX(430px) rotate(-648deg); }
+}
+
+/* Animation Classes - Prime number durations prevent collisions */
+.animate-orbit-1 {
+  animation: orbit-1 37s linear infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+.animate-orbit-2 {
+  animation: orbit-2 53s linear infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+.animate-orbit-3 {
+  animation: orbit-3 71s linear infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+.animate-orbit-4 {
+  animation: orbit-4 97s linear infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+.animate-orbit-5 {
+  animation: orbit-5 127s linear infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Rotating Circle System Animations */
 .animate-rotate-slow {
   animation: rotate-slow 120s linear infinite;
 }
 
+.animate-rotate-medium {
+  animation: rotate-slow 80s linear infinite;
+}
+
+.animate-rotate-fast {
+  animation: rotate-slow 60s linear infinite;
+}
+
 .animate-counter-rotate {
   animation: counter-rotate 120s linear infinite;
+}
+
+/* Smooth transitions for hover effects */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Magnetic repulsion effect for cards */
+.hover-container {
+  position: relative;
+}
+
+.hover-container .group {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-container:hover .group:not(:hover) {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+.hover-container .group:hover {
+  z-index: 20;
+  transform: scale(1.02) translateY(-4px);
+}
+
+/* Breathing glow effect */
+@keyframes breathe-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.3), 0 0 60px rgba(147, 51, 234, 0.2);
+  }
+}
+
+.animate-breathe-glow {
+  animation: breathe-glow 3s ease-in-out infinite;
+}
+
+/* Enhanced card spacing */
+.card-spacing {
+  margin: 1rem;
+  padding: 0.5rem;
+}
+
+/* Gentle scale effect that doesn't cause overlap */
+.gentle-hover {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gentle-hover:hover {
+  transform: scale(1.02) translateY(-4px);
+  z-index: 10;
+}
+
+/* Enhanced CTA animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+/* Gradient text animation */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Header enhancements */
+@keyframes header-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(147, 51, 234, 0.2); }
+}
+
+.header-glow {
+  animation: header-glow 4s ease-in-out infinite;
+}
+
+/* Logo pulse effect */
+@keyframes logo-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.logo-pulse:hover {
+  animation: logo-pulse 2s ease-in-out infinite;
+}
+
+/* Status indicator pulse */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.status-indicator {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* Subtle and elegant animations for refined experience */
+@keyframes gradient-flow-x {
+  0%, 100% { transform: translateX(-50%); opacity: 0.3; }
+  50% { transform: translateX(50%); opacity: 0.6; }
+}
+
+@keyframes gradient-flow-y {
+  0%, 100% { transform: translateY(-30%); opacity: 0.2; }
+  50% { transform: translateY(30%); opacity: 0.5; }
+}
+
+@keyframes gradient-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0px); opacity: 0.4; }
+  50% { transform: translateY(-4px); opacity: 0.7; }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.2), 0 0 35px rgba(147, 51, 234, 0.1);
+  }
+}
+
+@keyframes subtle-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  25% { transform: translate(10px, -5px) scale(1.01); opacity: 0.4; }
+  50% { transform: translate(-5px, 10px) scale(1.02); opacity: 0.5; }
+  75% { transform: translate(-10px, -5px) scale(1.01); opacity: 0.4; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.01); }
+}
+
+/* Refined animation classes with much slower timing */
+.animate-gradient-flow-x {
+  animation: gradient-flow-x 25s ease-in-out infinite;
+}
+
+.animate-gradient-flow-y {
+  animation: gradient-flow-y 30s ease-in-out infinite;
+}
+
+.animate-gradient-rotate {
+  animation: gradient-rotate 60s linear infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 8s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 12s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 8s ease-in-out infinite;
+}
+
+.animate-subtle-drift {
+  animation: subtle-drift 20s ease-in-out infinite;
+}
+
+/* Floating particles for dark theme interactions */
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25% { transform: translate(10px, -8px) scale(1.2); opacity: 1; }
+  50% { transform: translate(-5px, -15px) scale(0.8); opacity: 0.8; }
+  75% { transform: translate(8px, -5px) scale(1.1); opacity: 0.9; }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  33% { transform: translate(-12px, 10px) scale(1.3); opacity: 1; }
+  66% { transform: translate(6px, -8px) scale(0.9); opacity: 0.8; }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  40% { transform: translate(8px, -12px) scale(1.1); opacity: 1; }
+  80% { transform: translate(-10px, 5px) scale(0.7); opacity: 0.9; }
+}
+
+.animate-float-1 {
+  animation: float-1 3s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-2 4s ease-in-out infinite 0.5s;
+}
+
+.animate-float-3 {
+  animation: float-3 3.5s ease-in-out infinite 1s;
+}
+
+/* Gentle floating animations for orbital particles */
+@keyframes float-gentle-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25% { transform: translate(5px, -3px) scale(1.1); opacity: 0.8; }
+  50% { transform: translate(-3px, -6px) scale(0.9); opacity: 1; }
+  75% { transform: translate(4px, -2px) scale(1.05); opacity: 0.7; }
+}
+
+@keyframes float-gentle-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  33% { transform: translate(-4px, 4px) scale(1.2); opacity: 1; }
+  66% { transform: translate(3px, -4px) scale(0.8); opacity: 0.8; }
+}
+
+@keyframes float-gentle-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  40% { transform: translate(3px, -5px) scale(1.1); opacity: 0.9; }
+  80% { transform: translate(-4px, 2px) scale(0.9); opacity: 0.7; }
+}
+
+.animate-float-gentle-1 {
+  animation: float-gentle-1 8s ease-in-out infinite;
+}
+
+.animate-float-gentle-2 {
+  animation: float-gentle-2 10s ease-in-out infinite 1s;
+}
+
+.animate-float-gentle-3 {
+  animation: float-gentle-3 12s ease-in-out infinite 2s;
+}
+
+/* Slow gradient flow for light mode background */
+@keyframes gradient-flow-slow {
+  0%, 100% { transform: translateX(-100%) rotate(0deg); }
+  50% { transform: translateX(100%) rotate(180deg); }
+}
+
+.animate-gradient-flow-slow {
+  animation: gradient-flow-slow 20s ease-in-out infinite;
+}
+
+/* Gentle bounce for background particles */
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 6s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 15s ease-in-out infinite;
+}
+
+/* Subtle scale animation */
+.group-hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+/* Ensure dark mode toggle is always visible and prominent */
+.dark-mode-toggle {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 100 !important;
+}
+
+/* Enhanced visibility for the toggle button */
+.dark-mode-toggle:hover {
+  transform: scale(1.1) translateY(-2px) !important;
+}
+
+/* Ensure proper stacking context */
+.header-controls {
+  position: relative;
+  z-index: 50;
 }

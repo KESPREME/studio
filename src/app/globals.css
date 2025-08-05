@@ -154,6 +154,14 @@ body {
   animation: rotate-slow 120s linear infinite;
 }
 
+.animate-rotate-medium {
+  animation: rotate-slow 80s linear infinite;
+}
+
+.animate-rotate-fast {
+  animation: rotate-slow 60s linear infinite;
+}
+
 .animate-counter-rotate {
   animation: counter-rotate 120s linear infinite;
 }

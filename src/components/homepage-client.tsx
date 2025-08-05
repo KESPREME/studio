@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
-import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity, Camera, Lock, ChevronRight, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity, ChevronRight } from 'lucide-react';
 import { ScrollReveal } from '@/components/scroll-reveal';
-import { SolarSystem } from '../components/solar-system';
+import { SolarSystem } from '@/components/solar-system';
 
 // Custom SVG Icon Components for a more unique look
 const IconRealTime = () => (
@@ -34,7 +34,7 @@ const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradien
   gradientTo: string,
   titleColor?: string
 }) => (
-  <ScrollReveal delay={delay} forceVisible={true}>
+  <ScrollReveal delay={delay}>
     <div className="group relative opacity-100 cursor-pointer card-spacing">
       {/* Very subtle layered gradient backgrounds */}
       <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur-sm opacity-5 group-hover:opacity-15 transition-all duration-1000`}></div>
@@ -65,7 +65,7 @@ const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradien
   </ScrollReveal>
 );
 
-export default function HomePage() {
+export default function HomepageClient() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -307,308 +307,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* How It Works Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
-          <div className="container px-4 md:px-6 mx-auto">
-            <ScrollReveal>
-              <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">A Simple, Lifesaving Process</h2>
-                  <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    Our streamlined three-step system ensures every report is handled with speed and care.
-                  </p>
-                </div>
-              </div>
-            </ScrollReveal>
-            <div className="mx-auto grid max-w-5xl items-start gap-16 py-12 lg:grid-cols-3 lg:gap-12 xl:gap-16 hover-container">
-              <FeatureCard
-                title="1. Report an Issue"
-                icon={<AlertTriangle className="h-8 w-8" />}
-                delay={0.1}
-                gradientFrom="from-red-500/20"
-                gradientTo="to-orange-500/20"
-                titleColor="!text-red-600 dark:!text-red-400"
-              >
-                See a hazard? Open the app, fill out a quick form with details, photo, and location. Your report is instantly logged.
-              </FeatureCard>
-              <FeatureCard
-                title="2. Team Dispatch"
-                icon={<ShieldCheck className="h-8 w-8" />}
-                delay={0.2}
-                gradientFrom="from-green-500/20"
-                gradientTo="to-emerald-500/20"
-                titleColor="!text-green-600 dark:!text-green-400"
-              >
-                The nearest NDRF team is immediately notified with all the details, ensuring a rapid and informed response.
-              </FeatureCard>
-              <FeatureCard
-                title="3. Resolution & Update"
-                icon={<UserCheck className="h-8 w-8" />}
-                delay={0.3}
-                gradientFrom="from-blue-500/20"
-                gradientTo="to-purple-500/20"
-                titleColor="!text-blue-600 dark:!text-blue-400"
-              >
-                The response team addresses the hazard, and the status is updated in real-time for everyone's awareness.
-              </FeatureCard>
-            </div>
-          </div>
-        </section>
-
-        {/* Why AlertFront Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-primary/5">
-          <div className="container px-4 md:px-6 mx-auto">
-            <ScrollReveal>
-              <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                <div className="space-y-2">
-                  <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm font-semibold shadow-sm">
-                    Core Features
-                  </div>
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Built for Safety and Speed</h2>
-                   <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    AlertFront provides the tools necessary for effective community hazard management.
-                  </p>
-                </div>
-              </div>
-            </ScrollReveal>
-            <div className="mx-auto grid max-w-6xl items-center gap-12 py-12 lg:grid-cols-3 lg:gap-12 xl:gap-16 hover-container">
-              <FeatureCard
-                title="Quick Reporting"
-                icon={<AlertTriangle className="h-8 w-8" />}
-                delay={0.3}
-                gradientFrom="from-red-500/20"
-                gradientTo="to-orange-500/20"
-                titleColor="!text-red-600 dark:!text-red-400"
-              >
-                Report hazards instantly with our streamlined interface. Upload photos, add descriptions, and pinpoint exact locations.
-              </FeatureCard>
-              <FeatureCard
-                title="Real-time Mapping"
-                icon={<Map className="h-8 w-8" />}
-                delay={0.4}
-                gradientFrom="from-blue-500/20"
-                gradientTo="to-cyan-500/20"
-                titleColor="!text-blue-600 dark:!text-blue-400"
-              >
-                View all reported incidents on an interactive map. Track patterns and stay informed about your area's safety status.
-              </FeatureCard>
-              <FeatureCard
-                title="Direct Response"
-                icon={<IconDirectLine />}
-                delay={0.5}
-                gradientFrom="from-green-500/20"
-                gradientTo="to-emerald-500/20"
-                titleColor="!text-green-600 dark:!text-green-400"
-              >
-                Your reports go directly to NDRF teams and local authorities for immediate action and coordinated response.
-              </FeatureCard>
-              <FeatureCard
-                title="Community Insights"
-                icon={<Users className="h-8 w-8" />}
-                delay={0.4}
-                gradientFrom="from-purple-500/20"
-                gradientTo="to-pink-500/20"
-                titleColor="!text-purple-600 dark:!text-purple-400"
-              >
-                Access AI-powered community safety insights, trends, and actionable recommendations based on collective data.
-              </FeatureCard>
-              <FeatureCard
-                title="Smart Alerts"
-                icon={<Target className="h-8 w-8" />}
-                delay={0.5}
-                gradientFrom="from-yellow-500/20"
-                gradientTo="to-orange-500/20"
-                titleColor="!text-orange-600 dark:!text-orange-400"
-              >
-                Receive intelligent notifications about hazards in your area and safety tips tailored to your location.
-              </FeatureCard>
-              <FeatureCard
-                title="Status Tracking"
-                icon={<Siren className="h-8 w-8" />}
-                delay={0.6}
-                gradientFrom="from-indigo-500/20"
-                gradientTo="to-purple-500/20"
-                titleColor="!text-indigo-600 dark:!text-indigo-400"
-              >
-                Follow the progress of your reported issue from submission to resolution in real-time.
-              </FeatureCard>
-            </div>
-          </div>
-        </section>
-
-        {/* Who We Help Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
-          <div className="container px-4 md:px-6 mx-auto">
-             <ScrollReveal>
-              <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Two Roles, One Mission</h2>
-                   <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    Whether you're a vigilant citizen or a dedicated responder, you have a vital part to play.
-                  </p>
-                </div>
-              </div>
-            </ScrollReveal>
-            <div className="mx-auto grid items-stretch gap-12 py-12 md:grid-cols-2 lg:gap-16 hover-container max-w-6xl">
-              <ScrollReveal delay={0.2}>
-                <div className="group relative opacity-100 cursor-pointer card-spacing">
-                  {/* Enhanced gradient background for both themes */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 to-cyan-500/15 dark:from-blue-400/30 dark:via-cyan-400/20 dark:to-purple-400/25 rounded-3xl blur-lg opacity-0 group-hover:opacity-30 dark:group-hover:opacity-40 transition-all duration-500"></div>
-
-                  {/* Light mode floating sparkles */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 dark:opacity-0 transition-opacity duration-700 rounded-3xl overflow-hidden">
-                    <div className="absolute top-4 left-6 w-1.5 h-1.5 bg-blue-400 rounded-full animate-float-1 shadow-sm"></div>
-                    <div className="absolute top-8 right-8 w-1 h-1 bg-cyan-400 rounded-full animate-float-2 shadow-sm"></div>
-                    <div className="absolute bottom-6 left-8 w-1 h-1 bg-indigo-400 rounded-full animate-float-3 shadow-sm"></div>
-                    <div className="absolute bottom-8 right-6 w-1.5 h-1.5 bg-purple-400 rounded-full animate-float-1 shadow-sm" style={{animationDelay: '1s'}}></div>
-                  </div>
-
-                  {/* Dark mode floating particles */}
-                  <div className="absolute inset-0 opacity-0 dark:group-hover:opacity-100 transition-opacity duration-700 rounded-3xl overflow-hidden">
-                    <div className="absolute top-4 left-6 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-float-1"></div>
-                    <div className="absolute top-8 right-8 w-1 h-1 bg-blue-300 rounded-full animate-float-2"></div>
-                    <div className="absolute bottom-6 left-8 w-1 h-1 bg-purple-300 rounded-full animate-float-3"></div>
-                    <div className="absolute bottom-8 right-6 w-1.5 h-1.5 bg-teal-300 rounded-full animate-float-1" style={{animationDelay: '1s'}}></div>
-                  </div>
-
-                  <div className="relative bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 group-hover:border-blue-400/50 dark:group-hover:border-cyan-400/40 group-hover:shadow-xl group-hover:shadow-blue-500/10 rounded-3xl p-8 transition-all duration-500 group-hover:bg-white/98 dark:group-hover:bg-slate-900/95 h-full flex flex-col min-h-[320px] overflow-hidden">
-                    <div className="flex flex-col items-center text-center space-y-6 h-full">
-                      <div className="relative p-4 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 dark:from-blue-400/30 dark:to-cyan-400/30 rounded-2xl group-hover:scale-105 group-hover:from-cyan-400/40 dark:group-hover:from-cyan-300/40 group-hover:to-blue-400/40 dark:group-hover:to-purple-400/40 transition-all duration-500 overflow-hidden flex-shrink-0">
-                        {/* Enhanced shine effect for dark theme */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-cyan-300/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
-                        <UserCheck className="h-10 w-10 text-white relative z-10 group-hover:text-cyan-100 dark:group-hover:text-cyan-200 transition-all duration-500" />
-                      </div>
-                      <div className="flex-grow flex flex-col justify-center space-y-6">
-                        <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 dark:group-hover:text-cyan-300 group-hover:scale-105 transition-all duration-500">
-                          Community Reporters
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-500 flex-grow flex items-center">
-                          As a community member, you are the first line of defense. Report hazards like fallen trees, flooding, or power outages to alert response teams and protect your neighbors.
-                        </p>
-                        <div className="pt-4">
-                          <Button asChild className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-500 group-hover:scale-105">
-                            <Link href="/report/new">Report an Issue</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-              <ScrollReveal delay={0.3}>
-                <div className="group relative opacity-100 cursor-pointer card-spacing">
-                  {/* Enhanced gradient background for both themes */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/15 to-red-500/15 dark:from-orange-400/30 dark:via-red-400/20 dark:to-pink-400/25 rounded-3xl blur-lg opacity-0 group-hover:opacity-30 dark:group-hover:opacity-40 transition-all duration-500"></div>
-
-                  {/* Light mode floating sparkles */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 dark:opacity-0 transition-opacity duration-700 rounded-3xl overflow-hidden">
-                    <div className="absolute top-4 left-6 w-1.5 h-1.5 bg-orange-400 rounded-full animate-float-1 shadow-sm"></div>
-                    <div className="absolute top-8 right-8 w-1 h-1 bg-red-400 rounded-full animate-float-2 shadow-sm"></div>
-                    <div className="absolute bottom-6 left-8 w-1 h-1 bg-pink-400 rounded-full animate-float-3 shadow-sm"></div>
-                    <div className="absolute bottom-8 right-6 w-1.5 h-1.5 bg-yellow-400 rounded-full animate-float-1 shadow-sm" style={{animationDelay: '1s'}}></div>
-                  </div>
-
-                  {/* Dark mode floating particles */}
-                  <div className="absolute inset-0 opacity-0 dark:group-hover:opacity-100 transition-opacity duration-700 rounded-3xl overflow-hidden">
-                    <div className="absolute top-4 left-6 w-1.5 h-1.5 bg-orange-300 rounded-full animate-float-1"></div>
-                    <div className="absolute top-8 right-8 w-1 h-1 bg-red-300 rounded-full animate-float-2"></div>
-                    <div className="absolute bottom-6 left-8 w-1 h-1 bg-pink-300 rounded-full animate-float-3"></div>
-                    <div className="absolute bottom-8 right-6 w-1.5 h-1.5 bg-yellow-300 rounded-full animate-float-1" style={{animationDelay: '1s'}}></div>
-                  </div>
-
-                  <div className="relative bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 group-hover:border-orange-400/50 dark:group-hover:border-orange-400/40 group-hover:shadow-xl group-hover:shadow-orange-500/10 rounded-3xl p-8 transition-all duration-500 group-hover:bg-white/98 dark:group-hover:bg-slate-900/95 h-full flex flex-col min-h-[320px] overflow-hidden">
-                    <div className="flex flex-col items-center text-center space-y-6 h-full">
-                      <div className="relative p-4 bg-gradient-to-br from-orange-500/20 to-red-500/20 dark:from-orange-400/30 dark:to-red-400/30 rounded-2xl group-hover:scale-105 group-hover:from-red-400/40 dark:group-hover:from-orange-300/40 group-hover:to-orange-400/40 dark:group-hover:to-pink-400/40 transition-all duration-500 overflow-hidden flex-shrink-0">
-                        {/* Enhanced shine effect for dark theme */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-orange-300/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
-                        <ShieldCheck className="h-10 w-10 text-white relative z-10 group-hover:text-orange-100 dark:group-hover:text-orange-200 transition-all duration-500" />
-                      </div>
-                      <div className="flex-grow flex flex-col justify-center space-y-6">
-                        <h3 className="text-2xl font-bold text-orange-600 dark:text-orange-400 dark:group-hover:text-orange-300 group-hover:scale-105 transition-all duration-500">
-                          NDRF Responders
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-500 flex-grow flex items-center">
-                          As an NDRF team member, you get a dedicated dashboard to view, manage, and track all reported incidents, enabling you to coordinate and dispatch resources effectively.
-                        </p>
-                        <div className="pt-4">
-                          <Button asChild className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-500 group-hover:scale-105">
-                            <Link href="/admin">Go to Dashboard</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-          </div>
-        </section>
-
-        {/* Enhanced Final CTA */}
-        <section className="w-full py-16 md:py-24 lg:py-32 relative overflow-hidden">
-          {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/60 to-purple-50/40 dark:from-slate-950 dark:via-blue-950/40 dark:to-purple-950/30"></div>
-
-          {/* Floating gradient orbs */}
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-
-          <div className="container px-4 md:px-6 mx-auto relative z-10">
-            <ScrollReveal>
-              <div className="max-w-4xl mx-auto text-center">
-                {/* Enhanced CTA Card */}
-                <div className="group relative">
-                  {/* Subtle background glow */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-
-                  <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/30 dark:border-slate-700/30 rounded-3xl p-12 md:p-16 shadow-2xl group-hover:shadow-3xl transition-all duration-700 group-hover:bg-white/95 dark:group-hover:bg-slate-900/95">
-                    <div className="space-y-8">
-                      <div className="space-y-6">
-                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl font-headline bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-500">
-                          Ready to Make Your Community Safer?
-                        </h2>
-                        <p className="mx-auto max-w-[700px] text-slate-600 dark:text-slate-300 md:text-xl lg:text-2xl leading-relaxed group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-500">
-                          Join AlertFront today. Your involvement is crucial for building a more resilient and secure environment for everyone.
-                        </p>
-                      </div>
-
-                      <div className="flex justify-center items-center pt-6">
-                        <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-110 text-lg px-12 py-6 rounded-2xl group-hover:animate-pulse relative overflow-hidden">
-                          <Link href="/login" className="flex items-center gap-3 relative z-10">
-                            <span className="font-semibold">Sign Up & Get Started</span>
-                            <ChevronRight className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
-                            {/* Enhanced shine effect */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
-                          </Link>
-                        </Button>
-                      </div>
-
-                      {/* Trust indicators */}
-                      <div className="pt-8 border-t border-slate-200/50 dark:border-slate-700/50">
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Trusted by communities nationwide</p>
-                        <div className="flex justify-center items-center gap-8 opacity-60 group-hover:opacity-80 transition-opacity duration-500">
-                          <div className="flex items-center gap-2">
-                            <ShieldCheck className="h-5 w-5 text-green-500" />
-                            <span className="text-sm font-medium">Secure</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Zap className="h-5 w-5 text-yellow-500" />
-                            <span className="text-sm font-medium">Fast Response</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Users className="h-5 w-5 text-blue-500" />
-                            <span className="text-sm font-medium">Community Driven</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
+        {/* Rest of the content will be added in the next part */}
       </main>
       <AppFooter />
     </div>

@@ -1,4 +1,4 @@
-// src/app/api/reports/cleanup/route.ts
+// app/api/reports/cleanup/route.ts
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     // 1. Find old, resolved reports
     const { data: reportsToDelete, error: fetchError } = await supabaseAdmin
         .from('reports')
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     if (!reportsToDelete || reportsToDelete.length === 0) {
       return NextResponse.json({ message: 'No old resolved reports to delete.' });
     }
-    
+
     const reportIdsToDelete = reportsToDelete.map(r => r.id);
     const imagePathsToDelete = reportsToDelete
         .map(r => r.imageUrl)

@@ -60,7 +60,7 @@ function SettingsPage() {
                     <Settings className="h-8 w-8 text-white animate-spin" style={{animationDuration: '3s'}} />
                   </div>
                 </div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent mb-4">
+                <h1 className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-4 drop-shadow-lg">
                   Account Settings
                 </h1>
                 <p className="text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
@@ -87,7 +87,7 @@ function SettingsPage() {
                   <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg">
                     <User className="h-5 w-5 text-white" />
                   </div>
-                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-bold">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold drop-shadow-sm">
                     Profile Information
                   </span>
                 </CardTitle>
@@ -186,7 +186,7 @@ function SettingsPage() {
                   <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
                     <Palette className="h-5 w-5 text-white" />
                   </div>
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
+                  <span className="text-blue-600 dark:text-blue-400 font-bold drop-shadow-sm">
                     Theme Preferences
                   </span>
                 </CardTitle>

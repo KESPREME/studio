@@ -1,4 +1,4 @@
-// src/app/api/auth/otp/verify/route.ts
+// app/api/auth/otp/verify/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkVerificationOtp } from '@/lib/sms';
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const { phone, code } = validation.data;
     const verificationCheck = await checkVerificationOtp(phone, code);
-    
+
     if (verificationCheck.status === 'approved') {
         return NextResponse.json({ message: 'OTP verified successfully.' });
     } else {

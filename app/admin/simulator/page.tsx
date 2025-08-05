@@ -152,7 +152,7 @@ function SimulatorPage() {
                     <AlertTriangle className="h-8 w-8 text-white animate-pulse" />
                   </div>
                 </div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                <h1 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-4 drop-shadow-lg">
                   AI Disaster Simulation Center
                 </h1>
                 <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
@@ -184,7 +184,7 @@ function SimulatorPage() {
                     <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
                       <AlertTriangle className="h-5 w-5 text-white" />
                     </div>
-                    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-bold">
+                    <span className="text-indigo-600 dark:text-indigo-400 font-bold drop-shadow-sm">
                       Simulation Settings
                     </span>
                   </CardTitle>
@@ -223,7 +223,7 @@ function SimulatorPage() {
                     <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg">
                       <MapPin className="h-5 w-5 text-white" />
                     </div>
-                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
+                    <span className="text-purple-600 dark:text-purple-400 font-bold drop-shadow-sm">
                       Live Simulation Map
                     </span>
                   </CardTitle>
@@ -251,7 +251,7 @@ function SimulatorPage() {
                       <div className="p-2 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl shadow-lg">
                         <FileText className="h-5 w-5 text-white" />
                       </div>
-                      <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-bold">
+                      <span className="text-pink-600 dark:text-pink-400 font-bold drop-shadow-sm">
                         Generated Reports ({reports.length})
                       </span>
                     </CardTitle>

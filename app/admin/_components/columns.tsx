@@ -1,4 +1,3 @@
-// src/app/admin/_components/columns.tsx
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
@@ -100,8 +99,8 @@ export const getColumns = ({ onStatusChange, onDelete }: ColumnsProps): ColumnDe
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>Update Status</DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                 <DropdownMenuRadioGroup 
-                    value={report.status} 
+                 <DropdownMenuRadioGroup
+                    value={report.status}
                     onValueChange={(value) => onStatusChange(report.id, value as Status)}
                   >
                     <DropdownMenuRadioItem value="New">New</DropdownMenuRadioItem>

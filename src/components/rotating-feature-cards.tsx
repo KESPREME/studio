@@ -162,7 +162,7 @@ export function RotatingFeatureCards() {
       <RotatingFeatureCard
         title="Real-Time Updates"
         icon={<IconRealTime />}
-        delay={0.2}
+        delay={0.3}
         gradientFrom="from-blue-500/20"
         gradientTo="to-cyan-500/20"
         position={cardPositions[1]}
@@ -174,7 +174,7 @@ export function RotatingFeatureCards() {
       <RotatingFeatureCard
         title="Direct Communication"
         icon={<IconDirectLine />}
-        delay={0.3}
+        delay={0.5}
         gradientFrom="from-green-500/20"
         gradientTo="to-emerald-500/20"
         position={cardPositions[2]}
@@ -186,7 +186,7 @@ export function RotatingFeatureCards() {
       <RotatingFeatureCard
         title="Photo Documentation"
         icon={<Globe className="h-8 w-8" />}
-        delay={0.4}
+        delay={0.7}
         gradientFrom="from-blue-500/20"
         gradientTo="to-cyan-500/20"
         position={cardPositions[3]}
@@ -198,7 +198,7 @@ export function RotatingFeatureCards() {
       <RotatingFeatureCard
         title="GPS Location"
         icon={<Map className="h-8 w-8" />}
-        delay={0.5}
+        delay={0.9}
         gradientFrom="from-emerald-500/20"
         gradientTo="to-green-500/20"
         position={cardPositions[4]}
@@ -210,7 +210,7 @@ export function RotatingFeatureCards() {
       <RotatingFeatureCard
         title="Team Coordination"
         icon={<Users className="h-8 w-8" />}
-        delay={0.6}
+        delay={1.1}
         gradientFrom="from-purple-500/20"
         gradientTo="to-pink-500/20"
         position={cardPositions[5]}
