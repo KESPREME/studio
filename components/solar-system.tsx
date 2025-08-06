@@ -96,7 +96,7 @@ export function SolarSystem() {
         const startAngle = startAngles[index];
         
         return (
-          <div 
+          <div
             key={card.id}
             className={`absolute top-1/2 left-1/2 animate-orbit-${index + 1}`}
             style={{
@@ -107,7 +107,7 @@ export function SolarSystem() {
           >
             <div className="group relative -translate-x-1/2 -translate-y-1/2">
               <div
-                className={`absolute -inset-2 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700 bg-gradient-to-r ${card.gradientFrom}/10 to-${card.gradientTo.split('to-')[1]}/10`}
+                className={`absolute -inset-2 rounded-2xl blur-sm opacity-60 group-hover:opacity-80 transition-all duration-700 bg-gradient-to-r ${card.gradientFrom}/10 ${card.gradientTo}/10`}
               />
               <div
                 className={`card-3d relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-3 sm:p-4 rounded-xl shadow-lg border ${card.borderColor} hover:scale-110 transition-all duration-500 w-56 sm:w-64 ${card.hoverShadow}`}

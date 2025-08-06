@@ -21,6 +21,7 @@ export default {
     // Gradient animations
     'animate-gradient-flow-x', 'animate-gradient-flow-y', 'animate-gradient-rotate',
     'animate-shimmer', 'animate-glow-pulse', 'animate-bounce-gentle',
+    'animate-rgb-cycle', 'animate-rainbow-glow',
   ],
   theme: {
     extend: {

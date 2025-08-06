@@ -150,26 +150,26 @@ body {
   }
 }
 
-/* Solar System Animation Keyframes - Mathematically collision-free */
+/* Solar System Animation Keyframes - Pro-3 Style with dynamic radii */
 @keyframes orbit-1 {
-  from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
 }
 @keyframes orbit-2 {
-  from { transform: rotate(72deg) translateX(220px) rotate(-72deg); }
-  to { transform: rotate(432deg) translateX(220px) rotate(-432deg); }
+  from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
 }
 @keyframes orbit-3 {
-  from { transform: rotate(144deg) translateX(290px) rotate(-144deg); }
-  to { transform: rotate(504deg) translateX(290px) rotate(-504deg); }
+  from { transform: rotate(0deg) translateX(240px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(240px) rotate(-360deg); }
 }
 @keyframes orbit-4 {
-  from { transform: rotate(216deg) translateX(360px) rotate(-216deg); }
-  to { transform: rotate(576deg) translateX(360px) rotate(-576deg); }
+  from { transform: rotate(0deg) translateX(300px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(300px) rotate(-360deg); }
 }
 @keyframes orbit-5 {
-  from { transform: rotate(288deg) translateX(430px) rotate(-288deg); }
-  to { transform: rotate(648deg) translateX(430px) rotate(-648deg); }
+  from { transform: rotate(0deg) translateX(360px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(360px) rotate(-360deg); }
 }
 
 /* Animation Classes - Prime number durations prevent collisions */
@@ -515,4 +515,83 @@ body {
 .header-controls {
   position: relative;
   z-index: 50;
+}
+
+/* Enhanced animations from pro-3 */
+
+/* Gradient rotation animation */
+@keyframes gradient-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-gradient-rotate {
+  animation: gradient-rotate 8s linear infinite;
+}
+
+
+
+/* Enhanced mouse-following gradient effects */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+/* Card spacing utility */
+.card-spacing {
+  margin-bottom: 1.5rem;
+}
+
+/* Status indicator animation */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-indicator {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* RGB Cycling Glow Animation */
+@keyframes rgb-cycle {
+  0% {
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #ef4444);
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    filter: hue-rotate(90deg);
+  }
+  50% {
+    filter: hue-rotate(180deg);
+  }
+  75% {
+    filter: hue-rotate(270deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+.animate-rgb-cycle {
+  animation: rgb-cycle 3s ease-in-out infinite;
+}
+
+/* Enhanced RGB glow with multiple colors */
+@keyframes rainbow-glow {
+  0% { box-shadow: 0 0 20px #3b82f6, 0 0 40px #3b82f6, 0 0 60px #3b82f6; }
+  16% { box-shadow: 0 0 20px #8b5cf6, 0 0 40px #8b5cf6, 0 0 60px #8b5cf6; }
+  32% { box-shadow: 0 0 20px #ec4899, 0 0 40px #ec4899, 0 0 60px #ec4899; }
+  48% { box-shadow: 0 0 20px #ef4444, 0 0 40px #ef4444, 0 0 60px #ef4444; }
+  64% { box-shadow: 0 0 20px #f97316, 0 0 40px #f97316, 0 0 60px #f97316; }
+  80% { box-shadow: 0 0 20px #eab308, 0 0 40px #eab308, 0 0 60px #eab308; }
+  96% { box-shadow: 0 0 20px #22c55e, 0 0 40px #22c55e, 0 0 60px #22c55e; }
+  100% { box-shadow: 0 0 20px #06b6d4, 0 0 40px #06b6d4, 0 0 60px #06b6d4; }
+}
+
+.animate-rainbow-glow {
+  animation: rainbow-glow 4s ease-in-out infinite;
 }

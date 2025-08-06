@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { AppFooter } from '@/components/app-footer';
-import { AnimatedButton } from '@/components/animated-button';
-import { FloatingElementsBlue } from '@/components/floating-elements';
-import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity, Camera, Lock, ChevronRight, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Map, AlertTriangle, UserCheck, Users, Target, Siren, Zap, Globe, Activity, ChevronRight } from 'lucide-react';
 import { ScrollReveal } from '@/components/scroll-reveal';
 import { SolarSystem } from '../components/solar-system';
 
@@ -36,7 +34,7 @@ const FeatureCard = ({ icon, title, children, delay = 0.1, gradientFrom, gradien
   gradientTo: string,
   titleColor?: string
 }) => (
-  <ScrollReveal delay={delay} forceVisible={true}>
+  <ScrollReveal delay={delay}>
     <div className="group relative opacity-100 cursor-pointer card-spacing">
       {/* Very subtle layered gradient backgrounds */}
       <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-3xl blur-sm opacity-5 group-hover:opacity-15 transition-all duration-1000`}></div>
@@ -104,7 +102,6 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden">
-      <FloatingElementsBlue />
       {/* Enhanced mouse-following gradient for both themes */}
       <div
         className="fixed inset-0 -z-10 pointer-events-none transition-opacity duration-1000 opacity-15 dark:opacity-25"
@@ -122,14 +119,14 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-purple-50/30"></div>
         <div className="absolute inset-0 bg-gradient-to-tl from-green-50/40 via-transparent to-blue-50/40 animate-gradient-flow-slow"></div>
 
-        {/* Gentle floating particles for light mode - Optimized */}
+        {/* Gentle floating particles for light mode */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-0.5 h-0.5 bg-blue-400/15 rounded-full animate-bounce-gentle" style={{ animationDelay: '0s', animationDuration: '8s' }}></div>
-          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400/12 rounded-full animate-bounce-gentle" style={{ animationDelay: '5s', animationDuration: '10s' }}></div>
-          <div className="absolute bottom-1/3 left-1/3 w-0.5 h-0.5 bg-green-400/18 rounded-full animate-bounce-gentle" style={{ animationDelay: '10s', animationDuration: '12s' }}></div>
-          <div className="absolute top-1/2 right-1/3 w-0.5 h-0.5 bg-orange-400/15 rounded-full animate-bounce-gentle" style={{ animationDelay: '7s', animationDuration: '9s' }}></div>
-          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-cyan-400/12 rounded-full animate-bounce-gentle" style={{ animationDelay: '3s', animationDuration: '11s' }}></div>
-          <div className="absolute top-1/3 left-3/4 w-0.5 h-0.5 bg-pink-400/15 rounded-full animate-bounce-gentle" style={{ animationDelay: '12s', animationDuration: '13s' }}></div>
+          <div className="absolute top-1/4 left-1/4 w-0.5 h-0.5 bg-blue-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400/25 rounded-full animate-bounce-gentle" style={{ animationDelay: '5s' }}></div>
+          <div className="absolute bottom-1/3 left-1/3 w-0.5 h-0.5 bg-green-400/35 rounded-full animate-bounce-gentle" style={{ animationDelay: '10s' }}></div>
+          <div className="absolute top-1/2 right-1/3 w-0.5 h-0.5 bg-orange-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: '7s' }}></div>
+          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-cyan-400/25 rounded-full animate-bounce-gentle" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/3 left-3/4 w-0.5 h-0.5 bg-pink-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: '12s' }}></div>
         </div>
       </div>
       {/* Subtle and Elegant Animated Background */}
